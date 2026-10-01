@@ -36,12 +36,11 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 * Role: Developer
 * Responsibilities: Adding features
 
-### Jean Doe
+### Hannes Chan
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/penguinsgowild.png" width="200px">
 
-[[github](http://github.com/johndoe)]
-[[portfolio](team/johndoe.md)]
+[[github](https://github.com/penguinsgowild)]
 
 * Role: Developer
 * Responsibilities: Dev Ops + Threading
