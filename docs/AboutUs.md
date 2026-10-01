@@ -27,14 +27,14 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 * Role: Developer
 * Responsibilities: UI
 
-### Johnny Doe
+### Advait Phadnis
 
-<img src="images/johndoe.png" width="200px">
+<img src="images/advaitio.png" width="200px">
 
-[[github](http://github.com/johndoe)] [[portfolio](team/johndoe.md)]
+[[github](https://github.com/advaitio)]
 
 * Role: Developer
-* Responsibilities: Data
+* Responsibilities: Adding features
 
 ### Jean Doe
 
