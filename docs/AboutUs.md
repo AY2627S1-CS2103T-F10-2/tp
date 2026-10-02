@@ -15,8 +15,8 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 [[github](https://github.com/Mimbao)]
 
-* Role: Team Member
-* Responsibilities: add features, manage team repo, keep everyone on schedule
+* Role: Developer
+* Responsibilities: Add features
 
 ### Aanya Yaduvanshi
 
