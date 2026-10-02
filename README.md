@@ -1,14 +1,30 @@
-[![CI Status](https://github.com/se-edu/addressbook-level3/workflows/Java%20CI/badge.svg)](https://github.com/se-edu/addressbook-level3/actions)
+[![CI Status](https://github.com/AY2627S1-CS2103T-F10-2/tp/actions/workflows/gradle.yml/badge.svg)](https://github.com/AY2627S1-CS2103T-F10-2/tp/actions/workflows/gradle.yml)
 
-![Ui](docs/images/Ui.png)
+![Aiken Duet UI](docs/images/Ui.png)
 
-* This is **a sample project for Software Engineering (SE) students**.<br>
-  Example usages:
-  * as a starting point of a course project (as opposed to writing everything from scratch)
-  * as a case study
-* The project simulates an ongoing software project for a desktop application (called _AddressBook_) used for managing contact details.
-  * It is **written in an object-oriented programming (OOP) style** and provides a **reasonably well-written** codebase of about 6 KLoC. It is **larger** than what students typically write in beginner-level software-engineering modules, without being overwhelming.
-  * It comes with a **reasonable level of user and developer documentation**.
-* It is named `AddressBook Level 3` (`AB3` for short) because it was initially created as a part of a series of `AddressBook` projects (`Level 1`, `Level 2`, `Level 3` ...).
-* For the detailed documentation of this project, see the **[Address Book Product Website](https://se-education.org/addressbook-level3)**.
-* This project is a **part of the se-education.org** initiative. If you would like to contribute code to this project, see [se-education.org](https://se-education.org/#contributing-to-se-edu) for more info.
+# Aiken Duet
+
+Aiken Duet is a desktop application that helps teaching assistants manage classes, tutorial groups, students, and teaching-related observations. It is designed for fast keyboard-driven interaction through a command-line interface, with a graphical interface that makes class and student information easy to browse.
+
+## Features
+
+* Create and view classes with course codes and tags.
+* Add students to specific tutorial, laboratory, or recitation groups.
+* Search for students and classes using names, telehandles, matriculation numbers, or class groups.
+* Record timestamped teaching notes for a student in a particular class group.
+* Remove a student from one class group without deleting their other class enrolments.
+* Store data locally so class information remains available between sessions.
+
+## Getting started
+
+1. Download the latest release from the [releases page](https://github.com/AY2627S1-CS2103T-F10-2/tp/releases).
+2. Run the downloaded JAR file with `java -jar aiken-duet.jar`.
+3. Type `help` in the command box to see the available commands.
+
+## Documentation
+
+* [User Guide](https://AY2627S1-CS2103T-F10-2.github.io/tp/UserGuide.html)
+* [Developer Guide](https://AY2627S1-CS2103T-F10-2.github.io/tp/DeveloperGuide.html)
+* [About Us](https://AY2627S1-CS2103T-F10-2.github.io/tp/AboutUs.html)
+
+This project is based on the AddressBook-Level3 project created by the [SE-EDU initiative](https://se-education.org).
