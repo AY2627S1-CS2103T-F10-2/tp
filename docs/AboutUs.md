@@ -11,12 +11,12 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 ### Jeng Han
 
-<img src="images/jenghan.png" width="200px">
+<img src="images/mimbao.png" width="200px">
 
 [[github](https://github.com/Mimbao)]
 
-* Role: Team Member
-* Responsibilities: add features, manage team repo, keep everyone on schedule
+* Role: Developer
+* Responsibilities: Add features
 
 ### Aanya Yaduvanshi
 
