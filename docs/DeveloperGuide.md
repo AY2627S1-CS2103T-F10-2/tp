@@ -261,29 +261,33 @@ _{Explain here how the data archiving feature will be implemented}_
 
 **Target user profile**:
 
-* has a need to manage a significant number of contacts
-* prefers desktop apps over other types of applications
-* can type fast
-* prefers typing to mouse interactions
-* is reasonably comfortable using CLI apps
+* is a teaching assistant who manages students across multiple classes and class groups
+* needs to retrieve student information and record teaching observations quickly
+* prefers a desktop application that stores teaching data locally
+* can type quickly and is comfortable using CLI-style commands
 
-**Value proposition**: Manage contacts faster than with a typical mouse-driven GUI application.
+**Value proposition**: Aiken Duet helps teaching assistants manage classes, student enrolments, and teaching observations efficiently, with fast keyboard-driven access to information across multiple class groups.
 
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …​                                    | I want to …​                     | So that I can…​                                                        |
-| -------- | ------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------- |
-| `* * *`  | new user                                   | see usage instructions         | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person               |                                                                        |
-| `* * *`  | user                                       | delete a person                | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name          | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details   | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name           | locate a person easily                                                 |
-
-*{More to be added}*
+| Priority | As a …​ | I want to …​ | So that I can…​ |
+| -------- | ------- | ------------- | ---------------- |
+| `* * *` | new teaching assistant | view usage instructions | learn or recall the available commands |
+| `* * *` | teaching assistant | add a class with its course code | manage the students taking that class |
+| `* * *` | teaching assistant | add a student to a specific class group | track the student's enrolment accurately |
+| `* * *` | teaching assistant | list the students in a class group | prepare for and manage a teaching session |
+| `* * *` | teaching assistant | find a student using a name, matriculation number, or telehandle | retrieve the correct student's information quickly |
+| `* * *` | teaching assistant | record a timestamped observation for a student in a specific class group | retain relevant teaching notes and context |
+| `* * *` | teaching assistant | view a student's teaching observations | review the student's progress and past interactions |
+| `* * *` | teaching assistant | remove a student from one class group without deleting other enrolments | keep enrolment records accurate across classes |
+| `* *` | teaching assistant | edit a student's details | correct outdated or inaccurate information |
+| `* *` | teaching assistant | assign tags to a class | categorize classes in a way that suits my workflow |
+| `* *` | teaching assistant | find classes by course code or tag | locate the class I need without scanning the full list |
+| `* *` | teaching assistant | edit or remove an incorrect teaching observation | keep the student's record accurate |
+| `*` | teaching assistant | archive a completed class | keep current classes uncluttered without losing historical records |
 
 ### Use cases
 
@@ -316,16 +320,23 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ### Non-Functional Requirements
 
-1.  Should work on any _mainstream OS_ as long as it has Java `25` or above installed.
-2.  Should be able to hold up to 1000 persons without noticeable sluggishness in performance for typical usage.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
-
-*{More to be added}*
+1. Aiken Duet should work on any _mainstream OS_ with Java `25` or later installed.
+2. Aiken Duet should respond to add, edit, delete, list, and find commands within 2 seconds when storing up to 100 classes and 1,000 students on a typical laptop.
+3. A teaching assistant who is familiar with CLI applications should be able to create a class, add a student, find that student, and record an observation within 15 minutes of first using Aiken Duet with the User Guide available.
+4. Aiken Duet should store its data locally and should not transmit student information over a network unless the user explicitly initiates such an operation.
+5. Invalid commands should not modify existing class, student, enrolment, or teaching-observation data, and should not cause Aiken Duet to terminate unexpectedly.
 
 ### Glossary
 
-* **Mainstream OS**: Windows, Linux, Unix, or macOS
-* **Private contact detail**: A contact detail that is not meant to be shared with others
+* **Class**: A course offering managed in Aiken Duet and identified by a course code.
+* **Class group**: A tutorial, laboratory, or recitation group belonging to a class.
+* **Class tag**: A user-defined label used to categorize a class.
+* **Enrolment**: The association between a student and a class group.
+* **Mainstream OS**: Windows, Linux, Unix, or macOS.
+* **Student**: A learner whose details, class-group enrolments, and teaching observations are managed in Aiken Duet.
+* **Teaching observation**: A timestamped note about a student in the context of a specific class group.
+* **Telehandle**: A student's username on a messaging platform used for communication.
+* **Typical laptop**: A computer with at least a 2 GHz dual-core processor and 8 GB of RAM.
 
 --------------------------------------------------------------------------------------------------------------------
 
