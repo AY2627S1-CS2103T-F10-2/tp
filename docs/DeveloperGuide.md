@@ -271,23 +271,38 @@ _{Explain here how the data archiving feature will be implemented}_
 
 ### User stories
 
-Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
+Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 | Priority | As a …​ | I want to …​ | So that I can…​ |
 | -------- | ------- | ------------- | ---------------- |
-| `* * *` | new teaching assistant | view usage instructions | learn or recall the available commands |
-| `* * *` | teaching assistant | add a class with its course code | manage the students taking that class |
-| `* * *` | teaching assistant | add a student to a specific class group | track the student's enrolment accurately |
-| `* * *` | teaching assistant | list the students in a class group | prepare for and manage a teaching session |
-| `* * *` | teaching assistant | find a student using a name, matriculation number, or telehandle | retrieve the correct student's information quickly |
-| `* * *` | teaching assistant | record a timestamped observation for a student in a specific class group | retain relevant teaching notes and context |
-| `* * *` | teaching assistant | view a student's teaching observations | review the student's progress and past interactions |
-| `* * *` | teaching assistant | remove a student from one class group without deleting other enrolments | keep enrolment records accurate across classes |
-| `* *` | teaching assistant | edit a student's details | correct outdated or inaccurate information |
-| `* *` | teaching assistant | assign tags to a class | categorize classes in a way that suits my workflow |
-| `* *` | teaching assistant | find classes by course code or tag | locate the class I need without scanning the full list |
-| `* *` | teaching assistant | edit or remove an incorrect teaching observation | keep the student's record accurate |
-| `*` | teaching assistant | archive a completed class | keep current classes uncluttered without losing historical records |
+| `* * *` | teaching assistant | add a student | keep track of students in my class |
+| `* * *` | teaching assistant | view all my students in a list | see who I am managing |
+| `* * *` | teaching assistant | search for a student by name | quickly retrieve their details |
+| `* * *` | teaching assistant | edit a student's details | keep their information up to date |
+| `* * *` | teaching assistant | add a note about a student | remember important teaching-related observations |
+| `* *` | teaching assistant | delete a student | remove students I no longer manage |
+| `* *` | teaching assistant | undo a deletion of a student | undo the removal of a student I made by mistake |
+| `* *` | teaching assistant | view an individual's homework | grade their work |
+| `* *` | teaching assistant | view an individual's progress | monitor their efforts |
+| `* *` | teaching assistant | schedule consultation slots | organize meetings with my students |
+| `* *` | teaching assistant | view students who were absent from a class | identify students who may need a follow-up |
+| `* *` | teaching assistant | view all students in a specific tutorial or lab group | manage one class at a time |
+| `* *` | teaching assistant | record a student's attendance for a class | keep track of their attendance history |
+| `* *` | teaching assistant | record a student's participation in class | keep track of their engagement |
+| `* *` | teaching assistant | view students with incomplete assignments | identify who may need reminders |
+| `* *` | teaching assistant | record the date and topic of a consultation | remember what was discussed with a student |
+| `* *` | teaching assistant | view a student's previous consultations | prepare for them |
+| `* *` | teaching assistant | mark pending follow-up tasks as completed | keep track of outstanding work |
+| `* *` | teaching assistant | view a summary of a tutorial group | quickly understand its overall attendance, participation, and assignment status |
+| `*` | teaching assistant | archive my previous tasks | keep my list clean |
+| `*` | teaching assistant | view archived tasks | look back at my history if needed |
+| `*` | teaching assistant | see students who may be falling behind | follow up with them |
+| `*` | teaching assistant | set repeating weekly tasks | avoid recreating routine duties each week |
+| `*` | teaching assistant | tag tasks by assignment or exam name | organize duties by course milestones |
+| `*` | teaching assistant | set priority levels for tasks | focus on time-sensitive duties such as exam preparation first |
+| `*` | teaching assistant | view my tasks in a calendar | see how course duties overlap with my own academic exam schedule |
+| `*` | teaching assistant | log the estimated and actual hours spent on each task | stay within my contracted weekly hours limit |
+| `*` | teaching assistant | transfer an assigned task to another teaching assistant with an explanation | ensure it is completed if an emergency prevents me from doing it |
 
 ### Use cases
 
@@ -331,9 +346,14 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * **Class**: A course offering managed in Aiken Duet and identified by a course code.
 * **Class group**: A tutorial, laboratory, or recitation group belonging to a class.
 * **Class tag**: A user-defined label used to categorize a class.
+* **Consultation**: A scheduled meeting between a teaching assistant and a student, together with any recorded date and topic.
 * **Enrolment**: The association between a student and a class group.
+* **Follow-up task**: An action that a teaching assistant needs to complete after a class, consultation, or student interaction.
+* **Homework**: Work assigned to an individual student for completion outside class.
 * **Mainstream OS**: Windows, Linux, Unix, or macOS.
+* **Participation**: A record of a student's engagement during a class.
 * **Student**: A learner whose details, class-group enrolments, and teaching observations are managed in Aiken Duet.
+* **Task**: A teaching-related duty tracked by a teaching assistant, which may have a status, priority, schedule, tag, or time record.
 * **Teaching observation**: A timestamped note about a student in the context of a specific class group.
 * **Telehandle**: A student's username on a messaging platform used for communication.
 * **Typical laptop**: A computer with at least a 2 GHz dual-core processor and 8 GB of RAM.
