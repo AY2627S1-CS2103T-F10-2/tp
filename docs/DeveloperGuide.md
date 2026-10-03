@@ -275,13 +275,17 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 | Priority | As a …​ | I want to …​ | So that I can…​ |
 | -------- | ------- | ------------- | ---------------- |
+| `* * *` | teaching assistant | add a class | add students to it |
 | `* * *` | teaching assistant | add a student | keep track of students in my class |
 | `* * *` | teaching assistant | view all my students in a list | see who I am managing |
 | `* * *` | teaching assistant | search for a student by name | quickly retrieve their details |
+| `* * *` | teaching assistant | search for a class by name | quickly retrieve its details |
 | `* * *` | teaching assistant | edit a student's details | keep their information up to date |
 | `* * *` | teaching assistant | add a note about a student | remember important teaching-related observations |
 | `* *` | teaching assistant | delete a student | remove students I no longer manage |
+| `* *` | teaching assistant | delete a class | remove classes I no longer manage |
 | `* *` | teaching assistant | undo a deletion of a student | undo the removal of a student I made by mistake |
+| `* *` | teaching assistant | undo a deletion of a class | undo the removal of a class I made by mistake |
 | `* *` | teaching assistant | view an individual's homework | grade their work |
 | `* *` | teaching assistant | view an individual's progress | monitor their efforts |
 | `* *` | teaching assistant | schedule consultation slots | organize meetings with my students |
