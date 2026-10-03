@@ -321,7 +321,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * 3d2. Aiken Duet confirms the addition.
   * Use case ends.
 
-#### UC02 — Record a teaching observation
+#### UC02 — Add a note about a student
 
 **System:** Aiken Duet
 
@@ -329,10 +329,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS:**
 
-1. The Teaching Assistant requests to record a teaching observation.
-2. Aiken Duet requests the student, class group, and observation details.
+1. The Teaching Assistant requests to add a note about a student.
+2. Aiken Duet requests the student and note details.
 3. The Teaching Assistant provides the requested details.
-4. Aiken Duet records the observation with a timestamp and confirms the addition.
+4. Aiken Duet adds the note to the student's record and confirms the addition.
 
    Use case ends.
 
@@ -344,14 +344,11 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * 3a3. The Teaching Assistant provides new details.
   * Steps 3a1–3a3 are repeated until the details are valid.
   * Use case resumes from step 4.
-* 3b. The specified student or class group does not exist.
-  * 3b1. Aiken Duet informs the Teaching Assistant which record cannot be found.
-  * Use case ends.
-* 3c. The student is not enrolled in the specified class group.
-  * 3c1. Aiken Duet informs the Teaching Assistant that the student is not enrolled in that class group.
+* 3b. The specified student does not exist.
+  * 3b1. Aiken Duet informs the Teaching Assistant that the student cannot be found.
   * Use case ends.
 
-#### UC03 — Search for a student or class
+#### UC03 — Search for a student
 
 **System:** Aiken Duet
 
@@ -359,10 +356,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS:**
 
-1. The Teaching Assistant requests to search for a student or class.
+1. The Teaching Assistant requests to search for a student.
 2. Aiken Duet requests a search keyword.
 3. The Teaching Assistant provides a keyword.
-4. Aiken Duet displays the matching records with sufficient details to distinguish them.
+4. Aiken Duet displays the matching students with sufficient details to distinguish them.
 
    Use case ends.
 
@@ -375,23 +372,23 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * Steps 3a1–3a3 are repeated until the keyword is valid.
   * Use case resumes from step 4.
 * 4a. No matching record is found.
-  * 4a1. Aiken Duet informs the Teaching Assistant that no matching student or class was found.
+  * 4a1. Aiken Duet informs the Teaching Assistant that no matching student was found.
   * Use case ends.
 
-#### UC04 — Remove a student from a class group
+#### UC04 — Delete a student
 
 **System:** Aiken Duet
 
 **Actor:** Teaching Assistant
 
-**Guarantee:** The student's record and enrolments in other class groups remain unchanged.
-
 **MSS:**
 
-1. The Teaching Assistant requests to remove a student from a class group.
-2. Aiken Duet requests the student and class-group details.
+1. The Teaching Assistant requests to delete a student.
+2. Aiken Duet requests the student details.
 3. The Teaching Assistant provides the requested details.
-4. Aiken Duet removes the specified enrolment and confirms the removal.
+4. Aiken Duet displays the matching student and requests confirmation.
+5. The Teaching Assistant confirms the deletion.
+6. Aiken Duet deletes the student record and confirms the deletion.
 
    Use case ends.
 
@@ -403,11 +400,11 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
   * 3a3. The Teaching Assistant provides new details.
   * Steps 3a1–3a3 are repeated until the details are valid.
   * Use case resumes from step 4.
-* 3b. The specified student or class group does not exist.
-  * 3b1. Aiken Duet informs the Teaching Assistant which record cannot be found.
+* 4a. The specified student does not exist.
+  * 4a1. Aiken Duet informs the Teaching Assistant that the student cannot be found.
   * Use case ends.
-* 3c. The student is not enrolled in the specified class group.
-  * 3c1. Aiken Duet informs the Teaching Assistant that no such enrolment exists.
+* 5a. The Teaching Assistant cancels the deletion.
+  * 5a1. Aiken Duet confirms that the student record was not changed.
   * Use case ends.
 
 ### Non-Functional Requirements
