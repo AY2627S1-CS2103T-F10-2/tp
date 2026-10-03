@@ -306,32 +306,125 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 ### Use cases
 
-(For all use cases below, the **System** is the `AddressBook` and the **Actor** is the `user`, unless specified otherwise)
+#### UC01 — Add a student to a class group
 
-**Use case: Delete a person**
+**System:** Aiken Duet
 
-**MSS**
+**Actor:** Teaching Assistant
 
-1.  User requests to list persons
-2.  AddressBook shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
+**MSS:**
 
-    Use case ends.
+1. The Teaching Assistant requests to add a student to a class group.
+2. Aiken Duet requests the student details and class group.
+3. The Teaching Assistant provides the requested details.
+4. Aiken Duet creates the student record, enrols the student in the specified class group, and confirms the addition.
 
-**Extensions**
+   Use case ends.
 
-* 2a. The list is empty.
+**Extensions:**
 
-  Use case ends.
+* 3a. Aiken Duet detects an error in the provided details.
+  * 3a1. Aiken Duet informs the Teaching Assistant of the error.
+  * 3a2. Aiken Duet requests the correct details.
+  * 3a3. The Teaching Assistant provides new details.
+  * Steps 3a1–3a3 are repeated until the details are valid.
+  * Use case resumes from step 4.
+* 3b. The specified class group does not exist.
+  * 3b1. Aiken Duet informs the Teaching Assistant that the class group cannot be found.
+  * Use case ends.
+* 3c. The student is already enrolled in the specified class group.
+  * 3c1. Aiken Duet informs the Teaching Assistant that the enrolment already exists.
+  * Use case ends.
+* 3d. The student already exists but is not enrolled in the specified class group.
+  * 3d1. Aiken Duet enrols the existing student in the specified class group.
+  * 3d2. Aiken Duet confirms the addition.
+  * Use case ends.
 
-* 3a. The given index is invalid.
+#### UC02 — Add a note about a student
 
-    * 3a1. AddressBook shows an error message.
+**System:** Aiken Duet
 
-      Use case resumes at step 2.
+**Actor:** Teaching Assistant
 
-*{More to be added}*
+**MSS:**
+
+1. The Teaching Assistant requests to add a note about a student.
+2. Aiken Duet requests the student and note details.
+3. The Teaching Assistant provides the requested details.
+4. Aiken Duet adds the note to the student's record and confirms the addition.
+
+   Use case ends.
+
+**Extensions:**
+
+* 3a. Aiken Duet detects an error in the provided details.
+  * 3a1. Aiken Duet informs the Teaching Assistant of the error.
+  * 3a2. Aiken Duet requests the correct details.
+  * 3a3. The Teaching Assistant provides new details.
+  * Steps 3a1–3a3 are repeated until the details are valid.
+  * Use case resumes from step 4.
+* 3b. The specified student does not exist.
+  * 3b1. Aiken Duet informs the Teaching Assistant that the student cannot be found.
+  * Use case ends.
+
+#### UC03 — Search for a student
+
+**System:** Aiken Duet
+
+**Actor:** Teaching Assistant
+
+**MSS:**
+
+1. The Teaching Assistant requests to search for a student.
+2. Aiken Duet requests a search keyword.
+3. The Teaching Assistant provides a keyword.
+4. Aiken Duet displays the matching students with sufficient details to distinguish them.
+
+   Use case ends.
+
+**Extensions:**
+
+* 3a. The Teaching Assistant provides an empty keyword.
+  * 3a1. Aiken Duet informs the Teaching Assistant that the keyword cannot be empty.
+  * 3a2. Aiken Duet requests a new keyword.
+  * 3a3. The Teaching Assistant provides a new keyword.
+  * Steps 3a1–3a3 are repeated until the keyword is valid.
+  * Use case resumes from step 4.
+* 4a. No matching record is found.
+  * 4a1. Aiken Duet informs the Teaching Assistant that no matching student was found.
+  * Use case ends.
+
+#### UC04 — Delete a student
+
+**System:** Aiken Duet
+
+**Actor:** Teaching Assistant
+
+**MSS:**
+
+1. The Teaching Assistant requests to delete a student.
+2. Aiken Duet requests the student details.
+3. The Teaching Assistant provides the requested details.
+4. Aiken Duet displays the matching student and requests confirmation.
+5. The Teaching Assistant confirms the deletion.
+6. Aiken Duet deletes the student record and confirms the deletion.
+
+   Use case ends.
+
+**Extensions:**
+
+* 3a. Aiken Duet detects an error in the provided details.
+  * 3a1. Aiken Duet informs the Teaching Assistant of the error.
+  * 3a2. Aiken Duet requests the correct details.
+  * 3a3. The Teaching Assistant provides new details.
+  * Steps 3a1–3a3 are repeated until the details are valid.
+  * Use case resumes from step 4.
+* 4a. The specified student does not exist.
+  * 4a1. Aiken Duet informs the Teaching Assistant that the student cannot be found.
+  * Use case ends.
+* 5a. The Teaching Assistant cancels the deletion.
+  * 5a1. Aiken Duet confirms that the student record was not changed.
+  * Use case ends.
 
 ### Non-Functional Requirements
 
