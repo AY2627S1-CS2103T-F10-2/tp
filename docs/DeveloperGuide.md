@@ -261,29 +261,48 @@ _{Explain here how the data archiving feature will be implemented}_
 
 **Target user profile**:
 
-* has a need to manage a significant number of contacts
-* prefers desktop apps over other types of applications
-* can type fast
-* prefers typing to mouse interactions
-* is reasonably comfortable using CLI apps
+* is a teaching assistant who manages students across multiple classes and class groups
+* needs to retrieve student information and record teaching observations quickly
+* prefers a desktop application that stores teaching data locally
+* can type quickly and is comfortable using CLI-style commands
 
-**Value proposition**: Manage contacts faster than with a typical mouse-driven GUI application.
+**Value proposition**: Aiken Duet helps teaching assistants manage classes, student enrolments, and teaching observations efficiently, with fast keyboard-driven access to information across multiple class groups.
 
 
 ### User stories
 
-Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
+Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
-| Priority | As a …​                                    | I want to …​                     | So that I can…​                                                        |
-| -------- | ------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------- |
-| `* * *`  | new user                                   | see usage instructions         | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person               |                                                                        |
-| `* * *`  | user                                       | delete a person                | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name          | locate details of persons without having to go through the entire list |
-| `* *`    | user                                       | hide private contact details   | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name           | locate a person easily                                                 |
-
-*{More to be added}*
+| Priority | As a …​ | I want to …​ | So that I can…​ |
+| -------- | ------- | ------------- | ---------------- |
+| `* * *` | teaching assistant | add a student | keep track of students in my class |
+| `* * *` | teaching assistant | view all my students in a list | see who I am managing |
+| `* * *` | teaching assistant | search for a student by name | quickly retrieve their details |
+| `* * *` | teaching assistant | edit a student's details | keep their information up to date |
+| `* * *` | teaching assistant | add a note about a student | remember important teaching-related observations |
+| `* *` | teaching assistant | delete a student | remove students I no longer manage |
+| `* *` | teaching assistant | undo a deletion of a student | undo the removal of a student I made by mistake |
+| `* *` | teaching assistant | view an individual's homework | grade their work |
+| `* *` | teaching assistant | view an individual's progress | monitor their efforts |
+| `* *` | teaching assistant | schedule consultation slots | organize meetings with my students |
+| `* *` | teaching assistant | view students who were absent from a class | identify students who may need a follow-up |
+| `* *` | teaching assistant | view all students in a specific tutorial or lab group | manage one class at a time |
+| `* *` | teaching assistant | record a student's attendance for a class | keep track of their attendance history |
+| `* *` | teaching assistant | record a student's participation in class | keep track of their engagement |
+| `* *` | teaching assistant | view students with incomplete assignments | identify who may need reminders |
+| `* *` | teaching assistant | record the date and topic of a consultation | remember what was discussed with a student |
+| `* *` | teaching assistant | view a student's previous consultations | prepare for them |
+| `* *` | teaching assistant | mark pending follow-up tasks as completed | keep track of outstanding work |
+| `* *` | teaching assistant | view a summary of a tutorial group | quickly understand its overall attendance, participation, and assignment status |
+| `*` | teaching assistant | archive my previous tasks | keep my list clean |
+| `*` | teaching assistant | view archived tasks | look back at my history if needed |
+| `*` | teaching assistant | see students who may be falling behind | follow up with them |
+| `*` | teaching assistant | set repeating weekly tasks | avoid recreating routine duties each week |
+| `*` | teaching assistant | tag tasks by assignment or exam name | organize duties by course milestones |
+| `*` | teaching assistant | set priority levels for tasks | focus on time-sensitive duties such as exam preparation first |
+| `*` | teaching assistant | view my tasks in a calendar | see how course duties overlap with my own academic exam schedule |
+| `*` | teaching assistant | log the estimated and actual hours spent on each task | stay within my contracted weekly hours limit |
+| `*` | teaching assistant | transfer an assigned task to another teaching assistant with an explanation | ensure it is completed if an emergency prevents me from doing it |
 
 ### Use cases
 
@@ -316,16 +335,28 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 ### Non-Functional Requirements
 
-1.  Should work on any _mainstream OS_ as long as it has Java `25` or above installed.
-2.  Should be able to hold up to 1000 persons without noticeable sluggishness in performance for typical usage.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
-
-*{More to be added}*
+1. Aiken Duet should work on any _mainstream OS_ with Java `25` or later installed.
+2. Aiken Duet should respond to add, edit, delete, list, and find commands within 2 seconds when storing up to 100 classes and 1,000 students on a typical laptop.
+3. A teaching assistant who is familiar with CLI applications should be able to create a class, add a student, find that student, and record an observation within 15 minutes of first using Aiken Duet with the User Guide available.
+4. Aiken Duet should store its data locally and should not transmit student information over a network unless the user explicitly initiates such an operation.
+5. Invalid commands should not modify existing class, student, enrolment, or teaching-observation data, and should not cause Aiken Duet to terminate unexpectedly.
 
 ### Glossary
 
-* **Mainstream OS**: Windows, Linux, Unix, or macOS
-* **Private contact detail**: A contact detail that is not meant to be shared with others
+* **Class**: A course offering managed in Aiken Duet and identified by a course code.
+* **Class group**: A tutorial, laboratory, or recitation group belonging to a class.
+* **Class tag**: A user-defined label used to categorize a class.
+* **Consultation**: A scheduled meeting between a teaching assistant and a student, together with any recorded date and topic.
+* **Enrolment**: The association between a student and a class group.
+* **Follow-up task**: An action that a teaching assistant needs to complete after a class, consultation, or student interaction.
+* **Homework**: Work assigned to an individual student for completion outside class.
+* **Mainstream OS**: Windows, Linux, Unix, or macOS.
+* **Participation**: A record of a student's engagement during a class.
+* **Student**: A learner whose details, class-group enrolments, and teaching observations are managed in Aiken Duet.
+* **Task**: A teaching-related duty tracked by a teaching assistant, which may have a status, priority, schedule, tag, or time record.
+* **Teaching observation**: A timestamped note about a student in the context of a specific class group.
+* **Telehandle**: A student's username on a messaging platform used for communication.
+* **Typical laptop**: A computer with at least a 2 GHz dual-core processor and 8 GB of RAM.
 
 --------------------------------------------------------------------------------------------------------------------
 
