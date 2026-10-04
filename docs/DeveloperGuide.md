@@ -275,13 +275,17 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 | Priority | As a …​ | I want to …​ | So that I can…​ |
 | -------- | ------- | ------------- | ---------------- |
+| `* * *` | teaching assistant | add a class | add students to it |
 | `* * *` | teaching assistant | add a student | keep track of students in my class |
 | `* * *` | teaching assistant | view all my students in a list | see who I am managing |
 | `* * *` | teaching assistant | search for a student by name | quickly retrieve their details |
+| `* * *` | teaching assistant | search for a class by name | quickly retrieve its details |
 | `* * *` | teaching assistant | edit a student's details | keep their information up to date |
 | `* * *` | teaching assistant | add a note about a student | remember important teaching-related observations |
 | `* *` | teaching assistant | delete a student | remove students I no longer manage |
+| `* *` | teaching assistant | delete a class | remove classes I no longer manage |
 | `* *` | teaching assistant | undo a deletion of a student | undo the removal of a student I made by mistake |
+| `* *` | teaching assistant | undo a deletion of a class | undo the removal of a class I made by mistake |
 | `* *` | teaching assistant | view an individual's homework | grade their work |
 | `* *` | teaching assistant | view an individual's progress | monitor their efforts |
 | `* *` | teaching assistant | schedule consultation slots | organize meetings with my students |
@@ -306,7 +310,34 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 ### Use cases
 
-#### UC01 — Add a student to a class group
+#### UC01 — Add a class group
+
+**System:** Aiken Duet
+
+**Actor:** Teaching Assistant
+
+**MSS:**
+
+1. The Teaching Assistant requests to create a class group.
+2. Aiken Duet requests the class group name and details.
+3. The Teaching Assistant provides the requested details.
+4. Aiken Duet creates the class group with the relavent details.
+
+   Use case ends.
+
+**Extensions:**
+
+* 3a. Aiken Duet detects an error in the provided details.
+  * 3a1. Aiken Duet informs the Teaching Assistant of the error.
+  * 3a2. Aiken Duet requests the correct details.
+  * 3a3. The Teaching Assistant provides new details.
+  * Steps 3a1–3a3 are repeated until the details are valid.
+  * Use case resumes from step 4.
+* 3b. A class group with the same details already exists.
+  * 3b1. Aiken Duet informs the Teaching Assistant that a class group with the same details already exists.
+  * Use case ends.
+
+#### UC02 — Add a student to a class group
 
 **System:** Aiken Duet
 
@@ -340,7 +371,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
   * 3d2. Aiken Duet confirms the addition.
   * Use case ends.
 
-#### UC02 — Add a note about a student
+#### UC03 — Add a note about a student
 
 **System:** Aiken Duet
 
@@ -367,7 +398,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
   * 3b1. Aiken Duet informs the Teaching Assistant that the student cannot be found.
   * Use case ends.
 
-#### UC03 — Search for a student
+#### UC04 — Search for a student
 
 **System:** Aiken Duet
 
@@ -394,7 +425,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
   * 4a1. Aiken Duet informs the Teaching Assistant that no matching student was found.
   * Use case ends.
 
-#### UC04 — Delete a student
+#### UC05 — Delete a student
 
 **System:** Aiken Duet
 
