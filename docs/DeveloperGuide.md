@@ -464,6 +464,11 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 3. A teaching assistant who is familiar with CLI applications should be able to create a class, add a student, find that student, and record an observation within 15 minutes of first using Aiken Duet with the User Guide available.
 4. Aiken Duet should store its data locally and should not transmit student information over a network unless the user explicitly initiates such an operation.
 5. Invalid commands should not modify existing class, student, enrolment, or teaching-observation data, and should not cause Aiken Duet to terminate unexpectedly.
+6. Aiken Duet should parse and save application data within 2 seconds.
+7. Should the local save file be corrupted, the system should not overwrite the corrupted file with a blank slate and should alert the user of the error.
+8. The data file must saved in a standard location such as a data folder at the root directory.
+9. The teaching assistent should only need the jar file to run the application and should not need to install any other dependency (other than java).
+10. Saved data should be in an easy to edit format for ease of changing in case of save data corruption.
 
 ### Glossary
 
