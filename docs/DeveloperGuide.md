@@ -334,7 +334,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
   * Steps 3a1–3a3 are repeated until the details are valid.
   * Use case resumes from step 4.
 * 3b. A class group with the same details already exists.
-  * 3c1. Aiken Duet informs the Teaching Assistant that a class group with the same details already exists.
+  * 3b1. Aiken Duet informs the Teaching Assistant that a class group with the same details already exists.
   * Use case ends.
 
 #### UC02 — Add a student to a class group
