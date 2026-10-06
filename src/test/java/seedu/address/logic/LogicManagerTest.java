@@ -56,7 +56,7 @@ public class LogicManagerTest {
 
     @Test
     public void execute_commandExecutionError_throwsCommandException() {
-        String deleteCommand = "delete 9";
+        String deleteCommand = "dclass 9";
         assertCommandException(deleteCommand, MESSAGE_INVALID_COURSE_CLASS_DISPLAYED_INDEX);
     }
 

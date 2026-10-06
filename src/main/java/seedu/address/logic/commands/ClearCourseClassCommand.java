@@ -10,7 +10,7 @@ import seedu.address.model.Model;
  */
 public class ClearCourseClassCommand extends Command {
 
-    public static final String COMMAND_WORD = "clear";
+    public static final String COMMAND_WORD = "cclass";
     public static final String MESSAGE_SUCCESS = "Course class book has been cleared!";
 
     @Override

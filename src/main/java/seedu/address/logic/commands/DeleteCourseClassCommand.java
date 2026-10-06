@@ -16,7 +16,7 @@ import seedu.address.model.courseClass.CourseClass;
  */
 public class DeleteCourseClassCommand extends Command {
 
-    public static final String COMMAND_WORD = "delete";
+    public static final String COMMAND_WORD = "dclass";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Deletes the course class identified by the index number used in the displayed course class list.\n"

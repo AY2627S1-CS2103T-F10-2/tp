@@ -61,7 +61,7 @@ public class CourseClassUiTest {
             assertEquals("Students: 0", ((Label) card.getRoot().lookup("#studentCount")).getText());
             logic.execute("aclass n/F10-3 c/CS2103T");
             assertEquals(2, list.getItems().size());
-            logic.execute("clear");
+            logic.execute("cclass");
             assertEquals(0, list.getItems().size());
             stage.close();
             return null;

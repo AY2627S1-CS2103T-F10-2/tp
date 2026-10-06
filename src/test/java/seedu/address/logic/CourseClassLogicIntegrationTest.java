@@ -34,25 +34,25 @@ public class CourseClassLogicIntegrationTest {
         Logic logic = new LogicManager(model, new StorageManager(bookStorage,
                 new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
         logic.execute("aclass n/F10-2 c/CS2103T t/tutorial");
-        logic.execute("add n/F10-3 c/CS2103T");
+        logic.execute("aclass n/F10-3 c/CS2103T");
         assertEquals(2, logic.getFilteredCourseClassList().size());
 
-        logic.execute("find F10-3");
+        logic.execute("fclass F10-3");
         assertEquals("F10-3", logic.getFilteredCourseClassList().get(0).getName().fullName);
-        logic.execute("edit 1 n/F10-4 c/CS2101 t/");
+        logic.execute("eclass 1 n/F10-4 c/CS2101 t/");
         assertEquals(2, logic.getFilteredCourseClassList().size());
         assertEquals("CS2101", logic.getFilteredCourseClassList().get(1).getCourseCode().value);
-        assertThrows(CommandException.class, () -> logic.execute("edit 2 n/F10-2"));
-        assertThrows(CommandException.class, () -> logic.execute("delete 3"));
-        assertThrows(ParseException.class, () -> logic.execute("edit 1 c/"));
-        assertThrows(ParseException.class, () -> logic.execute("edit 1 n/F10-5 n/F10-6"));
+        assertThrows(CommandException.class, () -> logic.execute("eclass 2 n/F10-2"));
+        assertThrows(CommandException.class, () -> logic.execute("dclass 3"));
+        assertThrows(ParseException.class, () -> logic.execute("eclass 1 c/"));
+        assertThrows(ParseException.class, () -> logic.execute("eclass 1 n/F10-5 n/F10-6"));
 
-        logic.execute("find F10-4");
-        logic.execute("delete 1");
-        logic.execute("list");
+        logic.execute("fclass F10-4");
+        logic.execute("dclass 1");
+        logic.execute("lclass");
         assertEquals("F10-2", logic.getFilteredCourseClassList().get(0).getName().fullName);
         assertEquals(model.getCourseClassBook(), bookStorage.readCourseClassBook().orElseThrow());
-        logic.execute("clear");
+        logic.execute("cclass");
         assertTrue(logic.getFilteredCourseClassList().isEmpty());
         assertTrue(bookStorage.readCourseClassBook().orElseThrow().getCourseClassList().isEmpty());
     }
@@ -67,7 +67,7 @@ public class CourseClassLogicIntegrationTest {
                 new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json"));
         Logic logic = new LogicManager(model, new StorageManager(bookStorage,
                 new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
-        logic.execute("edit 1 n/F10-3");
+        logic.execute("eclass 1 n/F10-3");
         assertEquals(courseClass.getStudents(), logic.getFilteredCourseClassList().get(0).getStudents());
         assertEquals(courseClass.getStudents(),
                 bookStorage.readCourseClassBook().orElseThrow().getCourseClassList().get(0).getStudents());
