@@ -13,6 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.model.CourseClassBook;
+import seedu.address.model.UserPrefs;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
@@ -22,6 +23,24 @@ import seedu.address.testutil.TypicalPersons;
 public class JsonCourseClassBookStorageTest {
     @TempDir
     public Path temporaryFolder;
+
+    @Test
+    public void storageManager_delegatesPathsAndRoundTripsBooksAndPreferences() throws Exception {
+        Path classFile = temporaryFolder.resolve("classes.json");
+        Path prefsFile = temporaryFolder.resolve("prefs.json");
+        StorageManager manager = new StorageManager(new JsonCourseClassBookStorage(classFile),
+                new JsonUserPrefsStorage(prefsFile));
+        assertEquals(classFile, manager.getCourseClassBookFilePath());
+        assertEquals(prefsFile, manager.getUserPrefsFilePath());
+        assertTrue(manager.readCourseClassBook().isEmpty());
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()));
+        manager.saveCourseClassBook(book);
+        assertEquals(book, manager.readCourseClassBook().orElseThrow());
+        UserPrefs prefs = new UserPrefs();
+        manager.saveUserPrefs(prefs);
+        assertEquals(prefs, manager.readUserPrefs().orElseThrow());
+    }
 
     @Test
     public void saveAndRead_roundTrip_preservesClassFieldsAndStudents() throws Exception {

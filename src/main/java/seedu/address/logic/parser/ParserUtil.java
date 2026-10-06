@@ -23,6 +23,8 @@ public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
 
+    private ParserUtil() {}
+
     /**
      * Parses a course class name, trimming leading and trailing whitespace.
      * @throws ParseException if the name is invalid.

@@ -24,6 +24,37 @@ public class ModelManagerCourseClassTest {
     private final CourseClass second = createClass("F10-3", "CS2103T");
 
     @Test
+    public void equality_courseClassFiltersMustMatch() {
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(first);
+        book.addCourseClass(second);
+        ModelManager firstModel = new ModelManager(book, new UserPrefs());
+        ModelManager secondModel = new ModelManager(book, new UserPrefs());
+        secondModel.updateFilteredCourseClassList(first::equals);
+        assertNotEquals(firstModel, secondModel);
+    }
+
+    @Test
+    public void bookEquality_hashCodeAndDiagnosticString() {
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(first);
+        CourseClassBook copy = new CourseClassBook(book);
+        assertTrue(book.equals(book));
+        assertEquals(book, copy);
+        assertEquals(book.hashCode(), copy.hashCode());
+        assertNotEquals(book, null);
+        assertNotEquals(book, "book");
+        copy.addCourseClass(second);
+        assertNotEquals(book, copy);
+        assertEquals(CourseClassBook.class.getCanonicalName() + "{courseClasses=" + List.of(first) + "}",
+                book.toString());
+        AddressBook students = new AddressBook();
+        AddressBook studentCopy = new AddressBook(students);
+        assertNotEquals(students, "book");
+        assertEquals(students.hashCode(), studentCopy.hashCode());
+    }
+
+    @Test
     public void execute_studentAndClassCommands_shareModelWithIndependentFilters() throws Exception {
         Model model = new ModelManager();
         new AddCommand(TypicalPersons.ALICE).execute(model);

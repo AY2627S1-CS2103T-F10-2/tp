@@ -67,7 +67,7 @@ public class EditCourseClassCommandParser implements Parser<EditCourseClassComma
      * {@code Set<Tag>} containing zero tags.
      */
     private Optional<Set<Tag>> parseTagsForEdit(Collection<String> tags) throws ParseException {
-        assert tags != null;
+        requireNonNull(tags);
 
         if (tags.isEmpty()) {
             return Optional.empty();

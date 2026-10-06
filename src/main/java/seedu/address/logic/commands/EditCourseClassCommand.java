@@ -88,7 +88,7 @@ public class EditCourseClassCommand extends Command {
      */
     private static CourseClass createEditedCourseClass(CourseClass courseClassToEdit,
             EditCourseClassDescriptor editCourseClassDescriptor) {
-        assert courseClassToEdit != null;
+        requireNonNull(courseClassToEdit);
 
         Name updatedName = editCourseClassDescriptor.getName().orElse(courseClassToEdit.getName());
         CourseCode updatedCourseCode =

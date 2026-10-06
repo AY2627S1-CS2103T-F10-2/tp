@@ -20,6 +20,22 @@ public class UniqueCourseClassListTest {
     private final CourseClass second = createClass("F10-3", "CS2103T");
 
     @Test
+    public void equality_hashCodeAndIteration_followContents() {
+        classes.add(first);
+        UniqueCourseClassList copy = new UniqueCourseClassList();
+        copy.add(first);
+        assertTrue(classes.equals(classes));
+        assertEquals(classes, copy);
+        assertEquals(classes.hashCode(), copy.hashCode());
+        assertFalse(classes.equals(null));
+        assertFalse(classes.equals(List.of(first)));
+        copy.add(second);
+        assertFalse(classes.equals(copy));
+        assertEquals(first, classes.iterator().next());
+        assertEquals(List.of(first).toString(), classes.toString());
+    }
+
+    @Test
     public void containsAndAdd_enforceIdentity() {
         assertFalse(classes.contains(first));
         classes.add(first);
