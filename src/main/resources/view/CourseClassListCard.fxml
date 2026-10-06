@@ -34,7 +34,7 @@
         <padding>
             <Insets top="5" bottom="5" />
         </padding>
-      </VBox> 
+      </VBox>
     </VBox>
   </GridPane>
 </HBox>
