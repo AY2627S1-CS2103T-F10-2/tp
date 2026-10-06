@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddCourseClassCommand;
-import seedu.address.model.courseClass.CourseClass;
-import seedu.address.model.courseClass.CourseCode;
-import seedu.address.model.courseClass.Name;
-import seedu.address.model.courseClass.exceptions.CourseClassNotFoundException;
-import seedu.address.model.courseClass.exceptions.DuplicateCourseClassException;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.Name;
+import seedu.address.model.courseclass.exceptions.CourseClassNotFoundException;
+import seedu.address.model.courseclass.exceptions.DuplicateCourseClassException;
 import seedu.address.testutil.TypicalPersons;
 
 public class ModelManagerCourseClassTest {

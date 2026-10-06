@@ -1,4 +1,4 @@
-package seedu.address.model.courseClass;
+package seedu.address.model.courseclass;
 
 import java.util.List;
 import java.util.function.Predicate;

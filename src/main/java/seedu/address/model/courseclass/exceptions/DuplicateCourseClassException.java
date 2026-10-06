@@ -1,4 +1,4 @@
-package seedu.address.model.courseClass.exceptions;
+package seedu.address.model.courseclass.exceptions;
 
 /**
  * Signals that the operation will result in duplicate course classes with the same identity.

@@ -11,9 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.AddressBook;
-import seedu.address.model.courseClass.CourseClass;
-import seedu.address.model.courseClass.CourseCode;
-import seedu.address.model.courseClass.Name;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.Name;
 import seedu.address.model.tag.Tag;
 
 /** Jackson-friendly version of a course class, including its student book. */

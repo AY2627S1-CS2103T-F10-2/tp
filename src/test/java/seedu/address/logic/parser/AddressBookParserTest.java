@@ -23,10 +23,10 @@ import seedu.address.logic.commands.FindCourseClassCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.courseClass.CourseClass;
-import seedu.address.model.courseClass.CourseCode;
-import seedu.address.model.courseClass.Name;
-import seedu.address.model.courseClass.NameContainsKeywordsPredicate;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.Name;
+import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
 
 public class AddressBookParserTest {
 

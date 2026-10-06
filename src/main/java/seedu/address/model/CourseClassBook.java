@@ -6,8 +6,8 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
-import seedu.address.model.courseClass.CourseClass;
-import seedu.address.model.courseClass.UniqueCourseClassList;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.UniqueCourseClassList;
 
 /**
  * Wraps all data at the course-class-book level.

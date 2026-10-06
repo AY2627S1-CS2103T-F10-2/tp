@@ -1,4 +1,4 @@
-package seedu.address.model.courseClass;
+package seedu.address.model.courseclass;
 
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
@@ -40,7 +40,7 @@ public class CourseClass {
      * Every field must be present and not null.
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students) {
-        requireAllNonNull(name, code, tags);
+        requireAllNonNull(name, code, tags, students);
         this.name = name;
         this.code = code;
         this.tags.addAll(tags);
@@ -68,8 +68,8 @@ public class CourseClass {
     }
 
     /**
-     * Returns true if both persons have the same name.
-     * This defines a weaker notion of equality between two persons.
+     * Returns true if both course classes have the same name.
+     * This defines a weaker notion of equality between two course classes.
      */
     public boolean isSameCourseClass(CourseClass otherCourseClass) {
         if (otherCourseClass == this) {

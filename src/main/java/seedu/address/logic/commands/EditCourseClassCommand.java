@@ -19,9 +19,9 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.courseClass.CourseClass;
-import seedu.address.model.courseClass.CourseCode;
-import seedu.address.model.courseClass.Name;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.Name;
 import seedu.address.model.tag.Tag;
 
 /**

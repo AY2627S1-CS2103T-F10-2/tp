@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 
 import seedu.address.logic.commands.AddCourseClassCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.courseClass.CourseClass;
-import seedu.address.model.courseClass.CourseCode;
-import seedu.address.model.courseClass.Name;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.Name;
 import seedu.address.model.tag.Tag;
 
 /**

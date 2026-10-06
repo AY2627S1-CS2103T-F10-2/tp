@@ -1,7 +1,7 @@
 package seedu.address.model;
 
 import javafx.collections.ObservableList;
-import seedu.address.model.courseClass.CourseClass;
+import seedu.address.model.courseclass.CourseClass;
 
 /**
  * Unmodifiable view of an course class book

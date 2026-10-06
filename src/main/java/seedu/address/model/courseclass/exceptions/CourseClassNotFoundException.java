@@ -1,4 +1,4 @@
-package seedu.address.model.courseClass.exceptions;
+package seedu.address.model.courseclass.exceptions;
 
 /**
  * Signals that the operation is unable to find the specified course class.

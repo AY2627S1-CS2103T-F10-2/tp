@@ -9,7 +9,7 @@ import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.courseClass.CourseClass;
+import seedu.address.model.courseclass.CourseClass;
 
 /**
  * Deletes a course class identified using its displayed index from the course class book.

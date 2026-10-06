@@ -1,4 +1,4 @@
-package seedu.address.model.courseClass;
+package seedu.address.model.courseclass;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
@@ -8,8 +8,8 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import seedu.address.model.courseClass.exceptions.CourseClassNotFoundException;
-import seedu.address.model.courseClass.exceptions.DuplicateCourseClassException;
+import seedu.address.model.courseclass.exceptions.CourseClassNotFoundException;
+import seedu.address.model.courseclass.exceptions.DuplicateCourseClassException;
 
 /**
  * A list of course classes that enforces uniqueness between its elements and does not allow nulls.

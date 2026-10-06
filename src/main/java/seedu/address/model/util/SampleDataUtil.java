@@ -20,9 +20,9 @@ public class SampleDataUtil {
     /** Returns a sample course class book for a new installation. */
     public static seedu.address.model.ReadOnlyCourseClassBook getSampleCourseClassBook() {
         seedu.address.model.CourseClassBook book = new seedu.address.model.CourseClassBook();
-        book.addCourseClass(new seedu.address.model.courseClass.CourseClass(
-                new seedu.address.model.courseClass.Name("F10-2"),
-                new seedu.address.model.courseClass.CourseCode("CS2103T"), Set.of(new Tag("tutorial"))));
+        book.addCourseClass(new seedu.address.model.courseclass.CourseClass(
+                new seedu.address.model.courseclass.Name("F10-2"),
+                new seedu.address.model.courseclass.CourseCode("CS2103T"), Set.of(new Tag("tutorial"))));
         return book;
     }
 

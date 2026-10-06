@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
-import seedu.address.model.courseClass.NameContainsKeywordsPredicate;
+import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
 
 /**
  * Finds and lists all course classes in the course class book whose name contains any of the argument keywords.
