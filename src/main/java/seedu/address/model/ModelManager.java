@@ -21,6 +21,7 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final CourseClassModel courseClassModel;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -32,6 +33,7 @@ public class ModelManager implements Model {
 
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
+        courseClassModel = new CourseClassModelManager(new CourseClassBook(), this.userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
     }
 
@@ -40,6 +42,11 @@ public class ModelManager implements Model {
     }
 
     //=========== UserPrefs ==================================================================================
+
+    @Override
+    public CourseClassModel getCourseClassModel() {
+        return courseClassModel;
+    }
 
     @Override
     public ReadOnlyUserPrefs getUserPrefs() {
@@ -123,6 +130,7 @@ public class ModelManager implements Model {
 
         return addressBook.equals(otherModelManager.addressBook)
                 && userPrefs.equals(otherModelManager.userPrefs)
+                && courseClassModel.equals(otherModelManager.courseClassModel)
                 && filteredPersons.equals(otherModelManager.filteredPersons);
     }
 

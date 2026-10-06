@@ -13,6 +13,11 @@ public interface Model {
     /** {@code Predicate} that always evaluates to true */
     Predicate<Person> PREDICATE_SHOW_ALL_PERSONS = unused -> true;
 
+    /** Returns the model containing course classes. */
+    default CourseClassModel getCourseClassModel() {
+        throw new UnsupportedOperationException("Course classes are not supported by this model.");
+    }
+
     /**
      * Returns the user prefs.
      */

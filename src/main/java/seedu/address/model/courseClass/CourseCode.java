@@ -1,12 +1,12 @@
 package seedu.address.model.courseClass;
 
-    
+
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
  * Represents a Course Class's code name in the address book.
- * Guarantees: immutable; is valid as declared in {@link #isValidPhone(String)}
+ * Guarantees: immutable; is valid as declared in {@link #isValidCourseCode(String)}
  */
 public class CourseCode {
 
@@ -28,7 +28,7 @@ public class CourseCode {
     }
 
     /**
-     * Returns true if a given string is a valid phone number.
+     * Returns true if a given string is a valid course code.
      */
     public static boolean isValidCourseCode(String test) {
         return test.matches(VALIDATION_REGEX);

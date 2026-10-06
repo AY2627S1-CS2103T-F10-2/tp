@@ -1,14 +1,15 @@
 package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
+import static seedu.address.logic.parser.CliSyntax.PREFIX_CODE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.model.CourseClassModel;
 import seedu.address.model.Model;
-import seedu.address.model.person.Person;
 import seedu.address.model.courseClass.CourseClass;
 
 /**
@@ -21,10 +22,12 @@ public class AddCourseClassCommand extends Command {
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a class to the system. "
             + "Parameters: "
             + PREFIX_NAME + "NAME "
+            + PREFIX_CODE + "COURSE_CODE "
             + "[" + PREFIX_TAG + "TAG]...\n"
             + "Example: " + COMMAND_WORD + " "
-            + PREFIX_NAME + "CS2103T "
-            + PREFIX_TAG + "F10-2";
+            + PREFIX_NAME + "F10-2 "
+            + PREFIX_CODE + "CS2103T "
+            + PREFIX_TAG + "tutorial";
 
     public static final String MESSAGE_SUCCESS = "New class added: %1$s";
     public static final String MESSAGE_DUPLICATE_CLASS = "This class already exists in the system.";
@@ -32,7 +35,7 @@ public class AddCourseClassCommand extends Command {
     private final CourseClass toAdd;
 
     /**
-     * Creates an AddClassCommand to add the specified {@code Person}
+     * Creates an AddCourseClassCommand to add the specified {@code CourseClass}.
      */
     public AddCourseClassCommand(CourseClass courseClass) {
         requireNonNull(courseClass);
@@ -41,6 +44,12 @@ public class AddCourseClassCommand extends Command {
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
+        requireNonNull(model);
+        return execute(model.getCourseClassModel());
+    }
+
+    /** Executes the command using the course class model. */
+    public CommandResult execute(CourseClassModel model) throws CommandException {
         requireNonNull(model);
 
         if (model.hasCourseClass(toAdd)) {

@@ -9,6 +9,7 @@ import java.util.Set;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.courseClass.CourseCode;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -21,6 +22,32 @@ import seedu.address.model.tag.Tag;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+
+    /**
+     * Parses a course class name, trimming leading and trailing whitespace.
+     * @throws ParseException if the name is invalid.
+     */
+    public static seedu.address.model.courseClass.Name parseCourseClassName(String name) throws ParseException {
+        requireNonNull(name);
+        String trimmedName = name.trim();
+        if (!seedu.address.model.courseClass.Name.isValidName(trimmedName)) {
+            throw new ParseException(seedu.address.model.courseClass.Name.MESSAGE_CONSTRAINTS);
+        }
+        return new seedu.address.model.courseClass.Name(trimmedName);
+    }
+
+    /**
+     * Parses a course code, trimming leading and trailing whitespace.
+     * @throws ParseException if the code is invalid.
+     */
+    public static CourseCode parseCourseCode(String code) throws ParseException {
+        requireNonNull(code);
+        String trimmedCode = code.trim();
+        if (!CourseCode.isValidCourseCode(trimmedCode)) {
+            throw new ParseException(CourseCode.MESSAGE_CONSTRAINTS);
+        }
+        return new CourseCode(trimmedCode);
+    }
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
