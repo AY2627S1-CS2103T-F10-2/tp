@@ -2,12 +2,15 @@ package seedu.address.ui;
 
 import java.util.Comparator;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import seedu.address.model.courseClass.CourseClass;
+import seedu.address.model.person.Person;
 
 /**
  * A UI component that displays information of a {@code CourseClass}.
@@ -38,6 +41,8 @@ public class CourseClassCard extends UiPart<Region> {
     private Label studentCount;
     @FXML
     private FlowPane tags;
+    @FXML
+    private VBox studentsBox;
 
     /**
      * Creates a {@code CourseClassCard} with the given {@code CourseClass} and index to display.
@@ -49,6 +54,13 @@ public class CourseClassCard extends UiPart<Region> {
         name.setText(courseClass.getName().fullName);
         courseCode.setText(courseClass.getCourseCode().value);
         studentCount.setText("Students: " + courseClass.getStudents().getPersonList().size());
+        ObservableList<Person> students = courseClass.getStudents().getPersonList();
+
+        for (int i = 0; i < students.size(); i++) {
+            studentsBox.getChildren().add(
+                    new PersonCard(students.get(i), i + 1).getRoot());
+        }
+
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
