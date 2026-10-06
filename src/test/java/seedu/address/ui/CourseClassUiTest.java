@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -38,6 +39,10 @@ public class CourseClassUiTest {
 
     @BeforeAll
     public static void startToolkit() {
+        String display = System.getenv("DISPLAY");
+        boolean isHeadlessLinux = System.getProperty("os.name").startsWith("Linux")
+                && (display == null || display.isBlank());
+        assumeFalse(isHeadlessLinux, "JavaFX UI tests require a display on Linux");
         Platform.startup(() -> Platform.setImplicitExit(false));
     }
 
