@@ -44,6 +44,6 @@ public class AddCourseClassCommandParserTest {
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_CODE));
         assertParseFailure(parser, " n/ c/CS2103T", Name.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " n/F10-2 c/", CourseCode.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " n/F10-2 c/CS2103T t/invalid-tag", Tag.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " n/F10-2 c/CS2103T t/invalid*tag", Tag.MESSAGE_CONSTRAINTS);
     }
 }

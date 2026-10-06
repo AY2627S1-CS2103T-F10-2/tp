@@ -8,7 +8,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.exceptions.CommandException;
-import seedu.address.model.CourseClassModel;
 import seedu.address.model.Model;
 import seedu.address.model.courseClass.CourseClass;
 
@@ -25,7 +24,7 @@ public class AddCourseClassCommand extends Command {
             + PREFIX_CODE + "COURSE_CODE "
             + "[" + PREFIX_TAG + "TAG]...\n"
             + "Example: " + COMMAND_WORD + " "
-            + PREFIX_NAME + "F10-2 "
+            + PREFIX_NAME + "Software Engineering F10-2 "
             + PREFIX_CODE + "CS2103T "
             + PREFIX_TAG + "tutorial";
 
@@ -44,12 +43,6 @@ public class AddCourseClassCommand extends Command {
 
     @Override
     public CommandResult execute(Model model) throws CommandException {
-        requireNonNull(model);
-        return execute(model.getCourseClassModel());
-    }
-
-    /** Executes the command using the course class model. */
-    public CommandResult execute(CourseClassModel model) throws CommandException {
         requireNonNull(model);
 
         if (model.hasCourseClass(toAdd)) {

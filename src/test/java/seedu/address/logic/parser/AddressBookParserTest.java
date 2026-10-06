@@ -8,25 +8,25 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
-import seedu.address.logic.commands.AddCommand;
-import seedu.address.logic.commands.ClearCommand;
-import seedu.address.logic.commands.DeleteCommand;
-import seedu.address.logic.commands.EditCommand;
-import seedu.address.logic.commands.EditCommand.EditPersonDescriptor;
+import seedu.address.logic.commands.AddCourseClassCommand;
+import seedu.address.logic.commands.ClearCourseClassCommand;
+import seedu.address.logic.commands.DeleteCourseClassCommand;
+import seedu.address.logic.commands.EditCourseClassCommand;
+import seedu.address.logic.commands.EditCourseClassCommand.EditCourseClassDescriptor;
 import seedu.address.logic.commands.ExitCommand;
-import seedu.address.logic.commands.FindCommand;
+import seedu.address.logic.commands.FindCourseClassCommand;
 import seedu.address.logic.commands.HelpCommand;
-import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.person.NameContainsKeywordsPredicate;
-import seedu.address.model.person.Person;
-import seedu.address.testutil.EditPersonDescriptorBuilder;
-import seedu.address.testutil.PersonBuilder;
-import seedu.address.testutil.PersonUtil;
+import seedu.address.model.courseClass.CourseClass;
+import seedu.address.model.courseClass.CourseCode;
+import seedu.address.model.courseClass.Name;
+import seedu.address.model.courseClass.NameContainsKeywordsPredicate;
 
 public class AddressBookParserTest {
 
@@ -34,31 +34,36 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_add() throws Exception {
-        Person person = new PersonBuilder().build();
-        AddCommand command = (AddCommand) parser.parseCommand(PersonUtil.getAddCommand(person));
-        assertEquals(new AddCommand(person), command);
+        CourseClass courseClass =
+                new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+        AddCourseClassCommand command = (AddCourseClassCommand) parser.parseCommand("aclass n/F10-2 c/CS2103T");
+        assertEquals(new AddCourseClassCommand(courseClass), command);
     }
 
     @Test
     public void parseCommand_clear() throws Exception {
-        assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD) instanceof ClearCommand);
-        assertTrue(parser.parseCommand(ClearCommand.COMMAND_WORD + " 3") instanceof ClearCommand);
+        assertTrue(parser.parseCommand(ClearCourseClassCommand.COMMAND_WORD) instanceof ClearCourseClassCommand);
+        assertTrue(parser.parseCommand(ClearCourseClassCommand.COMMAND_WORD + " 3") instanceof ClearCourseClassCommand);
     }
 
     @Test
     public void parseCommand_delete() throws Exception {
-        DeleteCommand command = (DeleteCommand) parser.parseCommand(
-                DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
-        assertEquals(new DeleteCommand(INDEX_FIRST_PERSON), command);
+        DeleteCourseClassCommand command = (DeleteCourseClassCommand) parser.parseCommand(
+                DeleteCourseClassCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
+        assertEquals(new DeleteCourseClassCommand(INDEX_FIRST_PERSON), command);
     }
 
     @Test
     public void parseCommand_edit() throws Exception {
-        Person person = new PersonBuilder().build();
-        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder(person).build();
-        EditCommand command = (EditCommand) parser.parseCommand(EditCommand.COMMAND_WORD + " "
-                + INDEX_FIRST_PERSON.getOneBased() + " " + PersonUtil.getEditPersonDescriptorDetails(descriptor));
-        assertEquals(new EditCommand(INDEX_FIRST_PERSON, descriptor), command);
+        CourseClass courseClass =
+                new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+        EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
+        descriptor.setName(courseClass.getName());
+        descriptor.setCourseCode(courseClass.getCourseCode());
+        EditCourseClassCommand command = (EditCourseClassCommand) parser.parseCommand(
+                EditCourseClassCommand.COMMAND_WORD + " "
+                + INDEX_FIRST_PERSON.getOneBased() + " " + "n/F10-2 c/CS2103T");
+        assertEquals(new EditCourseClassCommand(INDEX_FIRST_PERSON, descriptor), command);
     }
 
     @Test
@@ -70,9 +75,9 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_find() throws Exception {
         List<String> keywords = List.of("foo", "bar", "baz");
-        FindCommand command = (FindCommand) parser.parseCommand(
-                FindCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
-        assertEquals(new FindCommand(new NameContainsKeywordsPredicate(keywords)), command);
+        FindCourseClassCommand command = (FindCourseClassCommand) parser.parseCommand(
+                FindCourseClassCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
+        assertEquals(new FindCourseClassCommand(new NameContainsKeywordsPredicate(keywords)), command);
     }
 
     @Test
@@ -83,8 +88,8 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_list() throws Exception {
-        assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD) instanceof ListCommand);
-        assertTrue(parser.parseCommand(ListCommand.COMMAND_WORD + " 3") instanceof ListCommand);
+        assertTrue(parser.parseCommand(ListCourseClassCommand.COMMAND_WORD) instanceof ListCourseClassCommand);
+        assertTrue(parser.parseCommand(ListCourseClassCommand.COMMAND_WORD + " 3") instanceof ListCourseClassCommand);
     }
 
     @Test

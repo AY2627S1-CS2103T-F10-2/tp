@@ -10,43 +10,48 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.model.courseClass.CourseClass;
 import seedu.address.model.person.Person;
 
 /**
- * Represents the in-memory model of the address book data.
+ * Represents the in-memory model of student and course class data.
  */
 public class ModelManager implements Model {
     private static final Logger logger = LogsCenter.getLogger(ModelManager.class);
 
     private final AddressBook addressBook;
+    private final CourseClassBook courseClassBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
-    private final CourseClassModel courseClassModel;
+    private final FilteredList<CourseClass> filteredCourseClasses;
 
-    /**
-     * Initializes a ModelManager with the given addressBook and userPrefs.
-     */
+    /** Initializes the model with student data and an empty course class book. */
     public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyUserPrefs userPrefs) {
-        requireAllNonNull(addressBook, userPrefs);
+        this(addressBook, new CourseClassBook(), userPrefs);
+    }
 
-        logger.fine("Initializing with address book: " + addressBook + " and user prefs " + userPrefs);
+    /** Initializes the model with course class data and an empty student address book. */
+    public ModelManager(ReadOnlyCourseClassBook courseClassBook, ReadOnlyUserPrefs userPrefs) {
+        this(new AddressBook(), courseClassBook, userPrefs);
+    }
 
+    /** Initializes the model with both books and shared user preferences. */
+    public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyCourseClassBook courseClassBook,
+            ReadOnlyUserPrefs userPrefs) {
+        requireAllNonNull(addressBook, courseClassBook, userPrefs);
+        logger.fine("Initializing with address book: " + addressBook + " and course class book: " + courseClassBook);
         this.addressBook = new AddressBook(addressBook);
+        this.courseClassBook = new CourseClassBook(courseClassBook);
         this.userPrefs = new UserPrefs(userPrefs);
-        courseClassModel = new CourseClassModelManager(new CourseClassBook(), this.userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        filteredCourseClasses = new FilteredList<>(this.courseClassBook.getCourseClassList());
     }
 
     public ModelManager() {
-        this(new AddressBook(), new UserPrefs());
+        this(new AddressBook(), new CourseClassBook(), new UserPrefs());
     }
 
     //=========== UserPrefs ==================================================================================
-
-    @Override
-    public CourseClassModel getCourseClassModel() {
-        return courseClassModel;
-    }
 
     @Override
     public ReadOnlyUserPrefs getUserPrefs() {
@@ -117,6 +122,59 @@ public class ModelManager implements Model {
         filteredPersons.setPredicate(predicate);
     }
 
+    //=========== CourseClassBook ================================================================================
+
+    @Override
+    public void setCourseClassBook(ReadOnlyCourseClassBook courseClassBook) {
+        this.courseClassBook.resetData(courseClassBook);
+    }
+
+    @Override
+    public ReadOnlyCourseClassBook getCourseClassBook() {
+        return courseClassBook;
+    }
+
+    @Override
+    public boolean hasCourseClass(CourseClass courseClass) {
+        requireNonNull(courseClass);
+        return courseClassBook.hasCourseClass(courseClass);
+    }
+
+    @Override
+    public void deleteCourseClass(CourseClass target) {
+        courseClassBook.removeCourseClass(target);
+    }
+
+    @Override
+    public void addCourseClass(CourseClass courseClass) {
+        courseClassBook.addCourseClass(courseClass);
+        updateFilteredCourseClassList(PREDICATE_SHOW_ALL_COURSE_CLASSES);
+    }
+
+    @Override
+    public void setCourseClass(CourseClass target, CourseClass editedCourseClass) {
+        requireAllNonNull(target, editedCourseClass);
+
+        courseClassBook.setCourseClass(target, editedCourseClass);
+    }
+
+    //=========== Filtered CourseClass List Accessors =============================================================
+
+    /**
+     * Returns an unmodifiable view of the list of {@code CourseClass} backed by the internal list of
+     * {@code courseClassBook}
+     */
+    @Override
+    public ObservableList<CourseClass> getFilteredCourseClassList() {
+        return filteredCourseClasses;
+    }
+
+    @Override
+    public void updateFilteredCourseClassList(Predicate<CourseClass> predicate) {
+        requireNonNull(predicate);
+        filteredCourseClasses.setPredicate(predicate);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == this) {
@@ -129,9 +187,10 @@ public class ModelManager implements Model {
         }
 
         return addressBook.equals(otherModelManager.addressBook)
+                && courseClassBook.equals(otherModelManager.courseClassBook)
                 && userPrefs.equals(otherModelManager.userPrefs)
-                && courseClassModel.equals(otherModelManager.courseClassModel)
-                && filteredPersons.equals(otherModelManager.filteredPersons);
+                && filteredPersons.equals(otherModelManager.filteredPersons)
+                && filteredCourseClasses.equals(otherModelManager.filteredCourseClasses);
     }
 
 }

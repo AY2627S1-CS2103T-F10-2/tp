@@ -17,6 +17,15 @@ import seedu.address.model.tag.Tag;
  * Contains utility methods for populating {@code AddressBook} with sample data.
  */
 public class SampleDataUtil {
+    /** Returns a sample course class book for a new installation. */
+    public static seedu.address.model.ReadOnlyCourseClassBook getSampleCourseClassBook() {
+        seedu.address.model.CourseClassBook book = new seedu.address.model.CourseClassBook();
+        book.addCourseClass(new seedu.address.model.courseClass.CourseClass(
+                new seedu.address.model.courseClass.Name("F10-2"),
+                new seedu.address.model.courseClass.CourseCode("CS2103T"), Set.of(new Tag("tutorial"))));
+        return book;
+    }
+
     public static Person[] getSamplePersons() {
         return new Person[] {
             new Person(new Name("Alex Yeoh"), new Phone("87438807"), new Email("alexyeoh@example.com"),

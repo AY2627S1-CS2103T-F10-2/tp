@@ -1,6 +1,7 @@
 package seedu.address.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,19 +10,55 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddCourseClassCommand;
 import seedu.address.model.courseClass.CourseClass;
 import seedu.address.model.courseClass.CourseCode;
 import seedu.address.model.courseClass.Name;
 import seedu.address.model.courseClass.exceptions.CourseClassNotFoundException;
 import seedu.address.model.courseClass.exceptions.DuplicateCourseClassException;
+import seedu.address.testutil.TypicalPersons;
 
-public class CourseClassModelManagerTest {
+public class ModelManagerCourseClassTest {
     private final CourseClass first = createClass("F10-2", "CS2103T");
     private final CourseClass second = createClass("F10-3", "CS2103T");
 
     @Test
+    public void execute_studentAndClassCommands_shareModelWithIndependentFilters() throws Exception {
+        Model model = new ModelManager();
+        new AddCommand(TypicalPersons.ALICE).execute(model);
+        new AddCourseClassCommand(first).execute(model);
+        model.updateFilteredPersonList(unused -> false);
+        assertEquals(List.of(first), model.getFilteredCourseClassList());
+        model.updateFilteredCourseClassList(unused -> false);
+        new AddCourseClassCommand(second).execute(model);
+        assertTrue(model.getFilteredPersonList().isEmpty());
+        assertEquals(List.of(first, second), model.getFilteredCourseClassList());
+        assertTrue(model.hasPerson(TypicalPersons.ALICE));
+    }
+
+    @Test
+    public void constructor_bothBooks_copiesDataAndIncludesClassStateInEquality() {
+        AddressBook students = new AddressBook();
+        students.addPerson(TypicalPersons.ALICE);
+        CourseClassBook classes = new CourseClassBook();
+        classes.addCourseClass(first);
+        ModelManager model = new ModelManager(students, classes, new UserPrefs());
+        assertEquals(model, new ModelManager(students, classes, new UserPrefs()));
+        assertNotEquals(model, new ModelManager(students, new UserPrefs()));
+        assertNotEquals(model, new ModelManager(classes, new UserPrefs()));
+        students.addPerson(TypicalPersons.BOB);
+        classes.addCourseClass(second);
+        assertEquals(List.of(TypicalPersons.ALICE), model.getFilteredPersonList());
+        assertEquals(List.of(first), model.getFilteredCourseClassList());
+        assertThrows(NullPointerException.class, () -> new ModelManager(null, classes, new UserPrefs()));
+        assertThrows(NullPointerException.class, () -> new ModelManager(students, null, new UserPrefs()));
+        assertThrows(NullPointerException.class, () -> new ModelManager(students, classes, null));
+    }
+
+    @Test
     public void addCourseClass_filteredList_showsAllClasses() {
-        CourseClassModel model = new CourseClassModelManager();
+        Model model = new ModelManager();
         model.addCourseClass(first);
         model.updateFilteredCourseClassList(unused -> false);
         assertTrue(model.getFilteredCourseClassList().isEmpty());
@@ -33,7 +70,7 @@ public class CourseClassModelManagerTest {
 
     @Test
     public void setCourseClassBook_copiesDataAndUpdatesExistingFilteredList() {
-        CourseClassModel model = new CourseClassModelManager();
+        Model model = new ModelManager();
         var filteredList = model.getFilteredCourseClassList();
         CourseClassBook replacement = new CourseClassBook();
         replacement.addCourseClass(first);

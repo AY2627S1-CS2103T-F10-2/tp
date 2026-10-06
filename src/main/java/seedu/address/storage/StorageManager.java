@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.ReadOnlyUserPrefs;
 import seedu.address.model.UserPrefs;
 
@@ -18,6 +19,7 @@ public class StorageManager implements Storage {
 
     private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
     private JsonAddressBookStorage addressBookStorage;
+    private JsonCourseClassBookStorage courseClassBookStorage;
     private JsonUserPrefsStorage userPrefsStorage;
 
     /**
@@ -26,6 +28,27 @@ public class StorageManager implements Storage {
     public StorageManager(JsonAddressBookStorage addressBookStorage, JsonUserPrefsStorage userPrefsStorage) {
         this.addressBookStorage = addressBookStorage;
         this.userPrefsStorage = userPrefsStorage;
+    }
+
+    /** Creates storage for the course class application. */
+    public StorageManager(JsonCourseClassBookStorage courseClassBookStorage, JsonUserPrefsStorage userPrefsStorage) {
+        this.courseClassBookStorage = courseClassBookStorage;
+        this.userPrefsStorage = userPrefsStorage;
+    }
+
+    @Override
+    public Path getCourseClassBookFilePath() {
+        return courseClassBookStorage.getCourseClassBookFilePath();
+    }
+
+    @Override
+    public Optional<ReadOnlyCourseClassBook> readCourseClassBook() throws DataLoadingException {
+        return courseClassBookStorage.readCourseClassBook();
+    }
+
+    @Override
+    public void saveCourseClassBook(ReadOnlyCourseClassBook courseClassBook) throws IOException {
+        courseClassBookStorage.saveCourseClassBook(courseClassBook);
     }
 
     // ================ UserPrefs methods ==============================
