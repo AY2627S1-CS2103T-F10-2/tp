@@ -1,6 +1,7 @@
 package seedu.address.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddCourseClassCommand;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
@@ -115,19 +117,36 @@ public class ModelManagerCourseClassTest {
         CourseClassBook book = new CourseClassBook();
         book.addCourseClass(first);
         book.addCourseClass(second);
-        CourseClass sameName = createClass("F10-2", "CS2101");
-        assertTrue(book.hasCourseClass(sameName));
-        assertThrows(DuplicateCourseClassException.class, () -> book.addCourseClass(sameName));
-        assertThrows(DuplicateCourseClassException.class, () -> book.setCourseClass(second, sameName));
-        assertThrows(DuplicateCourseClassException.class, () -> book.setCourseClasses(List.of(first, sameName)));
-        assertEquals(List.of(first, second), book.getCourseClassList());
+        CourseClass sameGroupDifferentModule = createClass("F10-2", "CS2101");
+        assertFalse(book.hasCourseClass(sameGroupDifferentModule));
+        book.addCourseClass(sameGroupDifferentModule);
+        assertEquals(List.of(first, second, sameGroupDifferentModule), book.getCourseClassList());
+        assertThrows(DuplicateCourseClassException.class, () -> book.addCourseClass(first));
+        assertThrows(DuplicateCourseClassException.class, () -> book.setCourseClass(second, first));
+        assertThrows(DuplicateCourseClassException.class, () -> book.setCourseClasses(List.of(first, first)));
         assertThrows(UnsupportedOperationException.class, () -> book.getCourseClassList().clear());
 
-        book.setCourseClass(first, sameName);
+        CourseClass updatedFirst = createClass("F10-4", "CS2101");
+        book.setCourseClass(first, updatedFirst);
         book.removeCourseClass(second);
-        assertEquals(List.of(sameName), book.getCourseClassList());
+        assertEquals(List.of(updatedFirst, sameGroupDifferentModule), book.getCourseClassList());
         assertThrows(CourseClassNotFoundException.class, () -> book.removeCourseClass(second));
         assertThrows(NullPointerException.class, () -> book.addCourseClass(null));
+    }
+
+    @Test
+    public void findCourseClassByGroup_legacyLookupFindsFirstMatchingGroup() {
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(first);
+        book.addCourseClass(createClass("F10-2", "CS2101"));
+
+        assertEquals(first, book.findCourseClassByGroup(new ClassGroup("F10-2"))
+                .orElseThrow());
+        assertTrue(book.findCourseClassByGroup(new ClassGroup("F10-4")).isEmpty());
+
+        ModelManager model = new ModelManager(book, new UserPrefs());
+        assertEquals(first, model.findCourseClassByGroup(new ClassGroup("F10-2"))
+                .orElseThrow());
     }
 
     private static CourseClass createClass(String name, String code) {

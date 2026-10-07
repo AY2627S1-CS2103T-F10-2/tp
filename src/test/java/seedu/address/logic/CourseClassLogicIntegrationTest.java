@@ -17,6 +17,9 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -42,7 +45,7 @@ public class CourseClassLogicIntegrationTest {
         logic.execute("eclass 1 n/F10-4 c/CS2101 t/");
         assertEquals(2, logic.getFilteredCourseClassList().size());
         assertEquals("CS2101", logic.getFilteredCourseClassList().get(1).getCourseCode().value);
-        assertThrows(CommandException.class, () -> logic.execute("eclass 2 n/F10-2"));
+        assertThrows(CommandException.class, () -> logic.execute("eclass 2 n/F10-2 c/CS2103T"));
         assertThrows(CommandException.class, () -> logic.execute("dclass 3"));
         assertThrows(ParseException.class, () -> logic.execute("eclass 1 c/"));
         assertThrows(ParseException.class, () -> logic.execute("eclass 1 n/F10-5 n/F10-6"));
@@ -71,5 +74,24 @@ public class CourseClassLogicIntegrationTest {
         assertEquals(courseClass.getStudents(), logic.getFilteredCourseClassList().get(0).getStudents());
         assertEquals(courseClass.getStudents(),
                 bookStorage.readCourseClassBook().orElseThrow().getCourseClassList().get(0).getStudents());
+    }
+
+    @Test
+    public void execute_edit_preservesEnrolledStudents() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage bookStorage =
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json"));
+        Logic logic = new LogicManager(model, new StorageManager(bookStorage,
+                new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
+        CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+        Student student = new Student(new StudentName("John Doe"), new Telehandle("birdman"));
+        courseClass.addStudent(student);
+        model.addCourseClass(courseClass);
+
+        logic.execute("eclass 1 n/T06");
+
+        assertEquals(Set.of(student), Set.copyOf(logic.getFilteredCourseClassList().get(0).getStudentList()));
+        assertEquals(Set.of(student), Set.copyOf(bookStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().get(0).getStudentList()));
     }
 }

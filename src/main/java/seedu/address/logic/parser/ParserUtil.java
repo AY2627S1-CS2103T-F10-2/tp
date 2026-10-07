@@ -9,11 +9,14 @@ import java.util.Set;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -49,6 +52,48 @@ public class ParserUtil {
             throw new ParseException(CourseCode.MESSAGE_CONSTRAINTS);
         }
         return new CourseCode(trimmedCode);
+    }
+
+    /**
+     * Parses a student name, trimming leading and trailing whitespace.
+     *
+     * @throws ParseException if the name is invalid
+     */
+    public static StudentName parseStudentName(String name) throws ParseException {
+        requireNonNull(name);
+        String trimmedName = name.trim();
+        if (!StudentName.isValidName(trimmedName)) {
+            throw new ParseException(StudentName.MESSAGE_CONSTRAINTS);
+        }
+        return new StudentName(trimmedName);
+    }
+
+    /**
+     * Parses a telehandle, trimming leading and trailing whitespace.
+     *
+     * @throws ParseException if the telehandle is invalid
+     */
+    public static Telehandle parseTelehandle(String telehandle) throws ParseException {
+        requireNonNull(telehandle);
+        String trimmedTelehandle = telehandle.trim();
+        if (!Telehandle.isValidTelehandle(trimmedTelehandle)) {
+            throw new ParseException(Telehandle.MESSAGE_CONSTRAINTS);
+        }
+        return new Telehandle(trimmedTelehandle);
+    }
+
+    /**
+     * Parses a class group, trimming leading and trailing whitespace.
+     *
+     * @throws ParseException if the class group is invalid
+     */
+    public static ClassGroup parseClassGroup(String classGroup) throws ParseException {
+        requireNonNull(classGroup);
+        String trimmedClassGroup = classGroup.trim();
+        if (!ClassGroup.isValidClassGroup(trimmedClassGroup)) {
+            throw new ParseException(ClassGroup.MESSAGE_CONSTRAINTS);
+        }
+        return new ClassGroup(trimmedClassGroup);
     }
 
     /**

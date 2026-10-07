@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ import seedu.address.model.UserPrefs;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.model.tag.Tag;
 import seedu.address.testutil.TypicalPersons;
 
@@ -51,11 +55,14 @@ public class JsonCourseClassBookStorageTest {
         CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"),
                 Set.of(new Tag("tutorial")));
         courseClass.getStudents().addPerson(TypicalPersons.ALICE);
+        Student student = new Student(new StudentName("John Doe"), new Telehandle("birdman"));
+        courseClass.addStudent(student);
         book.addCourseClass(courseClass);
         storage.saveCourseClassBook(book);
         var restored = storage.readCourseClassBook().orElseThrow();
         assertEquals(book, restored);
         assertEquals(courseClass.getStudents(), restored.getCourseClassList().get(0).getStudents());
+        assertEquals(List.of(student), restored.getCourseClassList().get(0).getStudentList());
     }
 
     @Test

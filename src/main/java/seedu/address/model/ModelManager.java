@@ -3,6 +3,7 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -10,7 +11,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.person.Person;
 
 /**
@@ -138,6 +141,18 @@ public class ModelManager implements Model {
     public boolean hasCourseClass(CourseClass courseClass) {
         requireNonNull(courseClass);
         return courseClassBook.hasCourseClass(courseClass);
+    }
+
+    @Override
+    public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup) {
+        requireNonNull(classGroup);
+        return courseClassBook.findCourseClassByGroup(classGroup);
+    }
+
+    @Override
+    public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup, CourseCode moduleName) {
+        requireAllNonNull(classGroup, moduleName);
+        return courseClassBook.findCourseClassByGroup(classGroup, moduleName);
     }
 
     @Override

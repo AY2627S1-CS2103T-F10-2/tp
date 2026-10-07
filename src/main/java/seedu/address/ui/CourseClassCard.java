@@ -2,6 +2,7 @@ package seedu.address.ui;
 
 import java.util.Comparator;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -11,6 +12,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.person.Person;
+import seedu.address.model.student.Student;
 
 /**
  * A UI component that displays information of a {@code CourseClass}.
@@ -53,16 +55,39 @@ public class CourseClassCard extends UiPart<Region> {
         id.setText(displayedIndex + ". ");
         name.setText(courseClass.getName().fullName);
         courseCode.setText(courseClass.getCourseCode().value);
-        studentCount.setText("Students: " + courseClass.getStudents().getPersonList().size());
-        ObservableList<Person> students = courseClass.getStudents().getPersonList();
+        refreshStudents();
 
-        for (int i = 0; i < students.size(); i++) {
-            studentsBox.getChildren().add(
-                    new PersonCard(students.get(i), i + 1).getRoot());
-        }
+        courseClass.getStudents().getPersonList().addListener(
+                (ListChangeListener<Person>) change -> refreshStudents());
+        courseClass.getStudentList().addListener(
+                (ListChangeListener<Student>) change -> refreshStudents());
 
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+    }
+
+    /**
+     * Refreshes the student count and the student cards shown inside this class card.
+     *
+     * <p>The legacy person list is retained for brownfield compatibility, while students added through the
+     * current enrolment model are displayed using {@link StudentCard}.</p>
+     */
+    private void refreshStudents() {
+        ObservableList<Person> legacyStudents = courseClass.getStudents().getPersonList();
+        ObservableList<Student> enrolledStudents = courseClass.getStudentList();
+        int legacyStudentCount = courseClass.getStudents().getPersonList().size();
+        int enrolledStudentCount = courseClass.getStudentList().size();
+        studentCount.setText("Students: " + (legacyStudentCount + enrolledStudentCount));
+
+        studentsBox.getChildren().clear();
+        for (int i = 0; i < legacyStudents.size(); i++) {
+            studentsBox.getChildren().add(
+                    new PersonCard(legacyStudents.get(i), i + 1).getRoot());
+        }
+        for (int i = 0; i < enrolledStudents.size(); i++) {
+            studentsBox.getChildren().add(
+                    new StudentCard(enrolledStudents.get(i), legacyStudents.size() + i + 1).getRoot());
+        }
     }
 }
