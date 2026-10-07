@@ -50,5 +50,7 @@ public class StudentTest {
         assertNotEquals(student, "John Doe");
         assertNotEquals(student, new Student(new StudentName("Jane Doe"), telehandle));
         assertNotEquals(student, new Student(name, new Telehandle("janedoe")));
+        assertEquals(Student.class.getCanonicalName() + "{name=" + name + ", telehandle=" + telehandle + "}",
+                student.toString());
     }
 }

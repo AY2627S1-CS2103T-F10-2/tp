@@ -237,6 +237,10 @@ public class CourseClassUiTest {
             assertEquals("Aaron Tan", ((Label) students.getChildren().get(0).lookup("#name")).getText());
             assertEquals("@aarontan", ((Label) students.getChildren().get(0)
                     .lookup("#telehandle")).getText());
+
+            courseClass.getStudents().addPerson(TypicalPersons.ALICE);
+            assertEquals("Students: 2", count.getText());
+            assertEquals(2, students.getChildren().size());
             return null;
         });
         Platform.runLater(task);

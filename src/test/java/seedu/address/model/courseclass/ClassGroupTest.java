@@ -2,6 +2,7 @@ package seedu.address.model.courseclass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,5 +30,17 @@ public class ClassGroupTest {
     public void constructor_nullClassGroup_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new ClassGroup(null));
         assertFalse(ClassGroup.isValidClassGroup(null));
+    }
+
+    @Test
+    public void equals_comparesClassGroupValue() {
+        ClassGroup classGroup = new ClassGroup("T05");
+
+        assertTrue(classGroup.equals(classGroup));
+        assertEquals(classGroup, new ClassGroup("T05"));
+        assertEquals(classGroup.hashCode(), new ClassGroup("T05").hashCode());
+        assertNotEquals(classGroup, null);
+        assertNotEquals(classGroup, "T05");
+        assertNotEquals(classGroup, new ClassGroup("F10-2"));
     }
 }

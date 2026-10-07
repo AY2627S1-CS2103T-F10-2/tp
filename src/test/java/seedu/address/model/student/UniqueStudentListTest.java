@@ -2,6 +2,7 @@ package seedu.address.model.student;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -54,6 +55,27 @@ public class UniqueStudentListTest {
         assertThrows(NullPointerException.class, () -> students.contains(null));
         assertThrows(NullPointerException.class, () -> students.add(null));
         assertThrows(NullPointerException.class, () -> students.setStudents(null));
+    }
+
+    @Test
+    public void iteratorAndDiagnostics_reflectListContents() {
+        students.add(first);
+        students.add(second);
+        UniqueStudentList copy = new UniqueStudentList(students);
+
+        List<Student> iteratedStudents = new java.util.ArrayList<>();
+        for (Student student : students) {
+            iteratedStudents.add(student);
+        }
+
+        assertEquals(List.of(first, second), iteratedStudents);
+        assertTrue(students.equals(students));
+        assertEquals(students, copy);
+        assertEquals(students.hashCode(), copy.hashCode());
+        assertEquals(students.asUnmodifiableObservableList().toString(), students.toString());
+        assertNotEquals(students, null);
+        assertNotEquals(students, "students");
+        assertNotEquals(students, new UniqueStudentList());
     }
 
     private static Student createStudent(String name, String telehandle) {

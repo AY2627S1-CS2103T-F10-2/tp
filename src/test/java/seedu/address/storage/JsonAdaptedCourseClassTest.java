@@ -63,4 +63,10 @@ public class JsonAdaptedCourseClassTest {
         assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
                 null, List.of(first, duplicate)).toModelType());
     }
+
+    @Test
+    public void toModelType_nullEnrolledStudent_rejectsMalformedData() {
+        assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, Arrays.asList((JsonAdaptedStudent) null)).toModelType());
+    }
 }

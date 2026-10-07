@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddCourseClassCommand;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
@@ -131,6 +132,21 @@ public class ModelManagerCourseClassTest {
         assertEquals(List.of(updatedFirst, sameGroupDifferentModule), book.getCourseClassList());
         assertThrows(CourseClassNotFoundException.class, () -> book.removeCourseClass(second));
         assertThrows(NullPointerException.class, () -> book.addCourseClass(null));
+    }
+
+    @Test
+    public void findCourseClassByGroup_legacyLookupFindsFirstMatchingGroup() {
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(first);
+        book.addCourseClass(createClass("F10-2", "CS2101"));
+
+        assertEquals(first, book.findCourseClassByGroup(new ClassGroup("F10-2"))
+                .orElseThrow());
+        assertTrue(book.findCourseClassByGroup(new ClassGroup("F10-4")).isEmpty());
+
+        ModelManager model = new ModelManager(book, new UserPrefs());
+        assertEquals(first, model.findCourseClassByGroup(new ClassGroup("F10-2"))
+                .orElseThrow());
     }
 
     private static CourseClass createClass(String name, String code) {
