@@ -2,6 +2,7 @@ package seedu.address.ui;
 
 import java.util.Comparator;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -11,6 +12,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.person.Person;
+import seedu.address.model.student.Student;
 
 /**
  * A UI component that displays information of a {@code CourseClass}.
@@ -53,7 +55,13 @@ public class CourseClassCard extends UiPart<Region> {
         id.setText(displayedIndex + ". ");
         name.setText(courseClass.getName().fullName);
         courseCode.setText(courseClass.getCourseCode().value);
-        studentCount.setText("Students: " + courseClass.getStudents().getPersonList().size());
+        updateStudentCount();
+
+        courseClass.getStudents().getPersonList().addListener(
+                (ListChangeListener<Person>) change -> updateStudentCount());
+        courseClass.getStudentList().addListener(
+                (ListChangeListener<Student>) change -> updateStudentCount());
+
         ObservableList<Person> students = courseClass.getStudents().getPersonList();
 
         for (int i = 0; i < students.size(); i++) {
@@ -64,5 +72,12 @@ public class CourseClassCard extends UiPart<Region> {
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+    }
+
+    /** Updates the displayed count whenever either student collection changes. */
+    private void updateStudentCount() {
+        int legacyStudentCount = courseClass.getStudents().getPersonList().size();
+        int enrolledStudentCount = courseClass.getStudentList().size();
+        studentCount.setText("Students: " + (legacyStudentCount + enrolledStudentCount));
     }
 }

@@ -38,6 +38,9 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.model.tag.Tag;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
@@ -207,6 +210,28 @@ public class CourseClassUiTest {
             assertEquals(TypicalPersons.BOB.getName().fullName, ((Label) students.getChildren().get(1)
                     .lookup("#name")).getText());
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void card_updatesStudentCountWhenStudentIsAdded() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "card_updatesStudentCountWhenStudentIsAdded", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            Label count = (Label) card.getRoot().lookup("#studentCount");
+
+            assertEquals("Students: 0", count.getText());
+
+            courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
+
+            assertEquals("Students: 1", count.getText());
             return null;
         });
         Platform.runLater(task);
