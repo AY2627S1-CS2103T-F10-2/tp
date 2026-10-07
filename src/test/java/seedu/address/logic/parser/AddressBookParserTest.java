@@ -22,6 +22,7 @@ import seedu.address.logic.commands.EditCourseClassCommand;
 import seedu.address.logic.commands.EditCourseClassCommand.EditCourseClassDescriptor;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCourseClassCommand;
+import seedu.address.logic.commands.FindStudentCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -32,6 +33,7 @@ import seedu.address.model.courseclass.Name;
 import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
+import seedu.address.model.student.StudentNameContainsKeywordsPredicate;
 import seedu.address.model.student.Telehandle;
 
 public class AddressBookParserTest {
@@ -101,6 +103,14 @@ public class AddressBookParserTest {
         FindCourseClassCommand command = (FindCourseClassCommand) parser.parseCommand(
                 FindCourseClassCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
         assertEquals(new FindCourseClassCommand(new NameContainsKeywordsPredicate(keywords)), command);
+    }
+
+    @Test
+    public void parseCommand_findStudent() throws Exception {
+        List<String> keywords = List.of("Alex", "Bernice");
+        FindStudentCommand command = (FindStudentCommand) parser.parseCommand(
+                FindStudentCommand.COMMAND_WORD + " " + String.join(" ", keywords));
+        assertEquals(new FindStudentCommand(new StudentNameContainsKeywordsPredicate(keywords)), command);
     }
 
     @Test
