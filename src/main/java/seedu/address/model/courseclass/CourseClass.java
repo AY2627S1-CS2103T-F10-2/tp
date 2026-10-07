@@ -4,6 +4,7 @@ import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -70,6 +71,26 @@ public class CourseClass {
         this.tags.addAll(tags);
         this.students = students;
         this.enrolledStudents = new UniqueStudentList(enrolledStudents);
+    }
+
+    /**
+     * Every field must be present and not null.
+     *
+     * @param name class group name
+     * @param code module code
+     * @param tags class tags
+     * @param students legacy student data
+     * @param enrolledStudents students using the current student model
+     */
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
+            List<Student> enrolledStudents) {
+        requireAllNonNull(name, code, tags, students, enrolledStudents);
+        this.name = name;
+        this.code = code;
+        this.tags.addAll(tags);
+        this.students = students;
+        this.enrolledStudents = new UniqueStudentList();
+        this.enrolledStudents.setStudents(enrolledStudents);
     }
 
     public Name getName() {
