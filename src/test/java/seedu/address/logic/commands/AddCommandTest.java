@@ -9,6 +9,7 @@ import static seedu.address.testutil.TypicalPersons.ALICE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.ReadOnlyUserPrefs;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
@@ -101,6 +103,11 @@ public class AddCommandTest {
 
         @Override
         public boolean hasCourseClass(CourseClass courseClass) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup) {
             throw new AssertionError("This method should not be called.");
         }
 

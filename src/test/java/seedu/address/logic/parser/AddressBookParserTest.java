@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCourseClassCommand;
+import seedu.address.logic.commands.AddStudentCommand;
 import seedu.address.logic.commands.ClearCourseClassCommand;
 import seedu.address.logic.commands.DeleteCourseClassCommand;
 import seedu.address.logic.commands.EditCourseClassCommand;
@@ -23,10 +24,14 @@ import seedu.address.logic.commands.FindCourseClassCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 
 public class AddressBookParserTest {
 
@@ -38,6 +43,15 @@ public class AddressBookParserTest {
                 new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
         AddCourseClassCommand command = (AddCourseClassCommand) parser.parseCommand("aclass n/F10-2 c/CS2103T");
         assertEquals(new AddCourseClassCommand(courseClass), command);
+    }
+
+    @Test
+    public void parseCommand_addStudent() throws Exception {
+        AddStudentCommand expected = new AddStudentCommand(
+                new Student(new StudentName("John Doe"), new Telehandle("birdman")),
+                new ClassGroup("T05"));
+
+        assertEquals(expected, parser.parseCommand("add n/John Doe t/birdman c/T05"));
     }
 
     @Test
@@ -105,7 +119,7 @@ public class AddressBookParserTest {
 
     @Test
     public void parseCommand_unprefixedClassCommands_throwsParseException() {
-        for (String command : List.of("add", "delete", "clear", "edit", "list", "find")) {
+        for (String command : List.of("delete", "clear", "edit", "list", "find")) {
             assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand(command));
         }
     }

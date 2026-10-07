@@ -1,9 +1,11 @@
 package seedu.address.model;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.person.Person;
 
@@ -85,6 +87,14 @@ public interface Model {
      * Returns true if a course class with the same identity as {@code courseClass} exists in the course class book.
      */
     boolean hasCourseClass(CourseClass courseClass);
+
+    /**
+     * Finds a course class by its class group.
+     *
+     * @param classGroup class group to find
+     * @return matching course class, or empty if none exists
+     */
+    Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup);
 
     /**
      * Deletes the given course class.

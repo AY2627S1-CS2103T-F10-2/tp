@@ -3,9 +3,11 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
+import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.UniqueCourseClassList;
 
@@ -54,6 +56,19 @@ public class CourseClassBook implements ReadOnlyCourseClassBook {
     public boolean hasCourseClass(CourseClass courseClass) {
         requireNonNull(courseClass);
         return courseClasses.contains(courseClass);
+    }
+
+    /**
+     * Returns the course class whose name represents {@code classGroup}.
+     *
+     * @param classGroup class group to find
+     * @return matching course class, or empty if no such class exists
+     */
+    public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup) {
+        requireNonNull(classGroup);
+        return courseClasses.asUnmodifiableObservableList().stream()
+                .filter(courseClass -> courseClass.getName().fullName.equals(classGroup.value))
+                .findFirst();
     }
 
     /**
