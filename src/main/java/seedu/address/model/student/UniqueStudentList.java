@@ -21,6 +21,19 @@ public class UniqueStudentList implements Iterable<Student> {
     private final ObservableList<Student> internalUnmodifiableList =
             FXCollections.unmodifiableObservableList(internalList);
 
+    /** Creates an empty student list. */
+    public UniqueStudentList() {}
+
+    /**
+     * Creates a student list containing the students in {@code toBeCopied}.
+     *
+     * @param toBeCopied list to copy
+     */
+    public UniqueStudentList(UniqueStudentList toBeCopied) {
+        requireNonNull(toBeCopied);
+        setStudents(toBeCopied.asUnmodifiableObservableList());
+    }
+
     /**
      * Returns true if the list contains a student with the same telehandle as {@code toCheck}.
      *

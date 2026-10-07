@@ -14,6 +14,8 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.UniqueStudentList;
 import seedu.address.model.tag.Tag;
 
 /** Jackson-friendly version of a course class, including its student book. */
@@ -22,18 +24,36 @@ class JsonAdaptedCourseClass {
     private final String courseCode;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
     private final JsonSerializableAddressBook students;
+    private final List<JsonAdaptedStudent> enrolledStudents = new ArrayList<>();
 
     /** Creates an adapted class from its JSON fields. */
     @JsonCreator
     public JsonAdaptedCourseClass(@JsonProperty("name") String name,
             @JsonProperty("courseCode") String courseCode, @JsonProperty("tags") List<JsonAdaptedTag> tags,
-            @JsonProperty("students") JsonSerializableAddressBook students) {
+            @JsonProperty("students") JsonSerializableAddressBook students,
+            @JsonProperty("enrolledStudents") List<JsonAdaptedStudent> enrolledStudents) {
         this.name = name;
         this.courseCode = courseCode;
         if (tags != null) {
             this.tags.addAll(tags);
         }
         this.students = students;
+        if (enrolledStudents != null) {
+            this.enrolledStudents.addAll(enrolledStudents);
+        }
+    }
+
+    /**
+     * Creates an adapted class without current-model student data.
+     *
+     * @param name class name
+     * @param courseCode course code
+     * @param tags class tags
+     * @param students legacy student data
+     */
+    public JsonAdaptedCourseClass(String name, String courseCode, List<JsonAdaptedTag> tags,
+            JsonSerializableAddressBook students) {
+        this(name, courseCode, tags, students, null);
     }
 
     /** Copies a course class for serialization. */
@@ -42,6 +62,8 @@ class JsonAdaptedCourseClass {
         courseCode = source.getCourseCode().value;
         tags.addAll(source.getTags().stream().map(JsonAdaptedTag::new).collect(Collectors.toList()));
         students = new JsonSerializableAddressBook(source.getStudents());
+        enrolledStudents.addAll(source.getStudentList().stream()
+                .map(JsonAdaptedStudent::new).collect(Collectors.toList()));
     }
 
     /**
@@ -63,6 +85,18 @@ class JsonAdaptedCourseClass {
             modelTags.add(tag.toModelType());
         }
         AddressBook studentBook = students == null ? new AddressBook() : students.toModelType();
-        return new CourseClass(new Name(name), new CourseCode(courseCode), modelTags, studentBook);
+        UniqueStudentList enrolledStudentList = new UniqueStudentList();
+        for (JsonAdaptedStudent jsonAdaptedStudent : enrolledStudents) {
+            if (jsonAdaptedStudent == null) {
+                throw new IllegalValueException("Enrolled students list must not contain null entries.");
+            }
+            Student student = jsonAdaptedStudent.toModelType();
+            if (enrolledStudentList.contains(student)) {
+                throw new IllegalValueException("Enrolled students list contains duplicate student(s).");
+            }
+            enrolledStudentList.add(student);
+        }
+        return new CourseClass(new Name(name), new CourseCode(courseCode), modelTags,
+                studentBook, enrolledStudentList);
     }
 }

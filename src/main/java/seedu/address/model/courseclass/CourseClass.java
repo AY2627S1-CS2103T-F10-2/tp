@@ -53,6 +53,25 @@ public class CourseClass {
         this.enrolledStudents = new UniqueStudentList();
     }
 
+    /**
+     * Every field must be present and not null.
+     *
+     * @param name class name
+     * @param code course code
+     * @param tags class tags
+     * @param students legacy student data
+     * @param enrolledStudents students using the current student model
+     */
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
+            UniqueStudentList enrolledStudents) {
+        requireAllNonNull(name, code, tags, students, enrolledStudents);
+        this.name = name;
+        this.code = code;
+        this.tags.addAll(tags);
+        this.students = students;
+        this.enrolledStudents = new UniqueStudentList(enrolledStudents);
+    }
+
     public Name getName() {
         return name;
     }
