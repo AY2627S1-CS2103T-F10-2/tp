@@ -17,6 +17,7 @@ import seedu.address.logic.commands.AddCourseClassCommand;
 import seedu.address.logic.commands.AddStudentCommand;
 import seedu.address.logic.commands.ClearCourseClassCommand;
 import seedu.address.logic.commands.DeleteCourseClassCommand;
+import seedu.address.logic.commands.DeleteStudentCommand;
 import seedu.address.logic.commands.EditCourseClassCommand;
 import seedu.address.logic.commands.EditCourseClassCommand.EditCourseClassDescriptor;
 import seedu.address.logic.commands.ExitCommand;
@@ -52,6 +53,14 @@ public class AddressBookParserTest {
                 new ClassGroup("T05"), new CourseCode("CS2103T"));
 
         assertEquals(expected, parser.parseCommand("add n/John Doe t/birdman c/T05 m/CS2103T"));
+    }
+
+    @Test
+    public void parseCommand_deleteStudent() throws Exception {
+        DeleteStudentCommand expected = new DeleteStudentCommand(
+                new Telehandle("birdman"), new ClassGroup("T05"), new CourseCode("CS2103T"));
+
+        assertEquals(expected, parser.parseCommand("dstudent t/birdman c/T05 m/CS2103T"));
     }
 
     @Test

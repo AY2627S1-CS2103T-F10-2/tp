@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.model.student.exceptions.DuplicateStudentException;
+import seedu.address.model.student.exceptions.StudentNotFoundException;
 
 public class UniqueStudentListTest {
 
@@ -48,6 +49,17 @@ public class UniqueStudentListTest {
 
         assertEquals(List.of(first), view);
         assertThrows(UnsupportedOperationException.class, () -> view.clear());
+    }
+
+    @Test
+    public void containsTelehandleAndRemove_removesMatchingStudent() {
+        students.add(first);
+
+        assertTrue(students.containsTelehandle(new Telehandle("john_doe")));
+        students.remove(new Telehandle("john_doe"));
+
+        assertFalse(students.containsTelehandle(new Telehandle("john_doe")));
+        assertThrows(StudentNotFoundException.class, () -> students.remove(new Telehandle("john_doe")));
     }
 
     @Test

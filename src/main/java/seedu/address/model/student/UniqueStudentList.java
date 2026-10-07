@@ -9,6 +9,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.model.student.exceptions.DuplicateStudentException;
+import seedu.address.model.student.exceptions.StudentNotFoundException;
 
 /**
  * A list of students that enforces uniqueness by telehandle and does not allow nulls.
@@ -45,6 +46,12 @@ public class UniqueStudentList implements Iterable<Student> {
         return internalList.stream().anyMatch(toCheck::isSameStudent);
     }
 
+    /** Returns true if the list contains a student with the given telehandle. */
+    public boolean containsTelehandle(Telehandle telehandle) {
+        requireNonNull(telehandle);
+        return internalList.stream().anyMatch(student -> student.getTelehandle().equals(telehandle));
+    }
+
     /**
      * Adds a student to the list.
      *
@@ -57,6 +64,15 @@ public class UniqueStudentList implements Iterable<Student> {
             throw new DuplicateStudentException();
         }
         internalList.add(toAdd);
+    }
+
+    /** Removes the student with the given telehandle from the list. */
+    public void remove(Telehandle telehandle) {
+        requireNonNull(telehandle);
+        boolean removed = internalList.removeIf(student -> student.getTelehandle().equals(telehandle));
+        if (!removed) {
+            throw new StudentNotFoundException();
+        }
     }
 
     /**

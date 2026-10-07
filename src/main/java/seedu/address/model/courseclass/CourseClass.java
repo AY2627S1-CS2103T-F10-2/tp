@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.AddressBook;
 import seedu.address.model.student.Student;
+import seedu.address.model.student.Telehandle;
 import seedu.address.model.student.UniqueStudentList;
 import seedu.address.model.tag.Tag;
 
@@ -115,6 +116,11 @@ public class CourseClass {
         return enrolledStudents.contains(student);
     }
 
+    /** Returns true if a student with the given telehandle is enrolled in this class. */
+    public boolean hasStudent(Telehandle telehandle) {
+        return enrolledStudents.containsTelehandle(telehandle);
+    }
+
     /**
      * Adds a student to this class.
      * The student must not already be enrolled in this class.
@@ -123,6 +129,11 @@ public class CourseClass {
      */
     public void addStudent(Student student) {
         enrolledStudents.add(student);
+    }
+
+    /** Removes the student with the given telehandle from this class. */
+    public void removeStudent(Telehandle telehandle) {
+        enrolledStudents.remove(telehandle);
     }
 
     /**
