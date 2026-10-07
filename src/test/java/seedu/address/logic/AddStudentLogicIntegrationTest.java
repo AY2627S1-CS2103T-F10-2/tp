@@ -11,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.logic.commands.AddStudentCommand;
 import seedu.address.logic.commands.CommandResult;
+import seedu.address.logic.commands.DeleteStudentCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.Model;
@@ -109,6 +110,72 @@ public class AddStudentLogicIntegrationTest {
                 logic.execute("add n/John2 t/birdman c/T05 m/CS2103T"));
         assertEquals(0, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
                 .orElseThrow().getStudentList().size());
+    }
+
+    @Test
+    public void execute_deleteStudent_requiresConfirmationAndRemovesOnlyRequestedEnrollment() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("aclass n/T05 c/CS2101");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2101");
+
+        CommandResult preview = logic.execute("dstudent t/birdman c/T05 m/CS2103T");
+
+        assertEquals(String.format(DeleteStudentCommand.MESSAGE_CONFIRMATION,
+                "John Doe", "birdman", "T05", "CS2103T"), preview.getFeedbackToUser());
+        assertEquals(1, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+
+        CommandResult deletion = logic.execute("yes");
+
+        assertEquals(String.format(DeleteStudentCommand.MESSAGE_SUCCESS,
+                "birdman", "T05", "CS2103T"), deletion.getFeedbackToUser());
+        assertEquals(0, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+        assertEquals(1, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2101"))
+                .orElseThrow().getStudentList().size());
+        assertEquals(0, classStorage.readCourseClassBook().orElseThrow().getCourseClassList().stream()
+                .filter(courseClass -> courseClass.getCourseCode().equals(new CourseCode("CS2103T")))
+                .findFirst().orElseThrow().getStudentList().size());
+    }
+
+    @Test
+    public void execute_deleteStudent_noCancelsWithoutChangingData() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        logic.execute("dstudent t/birdman c/T05 m/CS2103T");
+
+        CommandResult cancellation = logic.execute("no");
+
+        assertEquals(DeleteStudentCommand.MESSAGE_CANCELLED, cancellation.getFeedbackToUser());
+        assertEquals(1, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+    }
+
+    @Test
+    public void execute_invalidConfirmation_keepsPendingDeletion() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        logic.execute("dstudent t/birdman c/T05 m/CS2103T");
+
+        CommandException exception = assertThrows(CommandException.class, () -> logic.execute("maybe"));
+
+        assertEquals(DeleteStudentCommand.MESSAGE_EXPECTED_CONFIRMATION, exception.getMessage());
+        assertEquals(1, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+        logic.execute("no");
     }
 
     private JsonCourseClassBookStorage createClassStorage() {

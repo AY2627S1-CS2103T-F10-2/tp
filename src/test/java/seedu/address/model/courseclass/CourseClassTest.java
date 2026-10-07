@@ -16,6 +16,7 @@ import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
 import seedu.address.model.student.exceptions.DuplicateStudentException;
+import seedu.address.model.student.exceptions.StudentNotFoundException;
 import seedu.address.model.tag.Tag;
 
 public class CourseClassTest {
@@ -64,6 +65,19 @@ public class CourseClassTest {
         assertThrows(DuplicateStudentException.class, () -> courseClass.addStudent(sameStudent));
         assertEquals(Set.of(student), Set.copyOf(courseClass.getStudentList()));
         assertThrows(UnsupportedOperationException.class, () -> courseClass.getStudentList().clear());
+    }
+
+    @Test
+    public void removeStudent_removesByTelehandle() {
+        CourseClass courseClass = new CourseClass(name, code, Set.of());
+        Student student = new Student(new StudentName("John Doe"), new Telehandle("john_doe"));
+        courseClass.addStudent(student);
+
+        courseClass.removeStudent(new Telehandle("john_doe"));
+
+        assertTrue(courseClass.getStudentList().isEmpty());
+        assertFalse(courseClass.hasStudent(new Telehandle("john_doe")));
+        assertThrows(StudentNotFoundException.class, () -> courseClass.removeStudent(new Telehandle("john_doe")));
     }
 
     @Test

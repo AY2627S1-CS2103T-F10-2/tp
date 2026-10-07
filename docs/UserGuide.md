@@ -140,6 +140,23 @@ Examples:
 * `list` followed by `delete 2` deletes the 2nd person in the address book.
 * `find Betsy` followed by `delete 1` deletes the 1st person in the results of the `find` command.
 
+### Removing a student from a class group: `dstudent`
+
+Removes a student from one class group without removing the student's enrolments in other classes.
+The module name is required so that class groups with the same name in different modules are distinguished.
+
+Format: `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`
+
+* `TELEHANDLE` identifies the student.
+* `CLASS_GROUP` identifies the tutorial, laboratory, or recitation group.
+* `MODULE_NAME` identifies the module containing the class group.
+* The command first displays the matching student and asks for confirmation.
+  Type `yes` to remove the enrolment or `no` to cancel without changing any data.
+
+Example:
+
+* `dstudent t/birdman c/T05 m/CS2103T` removes `@birdman` from `T05` in `CS2103T` after confirmation.
+
 ### Clearing all entries: `clear`
 
 Clears all entries from the address book.
@@ -192,6 +209,7 @@ Action | Format, Examples
 **Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
+**Remove student** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
 **Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List** | `list`
