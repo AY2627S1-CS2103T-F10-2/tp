@@ -86,6 +86,10 @@ public class DeleteStudentCommandTest {
 
         assertTrue(command.equals(command));
         assertEquals(command, new DeleteStudentCommand(TELEHANDLE, CLASS_GROUP, MODULE));
+        assertFalse(command.equals(new DeleteStudentCommand(new Telehandle("janedoe"), CLASS_GROUP, MODULE)));
+        assertFalse(command.equals(new DeleteStudentCommand(TELEHANDLE, new ClassGroup("L14"), MODULE)));
+        assertFalse(command.equals(new DeleteStudentCommand(TELEHANDLE, CLASS_GROUP,
+                new CourseCode("CS2101"))));
         assertFalse(command.equals(command.confirm()));
         assertFalse(command.equals(null));
         assertFalse(command.equals("command"));

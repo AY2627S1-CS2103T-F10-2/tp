@@ -160,6 +160,24 @@ public class AddStudentLogicIntegrationTest {
                 .orElseThrow().getStudentList().size());
     }
 
+    @Test
+    public void execute_invalidConfirmation_keepsPendingDeletion() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        logic.execute("dstudent t/birdman c/T05 m/CS2103T");
+
+        CommandException exception = assertThrows(CommandException.class, () -> logic.execute("maybe"));
+
+        assertEquals(DeleteStudentCommand.MESSAGE_EXPECTED_CONFIRMATION, exception.getMessage());
+        assertEquals(1, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+        logic.execute("no");
+    }
+
     private JsonCourseClassBookStorage createClassStorage() {
         return new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json"));
     }

@@ -85,8 +85,7 @@ public class DeleteStudentCommand extends Command {
         Student studentToDelete = targetClass.getStudentList().stream()
                 .filter(student -> student.getTelehandle().equals(telehandle))
                 .findFirst()
-                .orElseThrow(() -> new CommandException(String.format(MESSAGE_STUDENT_NOT_FOUND,
-                        telehandle, classGroup, moduleName)));
+                .orElseThrow();
 
         if (!confirmed) {
             return new CommandResult(String.format(MESSAGE_CONFIRMATION,
