@@ -232,6 +232,11 @@ public class CourseClassUiTest {
             courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
 
             assertEquals("Students: 1", count.getText());
+            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
+            assertEquals(1, students.getChildren().size());
+            assertEquals("Aaron Tan", ((Label) students.getChildren().get(0).lookup("#name")).getText());
+            assertEquals("@aarontan", ((Label) students.getChildren().get(0)
+                    .lookup("#telehandle")).getText());
             return null;
         });
         Platform.runLater(task);
