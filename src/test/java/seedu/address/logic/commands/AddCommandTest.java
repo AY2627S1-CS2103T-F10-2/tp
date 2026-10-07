@@ -20,7 +20,9 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.ReadOnlyUserPrefs;
+import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
@@ -87,6 +89,46 @@ public class AddCommandTest {
      * A default model stub that has all of the methods failing.
      */
     private class ModelStub implements Model {
+        @Override
+        public void setCourseClassBook(ReadOnlyCourseClassBook book) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ReadOnlyCourseClassBook getCourseClassBook() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public boolean hasCourseClass(CourseClass courseClass) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void deleteCourseClass(CourseClass target) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void addCourseClass(CourseClass courseClass) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setCourseClass(CourseClass target, CourseClass editedCourseClass) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ObservableList<CourseClass> getFilteredCourseClassList() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void updateFilteredCourseClassList(Predicate<CourseClass> predicate) {
+            throw new AssertionError("This method should not be called.");
+        }
+
         @Override
         public ReadOnlyUserPrefs getUserPrefs() {
             throw new AssertionError("This method should not be called.");

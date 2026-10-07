@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.ReadOnlyUserPrefs;
 import seedu.address.model.UserPrefs;
 
@@ -13,6 +14,15 @@ import seedu.address.model.UserPrefs;
  * API of the Storage component
  */
 public interface Storage {
+
+    /** Returns the course class data file path. */
+    Path getCourseClassBookFilePath();
+
+    /** Reads course class data, returning an empty optional if the file is absent. */
+    Optional<ReadOnlyCourseClassBook> readCourseClassBook() throws DataLoadingException;
+
+    /** Saves the course class book. */
+    void saveCourseClassBook(ReadOnlyCourseClassBook courseClassBook) throws IOException;
 
     /**
      * Returns the file path of the UserPrefs data file.
