@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.UniqueCourseClassList;
 
 /**
@@ -59,7 +60,8 @@ public class CourseClassBook implements ReadOnlyCourseClassBook {
     }
 
     /**
-     * Returns the course class whose name represents {@code classGroup}.
+     * Returns the first course class whose name represents {@code classGroup}.
+     * This lookup is retained for callers that do not need module disambiguation.
      *
      * @param classGroup class group to find
      * @return matching course class, or empty if no such class exists
@@ -68,6 +70,22 @@ public class CourseClassBook implements ReadOnlyCourseClassBook {
         requireNonNull(classGroup);
         return courseClasses.asUnmodifiableObservableList().stream()
                 .filter(courseClass -> courseClass.getName().fullName.equals(classGroup.value))
+                .findFirst();
+    }
+
+    /**
+     * Returns the course class matching both a class group and module.
+     *
+     * @param classGroup class group to find
+     * @param moduleName module containing the class group
+     * @return matching course class, or empty if no such class exists
+     */
+    public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup, CourseCode moduleName) {
+        requireNonNull(classGroup);
+        requireNonNull(moduleName);
+        return courseClasses.asUnmodifiableObservableList().stream()
+                .filter(courseClass -> courseClass.getName().fullName.equals(classGroup.value)
+                        && courseClass.getCourseCode().equals(moduleName))
                 .findFirst();
     }
 

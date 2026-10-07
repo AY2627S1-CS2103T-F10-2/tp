@@ -109,7 +109,7 @@ public class CourseClassCommandTest {
     public void add_duplicateHiddenByFilter_preservesDataAndFilter() {
         model.addCourseClass(first);
         model.updateFilteredCourseClassList(unused -> false);
-        CourseClass duplicate = new CourseClass(first.getName(), new CourseCode("CS2101"), Set.of());
+        CourseClass duplicate = new CourseClass(first.getName(), first.getCourseCode(), Set.of());
         CommandException error = assertThrows(CommandException.class, () ->
                 new AddCourseClassCommand(duplicate).execute(model));
         assertEquals(AddCourseClassCommand.MESSAGE_DUPLICATE_CLASS, error.getMessage());

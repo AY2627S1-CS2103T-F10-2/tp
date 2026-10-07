@@ -41,10 +41,12 @@ public class CourseClassTest {
     }
 
     @Test
-    public void isSameCourseClass_comparesNamesRegardlessOfCodeOrTags() {
+    public void isSameCourseClass_comparesNameAndCodeRegardlessOfTags() {
         CourseClass courseClass = new CourseClass(name, code, Set.of());
         assertTrue(courseClass.isSameCourseClass(courseClass));
-        assertTrue(courseClass.isSameCourseClass(new CourseClass(name, new CourseCode("CS2101"),
+        assertFalse(courseClass.isSameCourseClass(new CourseClass(name, new CourseCode("CS2101"),
+                Set.of(new Tag("tutorial")))));
+        assertTrue(courseClass.isSameCourseClass(new CourseClass(name, code,
                 Set.of(new Tag("tutorial")))));
         assertFalse(courseClass.isSameCourseClass(null));
         assertFalse(courseClass.isSameCourseClass(new CourseClass(new Name("F10-3"), code, Set.of())));

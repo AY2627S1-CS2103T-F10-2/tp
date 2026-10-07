@@ -122,8 +122,8 @@ public class CourseClass {
     }
 
     /**
-     * Returns true if both course classes have the same name.
-     * This defines a weaker notion of equality between two course classes.
+     * Returns true if both course classes have the same class group and module.
+     * This defines the identity of a course class.
      */
     public boolean isSameCourseClass(CourseClass otherCourseClass) {
         if (otherCourseClass == this) {
@@ -131,7 +131,8 @@ public class CourseClass {
         }
 
         return otherCourseClass != null
-                && otherCourseClass.getName().equals(getName());
+                && otherCourseClass.getName().equals(getName())
+                && otherCourseClass.getCourseCode().equals(getCourseCode());
     }
 
     /**

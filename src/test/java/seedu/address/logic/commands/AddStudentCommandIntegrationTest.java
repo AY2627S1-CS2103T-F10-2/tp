@@ -22,10 +22,11 @@ public class AddStudentCommandIntegrationTest {
         Model model = new ModelManager();
         model.addCourseClass(new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of()));
 
-        Command command = new AddressBookParser().parseCommand("add n/John Doe t/birdman c/T05");
+        Command command = new AddressBookParser().parseCommand("add n/John Doe t/birdman c/T05 m/CS2103T");
         command.execute(model);
 
-        assertEquals(1, model.findCourseClassByGroup(new seedu.address.model.courseclass.ClassGroup("T05"))
+        assertEquals(1, model.findCourseClassByGroup(
+                new seedu.address.model.courseclass.ClassGroup("T05"), new CourseCode("CS2103T"))
                 .orElseThrow().getStudentList().size());
         assertThrows(CommandException.class, () -> command.execute(model));
     }
@@ -33,8 +34,24 @@ public class AddStudentCommandIntegrationTest {
     @Test
     public void execute_nonExistentClass_throwsCommandException() throws Exception {
         Model model = new ModelManager();
-        Command command = new AddressBookParser().parseCommand("add n/John Doe t/birdman c/T05");
+        Command command = new AddressBookParser().parseCommand("add n/John Doe t/birdman c/T05 m/CS2103T");
 
         assertThrows(CommandException.class, () -> command.execute(model));
+    }
+
+    @Test
+    public void execute_sameGroupInDifferentModules_addsToRequestedClass() throws Exception {
+        Model model = new ModelManager();
+        model.addCourseClass(new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of()));
+        model.addCourseClass(new CourseClass(new Name("T05"), new CourseCode("CS2101"), Set.of()));
+
+        Command command = new AddressBookParser().parseCommand(
+                "add n/John Doe t/birdman c/T05 m/CS2101");
+        command.execute(model);
+
+        assertEquals(0, model.findCourseClassByGroup(new seedu.address.model.courseclass.ClassGroup("T05"),
+                new CourseCode("CS2103T")).orElseThrow().getStudentList().size());
+        assertEquals(1, model.findCourseClassByGroup(new seedu.address.model.courseclass.ClassGroup("T05"),
+                new CourseCode("CS2101")).orElseThrow().getStudentList().size());
     }
 }

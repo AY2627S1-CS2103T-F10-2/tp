@@ -11,7 +11,7 @@ public class ClassGroupTest {
 
     @Test
     public void constructor_validClassGroups_success() {
-        for (String classGroup : new String[] {"T05", "L14", "R40"}) {
+        for (String classGroup : new String[] {"T05", "L14", "R40", "B32", "F10-2"}) {
             assertTrue(ClassGroup.isValidClassGroup(classGroup));
             assertEquals(classGroup, new ClassGroup(classGroup).toString());
         }
@@ -19,7 +19,7 @@ public class ClassGroupTest {
 
     @Test
     public void constructor_invalidClassGroups_throwsIllegalArgumentException() {
-        for (String classGroup : new String[] {"t05", "X05", "T5", "T005", "T0A", ""}) {
+        for (String classGroup : new String[] {"t05", "F1", "F100", "F10-", "F10-22", "F10-2-3", "T0A", ""}) {
             assertFalse(ClassGroup.isValidClassGroup(classGroup));
             assertThrows(IllegalArgumentException.class, () -> new ClassGroup(classGroup));
         }

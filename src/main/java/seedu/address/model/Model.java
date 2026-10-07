@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.person.Person;
 
 /**
@@ -95,6 +96,15 @@ public interface Model {
      * @return matching course class, or empty if none exists
      */
     Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup);
+
+    /**
+     * Finds a course class by its class group and module.
+     *
+     * @param classGroup class group to find
+     * @param moduleName module containing the class group
+     * @return matching course class, or empty if none exists
+     */
+    Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup, CourseCode moduleName);
 
     /**
      * Deletes the given course class.

@@ -25,6 +25,7 @@ import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.ReadOnlyUserPrefs;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.person.Person;
 import seedu.address.testutil.PersonBuilder;
 
@@ -108,6 +109,12 @@ public class AddCommandTest {
 
         @Override
         public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup,
+                CourseCode moduleName) {
             throw new AssertionError("This method should not be called.");
         }
 

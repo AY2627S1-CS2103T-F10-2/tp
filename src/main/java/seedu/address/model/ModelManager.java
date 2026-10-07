@@ -13,6 +13,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.person.Person;
 
 /**
@@ -146,6 +147,12 @@ public class ModelManager implements Model {
     public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup) {
         requireNonNull(classGroup);
         return courseClassBook.findCourseClassByGroup(classGroup);
+    }
+
+    @Override
+    public Optional<CourseClass> findCourseClassByGroup(ClassGroup classGroup, CourseCode moduleName) {
+        requireAllNonNull(classGroup, moduleName);
+        return courseClassBook.findCourseClassByGroup(classGroup, moduleName);
     }
 
     @Override

@@ -13,7 +13,8 @@ import seedu.address.model.courseclass.exceptions.DuplicateCourseClassException;
 
 /**
  * A list of course classes that enforces uniqueness between its elements and does not allow nulls.
- * A course class is considered unique by comparing using {@code CourseClass#isSameCourseClass(CourseClass)}. As such,
+ * A course class is considered unique by comparing its class group and module using
+ * {@code CourseClass#isSameCourseClass(CourseClass)}. As such,
  * adding and updating of
  * course classes uses CourseClass#isSameCourseClass(CourseClass) for equality so as to ensure that the course class
  * being added or updated is

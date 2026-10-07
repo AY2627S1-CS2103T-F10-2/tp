@@ -49,9 +49,9 @@ public class AddressBookParserTest {
     public void parseCommand_addStudent() throws Exception {
         AddStudentCommand expected = new AddStudentCommand(
                 new Student(new StudentName("John Doe"), new Telehandle("birdman")),
-                new ClassGroup("T05"));
+                new ClassGroup("T05"), new CourseCode("CS2103T"));
 
-        assertEquals(expected, parser.parseCommand("add n/John Doe t/birdman c/T05"));
+        assertEquals(expected, parser.parseCommand("add n/John Doe t/birdman c/T05 m/CS2103T"));
     }
 
     @Test

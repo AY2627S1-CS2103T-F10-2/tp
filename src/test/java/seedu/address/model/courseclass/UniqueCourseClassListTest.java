@@ -36,13 +36,15 @@ public class UniqueCourseClassListTest {
     }
 
     @Test
-    public void containsAndAdd_enforceIdentity() {
+    public void containsAndAdd_enforceGroupAndModuleIdentity() {
         assertFalse(classes.contains(first));
         classes.add(first);
-        CourseClass sameName = createClass("F10-2", "CS2101");
-        assertTrue(classes.contains(sameName));
-        assertThrows(DuplicateCourseClassException.class, () -> classes.add(sameName));
-        assertEquals(List.of(first), classes.asUnmodifiableObservableList());
+        CourseClass sameGroupDifferentModule = createClass("F10-2", "CS2101");
+        assertFalse(classes.contains(sameGroupDifferentModule));
+        classes.add(sameGroupDifferentModule);
+        assertTrue(classes.contains(first));
+        assertThrows(DuplicateCourseClassException.class, () -> classes.add(first));
+        assertEquals(List.of(first, sameGroupDifferentModule), classes.asUnmodifiableObservableList());
     }
 
     @Test

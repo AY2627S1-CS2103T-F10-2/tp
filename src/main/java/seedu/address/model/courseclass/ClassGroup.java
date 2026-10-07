@@ -4,14 +4,14 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
- * Represents a tutorial, laboratory, or recitation class group.
+ * Represents a class group.
  * Guarantees: immutable; is valid as declared in {@link #isValidClassGroup(String)}.
  */
 public class ClassGroup {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Class groups should start with T, L, or R and be followed by exactly two digits";
-    public static final String VALIDATION_REGEX = "[TLR]\\d{2}";
+            "Class groups should start with an uppercase letter, followed by two digits, and may end with -<digit>";
+    public static final String VALIDATION_REGEX = "[A-Z]\\d{2}(?:-\\d)?";
 
     public final String value;
 

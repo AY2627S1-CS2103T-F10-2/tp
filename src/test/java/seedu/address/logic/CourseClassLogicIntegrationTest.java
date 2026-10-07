@@ -42,7 +42,7 @@ public class CourseClassLogicIntegrationTest {
         logic.execute("eclass 1 n/F10-4 c/CS2101 t/");
         assertEquals(2, logic.getFilteredCourseClassList().size());
         assertEquals("CS2101", logic.getFilteredCourseClassList().get(1).getCourseCode().value);
-        assertThrows(CommandException.class, () -> logic.execute("eclass 2 n/F10-2"));
+        assertThrows(CommandException.class, () -> logic.execute("eclass 2 n/F10-2 c/CS2103T"));
         assertThrows(CommandException.class, () -> logic.execute("dclass 3"));
         assertThrows(ParseException.class, () -> logic.execute("eclass 1 c/"));
         assertThrows(ParseException.class, () -> logic.execute("eclass 1 n/F10-5 n/F10-6"));
