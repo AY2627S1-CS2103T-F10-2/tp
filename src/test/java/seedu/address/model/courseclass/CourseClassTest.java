@@ -12,6 +12,10 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.model.AddressBook;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
+import seedu.address.model.student.exceptions.DuplicateStudentException;
 import seedu.address.model.tag.Tag;
 
 public class CourseClassTest {
@@ -44,6 +48,20 @@ public class CourseClassTest {
                 Set.of(new Tag("tutorial")))));
         assertFalse(courseClass.isSameCourseClass(null));
         assertFalse(courseClass.isSameCourseClass(new CourseClass(new Name("F10-3"), code, Set.of())));
+    }
+
+    @Test
+    public void studentOperations_enforceTelehandleIdentity() {
+        CourseClass courseClass = new CourseClass(name, code, Set.of());
+        Student student = new Student(new StudentName("John Doe"), new Telehandle("john_doe"));
+        Student sameStudent = new Student(new StudentName("Different Name"), new Telehandle("john_doe"));
+
+        assertFalse(courseClass.hasStudent(student));
+        courseClass.addStudent(student);
+        assertTrue(courseClass.hasStudent(sameStudent));
+        assertThrows(DuplicateStudentException.class, () -> courseClass.addStudent(sameStudent));
+        assertEquals(Set.of(student), Set.copyOf(courseClass.getStudentList()));
+        assertThrows(UnsupportedOperationException.class, () -> courseClass.getStudentList().clear());
     }
 
     @Test

@@ -7,8 +7,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.AddressBook;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.UniqueStudentList;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -24,6 +27,7 @@ public class CourseClass {
     // Data fields
     private final Set<Tag> tags = new HashSet<>();
     private final AddressBook students;
+    private final UniqueStudentList enrolledStudents;
 
     /**
      * Every field must be present and not null.
@@ -34,6 +38,7 @@ public class CourseClass {
         this.code = code;
         this.tags.addAll(tags);
         this.students = new AddressBook();
+        this.enrolledStudents = new UniqueStudentList();
     }
 
     /**
@@ -45,6 +50,7 @@ public class CourseClass {
         this.code = code;
         this.tags.addAll(tags);
         this.students = students;
+        this.enrolledStudents = new UniqueStudentList();
     }
 
     public Name getName() {
@@ -57,6 +63,35 @@ public class CourseClass {
 
     public AddressBook getStudents() {
         return students;
+    }
+
+    /**
+     * Returns true if a student with the same telehandle is enrolled in this class.
+     *
+     * @param student student to check
+     * @return true if the student is enrolled in this class
+     */
+    public boolean hasStudent(Student student) {
+        return enrolledStudents.contains(student);
+    }
+
+    /**
+     * Adds a student to this class.
+     * The student must not already be enrolled in this class.
+     *
+     * @param student student to enrol
+     */
+    public void addStudent(Student student) {
+        enrolledStudents.add(student);
+    }
+
+    /**
+     * Returns an unmodifiable view of the students enrolled in this class.
+     *
+     * @return an unmodifiable student list
+     */
+    public ObservableList<Student> getStudentList() {
+        return enrolledStudents.asUnmodifiableObservableList();
     }
 
     /**
