@@ -155,6 +155,28 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Student search feature
+
+The student search feature is implemented by `FindStudentCommand`,
+`FindStudentCommandParser`, and `StudentNameContainsKeywordsPredicate`.
+
+When the user enters `fstudent KEYWORD [MORE_KEYWORDS]`, `AddressBookParser`
+delegates the arguments to `FindStudentCommandParser`. The parser rejects an
+empty keyword list and creates a `FindStudentCommand` containing a
+`StudentNameContainsKeywordsPredicate` otherwise.
+
+During execution, `FindStudentCommand` visits the enrolled-student list of each
+course class in the model. The predicate performs a case-insensitive, full-word
+comparison and accepts a student when any keyword matches the student's name.
+The command returns every matching enrolment with the student's Telegram
+handle, class group, and module code, allowing similarly named students and
+multiple enrolments to be distinguished.
+
+This approach searches the existing per-class student lists instead of
+introducing a separate global student index. It keeps the first feature
+increment small and avoids duplicating enrolment data, while still satisfying
+the current requirement to search across all classes.
+
 ### \[Proposed\] Undo/redo feature
 
 #### Proposed Implementation

@@ -157,6 +157,37 @@ Example:
 
 * `dstudent t/birdman c/T05 m/CS2103T` removes `@birdman` from `T05` in `CS2103T` after confirmation.
 
+### Finding enrolled students by name: `fstudent`
+
+Finds students enrolled in any class whose names contain at least one of the supplied keywords.
+Each result includes the student's Telegram handle, class group, and module so that students with the same name
+can be distinguished.
+
+Format: `fstudent KEYWORD [MORE_KEYWORDS]`
+
+* The search is case-insensitive.
+* Only full words in student names match; for example, `Alex` matches `Alex Tan`, but `Ale` does not.
+* When several keywords are supplied, a student matching any keyword is returned.
+* A student enrolled in multiple classes is shown once for each enrolment.
+
+Examples:
+
+* `fstudent Alex` finds every enrolled student with `Alex` as a full word in their name.
+* `fstudent Alex Bernice` finds students whose names contain either `Alex` or `Bernice`.
+
+### Finding classes by class-group name: `fclass`
+
+Finds class groups whose names contain at least one of the supplied keywords and displays the matching classes.
+
+Format: `fclass KEYWORD [MORE_KEYWORDS]`
+
+* The search is case-insensitive and matches full words.
+* When several keywords are supplied, a class matching any keyword is returned.
+
+Example:
+
+* `fclass T05 L01` finds class groups whose names contain either `T05` or `L01`.
+
 ### Clearing all entries: `clear`
 
 Clears all entries from the address book.
@@ -210,6 +241,8 @@ Action | Format, Examples
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
 **Remove student** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
+**Find student** | `fstudent KEYWORD [MORE_KEYWORDS]`<br> e.g., `fstudent Alex Bernice`
+**Find class** | `fclass KEYWORD [MORE_KEYWORDS]`<br> e.g., `fclass T05 L01`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
 **Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
 **List** | `list`
