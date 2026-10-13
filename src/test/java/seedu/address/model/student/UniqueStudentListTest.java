@@ -78,6 +78,17 @@ public class UniqueStudentListTest {
     }
 
     @Test
+    public void setStudent_uniqueDifferentIdentity_replacesInPlace() {
+        students.add(first);
+        students.add(second);
+        Student editedFirst = createStudent("John Tan", "johntan");
+
+        students.setStudent(first, editedFirst);
+
+        assertEquals(List.of(editedFirst, second), students.asUnmodifiableObservableList());
+    }
+
+    @Test
     public void operations_nullArguments_throwNullPointerException() {
         assertThrows(NullPointerException.class, () -> students.contains(null));
         assertThrows(NullPointerException.class, () -> students.add(null));
