@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +40,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
@@ -210,6 +213,94 @@ public class CourseClassUiTest {
             assertEquals(TypicalPersons.BOB.getName().fullName, ((Label) students.getChildren().get(1)
                     .lookup("#name")).getText());
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void studentCard_displaysNotesInStoredOrderWithReadableTimestamps() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "studentCard_displaysNotesInStoredOrderWithReadableTimestamps",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note firstNote = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Note secondNote = new Note("A long observation that should wrap instead of widening the student card.",
+                    LocalDateTime.of(2026, 10, 9, 9, 5));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"),
+                    List.of(firstNote, secondNote));
+
+            StudentCard card = new StudentCard(student, 1);
+            VBox notesBox = (VBox) card.getRoot().lookup("#notesBox");
+            assertTrue(notesBox.isManaged());
+            assertTrue(notesBox.isVisible());
+            assertEquals(2, notesBox.getChildren().size());
+
+            Label firstNoteLabel = (Label) notesBox.getChildren().get(0);
+            Label secondNoteLabel = (Label) notesBox.getChildren().get(1);
+            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
+            assertEquals("[09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
+            assertTrue(firstNoteLabel.isWrapText());
+            assertTrue(secondNoteLabel.isWrapText());
+            assertEquals(0, firstNoteLabel.getMinWidth());
+            assertEquals(0, firstNoteLabel.getPrefWidth());
+            assertEquals(Double.MAX_VALUE, firstNoteLabel.getMaxWidth());
+            assertEquals(Double.MAX_VALUE, secondNoteLabel.getMaxWidth());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void courseClassCard_refreshesNotesWhenStudentChanges() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_refreshesNotesWhenStudentChanges", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"));
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+            VBox initialNotesBox = (VBox) studentsBox.getChildren().get(0).lookup("#notesBox");
+            assertFalse(initialNotesBox.isManaged());
+
+            Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
+            courseClass.removeStudent(student.getTelehandle());
+            courseClass.addStudent(new Student(student.getName(), student.getTelehandle(), List.of(note)));
+
+            VBox refreshedNotesBox = (VBox) studentsBox.getChildren().get(0).lookup("#notesBox");
+            assertTrue(refreshedNotesBox.isManaged());
+            assertEquals(1, refreshedNotesBox.getChildren().size());
+            Label refreshedNoteLabel = (Label) refreshedNotesBox.getChildren().get(0);
+            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void studentCard_withoutNotes_hidesNotesContainer() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "studentCard_withoutNotes_hidesNotesContainer", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"));
+
+            StudentCard card = new StudentCard(student, 1);
+            VBox notesBox = (VBox) card.getRoot().lookup("#notesBox");
+            assertFalse(notesBox.isManaged());
+            assertFalse(notesBox.isVisible());
+            assertTrue(notesBox.getChildren().isEmpty());
+            assertEquals("Aaron Tan", ((Label) card.getRoot().lookup("#name")).getText());
+            assertEquals("@aarontan", ((Label) card.getRoot().lookup("#telehandle")).getText());
             return null;
         });
         Platform.runLater(task);
