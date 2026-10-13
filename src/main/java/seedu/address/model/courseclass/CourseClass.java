@@ -131,6 +131,11 @@ public class CourseClass {
         enrolledStudents.add(student);
     }
 
+    /** Replaces {@code target} with {@code editedStudent} in this class. */
+    public void setStudent(Student target, Student editedStudent) {
+        enrolledStudents.setStudent(target, editedStudent);
+    }
+
     /** Removes the student with the given telehandle from this class. */
     public void removeStudent(Telehandle telehandle) {
         enrolledStudents.remove(telehandle);

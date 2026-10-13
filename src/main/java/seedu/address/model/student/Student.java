@@ -2,6 +2,7 @@ package seedu.address.model.student;
 
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,6 +55,19 @@ public class Student {
     /** Returns the student's notes as an unmodifiable list. */
     public List<Note> getNotes() {
         return notes;
+    }
+
+    /**
+     * Returns a copy of this student with {@code note} appended to the existing notes.
+     *
+     * @param note note to append
+     * @return updated student
+     */
+    public Student withNote(Note note) {
+        requireAllNonNull(note);
+        List<Note> updatedNotes = new ArrayList<>(notes);
+        updatedNotes.add(note);
+        return new Student(name, telehandle, updatedNotes);
     }
 
     /**
