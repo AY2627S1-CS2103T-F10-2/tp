@@ -30,7 +30,7 @@ public class AddNoteCommand extends Command {
             + PREFIX_TELEHANDLE + "TELEHANDLE "
             + PREFIX_CLASS_GROUP + "CLASS_GROUP "
             + PREFIX_MODULE_NAME + "MODULE_NAME "
-            + PREFIX_NOTE + "NOTE\n"
+            + PREFIX_NOTE + "OBSERVATION\n"
             + "Example: " + COMMAND_WORD + " "
             + PREFIX_TELEHANDLE + "birdman "
             + PREFIX_CLASS_GROUP + "T05 "
