@@ -42,7 +42,7 @@ public class AddNoteCommandIntegrationTest {
         model.addCourseClass(courseClass);
         Logic logic = new LogicManager(model, storage);
 
-        logic.execute("note t/birdman c/T05 m/CS2103T r/Needs follow-up");
+        logic.execute("note t/birdman c/T05 m/CS2103T o/Needs follow-up");
 
         ReadOnlyCourseClassBook reloadedBook = courseClassBookStorage.readCourseClassBook().orElseThrow();
         Student reloadedStudent = reloadedBook.getCourseClassList().getFirst().getStudentList().getFirst();

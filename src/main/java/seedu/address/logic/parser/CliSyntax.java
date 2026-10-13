@@ -15,6 +15,6 @@ public class CliSyntax {
     public static final Prefix PREFIX_TELEHANDLE = PREFIX_TAG;
     public static final Prefix PREFIX_CLASS_GROUP = PREFIX_CODE;
     public static final Prefix PREFIX_MODULE_NAME = new Prefix("m/");
-    public static final Prefix PREFIX_NOTE = new Prefix("r/");
+    public static final Prefix PREFIX_NOTE = new Prefix("o/");
 
 }

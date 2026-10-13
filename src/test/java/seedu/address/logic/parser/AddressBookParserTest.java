@@ -65,7 +65,7 @@ public class AddressBookParserTest {
                 new CourseCode("CS2103T"), "Needs follow-up");
 
         assertEquals(expected, parser.parseCommand(
-                "note t/birdman c/T05 m/CS2103T r/Needs follow-up"));
+                "note t/birdman c/T05 m/CS2103T o/Needs follow-up"));
     }
 
     @Test
