@@ -24,6 +24,7 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -40,6 +41,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
@@ -187,6 +189,8 @@ public class CourseClassUiTest {
                 assertEquals(Color.web("#0B111E"), titleBar.getBackground().getFills().get(0).getFill());
                 assertEquals(Color.web("#2D3B4E"), titleBar.getBorder().getStrokes().get(0).getBottomStroke());
                 assertEquals("Course Classes", ((Label) stage.getScene().lookup("#windowTitle")).getText());
+                stage.setTitle("Updated title");
+                assertEquals("Updated title", ((Label) stage.getScene().lookup("#windowTitle")).getText());
 
                 Button close = (Button) stage.getScene().lookup("#closeButton");
                 assertEquals(5, titleBar.getWidth() - close.getBoundsInParent().getMaxX(), 1);
@@ -219,8 +223,11 @@ public class CourseClassUiTest {
                 maximize.fire();
                 assertTrue(stage.isMaximized());
                 assertEquals("Restore window", maximize.getAccessibleText());
+                assertEquals("\u2750", maximize.getText());
                 maximize.fire();
                 assertFalse(stage.isMaximized());
+                assertEquals("Maximize window", maximize.getAccessibleText());
+                assertEquals("\u25a1", maximize.getText());
                 Button minimize = (Button) stage.getScene().lookup("#minimizeButton");
                 minimize.fire();
                 assertTrue(stage.isIconified());
@@ -242,6 +249,218 @@ public class CourseClassUiTest {
         return new MouseEvent(type, x, y, screenX, screenY, MouseButton.PRIMARY, 1,
                 false, false, false, false, type != MouseEvent.MOUSE_RELEASED,
                 false, false, false, false, false, null);
+    }
+
+    @Test
+    public void windowFrame_edgesResizeAndRespectLimits() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "windowFrame_edgesResizeAndRespectLimits", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Stage stage = new Stage();
+            HBox title = new HBox();
+            VBox root = new VBox(title);
+            Scene scene = new Scene(root, 800, 600);
+            stage.setScene(scene);
+            new WindowFrame(stage, title);
+            stage.setMinWidth(400);
+            stage.setMinHeight(300);
+            stage.setMaxWidth(1000);
+            stage.setMaxHeight(900);
+            double[][] edges = {
+                {1, 1}, {799, 599}, {799, 1}, {1, 599},
+                {1, 200}, {799, 200}, {200, 1}, {200, 599}, {200, 200}
+            };
+            Cursor[] cursors = {
+                Cursor.NW_RESIZE, Cursor.NW_RESIZE, Cursor.NE_RESIZE, Cursor.NE_RESIZE,
+                Cursor.H_RESIZE, Cursor.H_RESIZE, Cursor.V_RESIZE, Cursor.V_RESIZE, Cursor.DEFAULT
+            };
+            try {
+                for (int i = 0; i < edges.length; i++) {
+                    double x = edges[i][0];
+                    double y = edges[i][1];
+                    root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, x, y, 100, 100));
+                    assertEquals(cursors[i], scene.getCursor());
+                    stage.setX(50);
+                    stage.setY(60);
+                    stage.setWidth(800);
+                    stage.setHeight(600);
+                    root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, x, y, 100, 100));
+                    root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, x, y, 120, 130));
+                    boolean leftEdge = x == 1;
+                    boolean rightEdge = x == 799;
+                    boolean topEdge = y == 1;
+                    boolean bottomEdge = y == 599;
+                    assertEquals(leftEdge ? 780 : rightEdge ? 820 : 800, stage.getWidth(), 0.01);
+                    assertEquals(topEdge ? 570 : bottomEdge ? 630 : 600, stage.getHeight(), 0.01);
+                    assertEquals(leftEdge ? 70 : 50, stage.getX(), 0.01);
+                    assertEquals(topEdge ? 90 : 60, stage.getY(), 0.01);
+                    root.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, x, y, 120, 130));
+                    assertEquals(Cursor.DEFAULT, scene.getCursor());
+                }
+                // The top-left corner must keep the opposite corner fixed when clamped.
+                stage.setX(50);
+                stage.setY(60);
+                stage.setWidth(800);
+                stage.setHeight(600);
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 2100, 2100));
+                assertEquals(400, stage.getWidth());
+                assertEquals(300, stage.getHeight());
+                assertEquals(450, stage.getX());
+                assertEquals(360, stage.getY());
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, -1900, -1900));
+                assertEquals(1000, stage.getWidth());
+                assertEquals(900, stage.getHeight());
+                assertEquals(-150, stage.getX());
+                assertEquals(-240, stage.getY());
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, 1, 1, -1900, -1900));
+                double releasedWidth = stage.getWidth();
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 100, 100));
+                assertEquals(releasedWidth, stage.getWidth());
+            } finally {
+                stage.close();
+            }
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void windowFrame_titleBarAndDisabledResizeStates() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "windowFrame_titleBarAndDisabledResizeStates", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Stage stage = new Stage();
+            HBox title = new HBox();
+            VBox root = new VBox(title);
+            Scene scene = new Scene(root, 800, 600);
+            stage.setScene(scene);
+            new WindowFrame(stage, title);
+            stage.setX(50);
+            stage.setY(60);
+            stage.setWidth(800);
+            stage.setHeight(600);
+            try {
+                MouseEvent secondary = new MouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100,
+                        MouseButton.SECONDARY, 1, false, false, false, false,
+                        false, false, true, false, false, false, null);
+                title.fireEvent(secondary);
+                title.fireEvent(new MouseEvent(MouseEvent.MOUSE_DRAGGED, 200, 200, 130, 120,
+                        MouseButton.SECONDARY, 1, false, false, false, false,
+                        false, false, true, false, false, false, null));
+                assertEquals(50, stage.getX());
+                assertEquals(60, stage.getY());
+                title.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED, 200, 200, 100, 100,
+                        MouseButton.SECONDARY, 2, false, false, false, false,
+                        false, false, false, false, false, false, null));
+                assertFalse(stage.isMaximized());
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_CLICKED, 200, 200, 100, 100));
+                assertFalse(stage.isMaximized());
+                MouseEvent doubleClick = new MouseEvent(MouseEvent.MOUSE_CLICKED, 200, 200, 100, 100,
+                        MouseButton.PRIMARY, 2, false, false, false, false,
+                        false, false, false, false, false, false, null);
+                title.fireEvent(doubleClick);
+                assertTrue(stage.isMaximized());
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100));
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 200, 200, 130, 120));
+                assertEquals(50, stage.getX());
+                assertEquals(60, stage.getY());
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
+                assertEquals(Cursor.DEFAULT, scene.getCursor());
+                title.fireEvent(doubleClick.copyFor(title, title));
+                assertFalse(stage.isMaximized());
+
+                stage.setResizable(false);
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
+                assertEquals(Cursor.DEFAULT, scene.getCursor());
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, 1, 1, 130, 120));
+                assertEquals(800, stage.getWidth());
+                assertEquals(600, stage.getHeight());
+                stage.setResizable(true);
+                stage.setFullScreen(true);
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
+                assertEquals(Cursor.DEFAULT, scene.getCursor());
+                stage.setFullScreen(false);
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
+                assertEquals(Cursor.NW_RESIZE, scene.getCursor());
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
+                stage.setMaximized(true);
+                assertEquals(Cursor.DEFAULT, scene.getCursor());
+                root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
+                assertEquals(800, stage.getWidth());
+                assertEquals(600, stage.getHeight());
+            } finally {
+                stage.close();
+            }
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void theme_actionButtonsAndHelpWindow_renderInteractionStates() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "theme_actionButtonsAndHelpWindow_renderInteractionStates", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Button primary = new Button("Save");
+            primary.getStyleClass().add("primary-action");
+            Button destructive = new Button("Delete");
+            destructive.getStyleClass().add("destructive-action");
+            Button normal = new Button("Other");
+            VBox root = new VBox(primary, destructive, normal);
+            Scene scene = new Scene(root, 400, 300);
+            scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
+            root.applyCss();
+            assertEquals(Color.web("#0B111E"), root.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#FCBF3A"), primary.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#0B111E"), primary.getTextFill());
+            assertEquals(Color.TRANSPARENT, destructive.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#D94C4C"), destructive.getTextFill());
+            assertEquals(Color.web("#D94C4C"), destructive.getBorder().getStrokes().get(0).getTopStroke());
+            for (String state : List.of("hover", "pressed")) {
+                PseudoClass pseudoClass = PseudoClass.getPseudoClass(state);
+                destructive.pseudoClassStateChanged(pseudoClass, true);
+                destructive.applyCss();
+                assertEquals(Color.web("#D94C4C"), destructive.getBackground().getFills().get(0).getFill());
+                assertEquals(Color.WHITE, destructive.getTextFill());
+                destructive.pseudoClassStateChanged(pseudoClass, false);
+            }
+            PseudoClass hover = PseudoClass.getPseudoClass("hover");
+            normal.pseudoClassStateChanged(hover, true);
+            normal.applyCss();
+            assertEquals(Color.web("#2A7B82"), normal.getBackground().getFills().get(0).getFill());
+            normal.pseudoClassStateChanged(hover, false);
+            normal.setDefaultButton(true);
+            normal.applyCss();
+            assertEquals(Color.web("#FCBF3A"), normal.getBackground().getFills().get(0).getFill());
+            normal.setDefaultButton(false);
+            normal.setDisable(true);
+            normal.applyCss();
+            assertEquals(0.4, normal.getOpacity());
+            assertNull(primary.getEffect());
+            assertNull(destructive.getEffect());
+            HelpWindow help = new HelpWindow();
+            try {
+                help.getRoot().getScene().getRoot().applyCss();
+                assertNull(help.getRoot().getScene().lookup("#copyButton").getEffect());
+                assertNull(help.getRoot().getScene().lookup("#helpMessage").getEffect());
+            } finally {
+                help.getRoot().close();
+            }
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
     }
 
     @Test
@@ -267,6 +486,31 @@ public class CourseClassUiTest {
             assertNotNull(window.getCourseClassListPanel());
             ListView<?> list = (ListView<?>) window.getCourseClassListPanel().getRoot().lookup("#courseClassListView");
             assertSame(logic.getFilteredCourseClassList(), list.getItems());
+
+            Region bottom = (Region) stage.getScene().lookup("#bottomMenu");
+            Region inputPane = (Region) stage.getScene().lookup("#commandBoxPlaceholder");
+            Region statusPane = (Region) stage.getScene().lookup("#statusbarPlaceholder");
+            TextField input = (TextField) stage.getScene().lookup("#commandTextField");
+            assertSame(bottom, inputPane.getParent());
+            assertSame(bottom, statusPane.getParent());
+            assertTrue(bottom.localToScene(0, 0).getY() >= list.localToScene(list.getBoundsInLocal()).getMaxY());
+            assertEquals(Color.web("#0B111E"), inputPane.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#151E2E"), input.getBackground().getFills().get(0).getFill());
+            assertEquals(50, input.getPrefHeight());
+            assertEquals(50, input.getHeight(), 1);
+            Label saveLocation = (Label) statusPane.lookup("#saveLocationStatus");
+            assertEquals(Pos.CENTER, saveLocation.getAlignment());
+            assertEquals(Color.web("#9CA3AF"), saveLocation.getTextFill());
+            assertNull(input.getEffect());
+            enterCommand(input, "unknown-command");
+            input.applyCss();
+            Text commandText = (Text) input.lookupAll(".text").stream()
+                    .filter(node -> node instanceof Text text && text.getText().equals("unknown-command"))
+                    .findFirst().orElseThrow();
+            assertEquals(Color.web("#D94C4C"), commandText.getFill());
+            enterCommand(input, "lclass");
+            input.applyCss();
+            assertEquals(Color.WHITE, commandText.getFill());
 
             CourseClassCard card = new CourseClassCard(courseClass, 1);
             assertEquals("F10-2", ((Label) card.getRoot().lookup("#name")).getText());
@@ -493,6 +737,17 @@ public class CourseClassUiTest {
             courseClass.getStudents().addPerson(TypicalPersons.ALICE);
             assertEquals("Students: 2", count.getText());
             assertEquals(2, students.getChildren().size());
+            assertEquals("1. ", ((Label) students.getChildren().get(0).lookup("#id")).getText());
+            assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
+            assertFalse(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
+            assertTrue(students.getChildren().get(1).getStyleClass().contains("student-row-last"));
+            PersonListPanel legacyPanel = new PersonListPanel(courseClass.getStudents().getPersonList());
+            ListView<?> legacyList = (ListView<?>) legacyPanel.getRoot().lookup("#personListView");
+            assertSame(courseClass.getStudents().getPersonList(), legacyList.getItems());
+            courseClass.removeStudent(new Telehandle("aarontan"));
+            assertEquals("Students: 1", count.getText());
+            assertEquals(1, students.getChildren().size());
+            assertTrue(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
             return null;
         });
         Platform.runLater(task);

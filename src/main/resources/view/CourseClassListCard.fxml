@@ -30,7 +30,7 @@
         <Label fx:id="courseCode" styleClass="cell_small_label" text="Course code" />
         <FlowPane fx:id="tags" alignment = "CENTER_LEFT" prefWrapLength="10"/>
       </HBox>
-      <Label fx:id="studentCount" 
+      <Label fx:id="studentCount"
              styleClass="cell_small_label"
              text="Students"
              maxWidth="Infinity"
