@@ -19,23 +19,32 @@ public class AddNoteCommandParser implements Parser<AddNoteCommand> {
 
     @Override
     public AddNoteCommand parse(String args) throws ParseException {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args,
-                PREFIX_TELEHANDLE, PREFIX_CLASS_GROUP, PREFIX_MODULE_NAME, PREFIX_NOTE);
+        String notePrefix = " " + PREFIX_NOTE;
+        int notePrefixPosition = args.indexOf(notePrefix);
+        if (notePrefixPosition < 0) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
+                    AddNoteCommand.MESSAGE_USAGE));
+        }
+
+        String studentArguments = args.substring(0, notePrefixPosition);
+        String noteArgument = args.substring(notePrefixPosition + notePrefix.length());
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(studentArguments,
+                PREFIX_TELEHANDLE, PREFIX_CLASS_GROUP, PREFIX_MODULE_NAME);
 
         if (!arePrefixesPresent(argMultimap,
-                PREFIX_TELEHANDLE, PREFIX_CLASS_GROUP, PREFIX_MODULE_NAME, PREFIX_NOTE)
+                PREFIX_TELEHANDLE, PREFIX_CLASS_GROUP, PREFIX_MODULE_NAME)
                 || !argMultimap.getPreamble().isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT,
                     AddNoteCommand.MESSAGE_USAGE));
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(
-                PREFIX_TELEHANDLE, PREFIX_CLASS_GROUP, PREFIX_MODULE_NAME, PREFIX_NOTE);
+                PREFIX_TELEHANDLE, PREFIX_CLASS_GROUP, PREFIX_MODULE_NAME);
 
         Telehandle telehandle = ParserUtil.parseTelehandle(argMultimap.getValue(PREFIX_TELEHANDLE).get());
         ClassGroup classGroup = ParserUtil.parseClassGroup(argMultimap.getValue(PREFIX_CLASS_GROUP).get());
         CourseCode moduleName = ParserUtil.parseCourseCode(argMultimap.getValue(PREFIX_MODULE_NAME).get());
-        String noteText = ParserUtil.parseNoteText(argMultimap.getValue(PREFIX_NOTE).get());
+        String noteText = ParserUtil.parseNoteText(noteArgument);
 
         return new AddNoteCommand(telehandle, classGroup, moduleName, noteText);
     }

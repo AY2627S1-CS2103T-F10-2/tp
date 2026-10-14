@@ -42,11 +42,11 @@ public class AddNoteCommandIntegrationTest {
         model.addCourseClass(courseClass);
         Logic logic = new LogicManager(model, storage);
 
-        logic.execute("note t/birdman c/T05 m/CS2103T o/Needs follow-up");
+        logic.execute("note t/birdman c/T05 m/CS2103T o/Discussed m/ath skills");
 
         ReadOnlyCourseClassBook reloadedBook = courseClassBookStorage.readCourseClassBook().orElseThrow();
         Student reloadedStudent = reloadedBook.getCourseClassList().getFirst().getStudentList().getFirst();
-        assertEquals("Needs follow-up", reloadedStudent.getNotes().getFirst().getText());
+        assertEquals("Discussed m/ath skills", reloadedStudent.getNotes().getFirst().getText());
         assertEquals(1, reloadedStudent.getNotes().size());
     }
 }

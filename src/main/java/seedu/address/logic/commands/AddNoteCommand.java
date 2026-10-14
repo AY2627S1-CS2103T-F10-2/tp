@@ -26,6 +26,7 @@ public class AddNoteCommand extends Command {
     public static final String COMMAND_WORD = "note";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD + ": Adds a note to a student enrolled in a class. "
+            + "The observation must be the final parameter. "
             + "Parameters: "
             + PREFIX_TELEHANDLE + "TELEHANDLE "
             + PREFIX_CLASS_GROUP + "CLASS_GROUP "
