@@ -219,6 +219,9 @@ public class CourseClassUiTest {
                 stage.getScene().getRoot().fireEvent(
                         mouseEvent(MouseEvent.MOUSE_RELEASED, width - 1, 200, 920, 200));
 
+                // Verify the controller's requests without native window-manager feedback.
+                // A visible stage's maximized/iconified state may be overridden by the platform.
+                stage.hide();
                 Button maximize = (Button) stage.getScene().lookup("#maximizeButton");
                 maximize.fire();
                 assertTrue(stage.isMaximized());
@@ -232,6 +235,8 @@ public class CourseClassUiTest {
                 minimize.fire();
                 assertTrue(stage.isIconified());
                 stage.setIconified(false);
+                window.show();
+                assertTrue(stage.isShowing());
                 close.fire();
                 assertFalse(stage.isShowing());
                 assertEquals((int) stage.getX(), model.getGuiSettings().getWindowCoordinates().x);
