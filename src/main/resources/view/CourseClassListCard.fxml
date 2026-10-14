@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
@@ -16,7 +17,7 @@
     </columnConstraints>
     <VBox alignment="TOP_LEFT" minHeight="105" GridPane.columnIndex="0">
       <padding>
-        <Insets top="5" right="5" bottom="5" left="15" />
+        <Insets top="5" right="15" bottom="5" left="15" />
       </padding>
       <HBox spacing="10" alignment="BASELINE_LEFT">
         <Label fx:id="id" styleClass="cell_big_label">
@@ -39,11 +40,12 @@
             <Insets right="10" />
         </padding>
       </Label>
-      <VBox fx:id="studentsBox" spacing="5" fillWidth="true">
-        <padding>
-            <Insets top="5" bottom="5" />
-        </padding>
-      </VBox>
+      <StackPane styleClass="student-list">
+        <VBox.margin>
+          <Insets top="10" bottom="10" />
+        </VBox.margin>
+        <VBox fx:id="studentsBox" spacing="0" fillWidth="true" />
+      </StackPane>
     </VBox>
   </GridPane>
 </HBox>

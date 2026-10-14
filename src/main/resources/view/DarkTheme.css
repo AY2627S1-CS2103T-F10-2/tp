@@ -1,3 +1,8 @@
+/* Disable shadow effects, including those from JavaFX's default styles. */
+* {
+    -fx-effect: null;
+}
+
 .root {
     -fx-base: #0B111E;
     -fx-background: #0B111E;
@@ -200,6 +205,49 @@
     -fx-font-family: "Segoe UI";
     -fx-font-size: 13px;
     -fx-text-fill: #9CA3AF;
+}
+
+.student-card .cell_big_label {
+    -fx-font-size: 14px;
+}
+
+#cardPane.student-card {
+    -fx-background-color: #0F1626;
+    -fx-background-radius: 0;
+    -fx-border-color: #1E293B;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-radius: 0;
+}
+
+#cardPane.student-card.student-row-alternate {
+    -fx-background-color: #161F30;
+}
+
+.student-card .student-note {
+    -fx-background-color: #202C40;
+    -fx-alignment: center-left;
+    -fx-text-alignment: left;
+}
+
+.student-list {
+    -fx-background-color: transparent;
+    -fx-background-radius: 5;
+    -fx-border-color: #1E293B;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+#studentsBox {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+}
+
+#cardPane.student-card.student-row-last {
+    -fx-border-width: 0;
+}
+
+.student-card .cell_small_label {
+    -fx-font-size: 12px;
 }
 
 .student-note {
@@ -420,8 +468,11 @@
 
 #cardPane {
     -fx-background-color: transparent;
+    -fx-background-color: #0B111E;
+    -fx-background-radius: 5;
     -fx-border-width: 1;
     -fx-border-color: #2D3B4E;
+    -fx-border-radius: 5;
 }
 
 #commandTypeLabel {
@@ -457,10 +508,6 @@
     -fx-text-fill: white;
 
     -fx-pref-height: 50px;
-}
-
-#filterField, #personListPanel, #personWebpage {
-    -fx-effect: innershadow(gaussian, black, 10, 0, 0, 0);
 }
 
 #resultDisplay .content {

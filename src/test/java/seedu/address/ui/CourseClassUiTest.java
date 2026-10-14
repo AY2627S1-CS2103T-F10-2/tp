@@ -23,6 +23,8 @@ import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -34,8 +36,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
@@ -309,6 +313,52 @@ public class CourseClassUiTest {
     }
 
     @Test
+    public void studentCard_rowsAlignColumnsAndGrowForNotes() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "studentCard_rowsAlignColumnsAndGrowForNotes", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"));
+            Note note = new Note("A longer note below the student name that makes the row taller.",
+                    LocalDateTime.of(2026, 10, 8, 14, 30));
+            Student other = new Student(new StudentName("Beth"), new Telehandle("bethtan"), List.of(note));
+            Region first = new StudentCard(student, 1).getRoot();
+            Region second = new StudentCard(other, 2).getRoot();
+            VBox rows = new VBox(first, second);
+            Scene scene = new Scene(rows, 700, 300);
+            scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
+            rows.applyCss();
+            rows.layout();
+
+            assertEquals(first.getBoundsInParent().getMaxY(), second.getLayoutY(), 0.01);
+            assertEquals(first.lookup("#name").localToScene(0, 0).getX(),
+                    second.lookup("#name").localToScene(0, 0).getX(), 0.01);
+            assertEquals(first.lookup("#telehandle").localToScene(0, 0).getX(),
+                    second.lookup("#telehandle").localToScene(0, 0).getX(), 0.01);
+            assertTrue(second.getHeight() > first.getHeight());
+            VBox notes = (VBox) second.lookup("#notesBox");
+            assertEquals(second.lookup("#id").localToScene(0, 0).getX(),
+                    notes.localToScene(0, 0).getX(), 0.01);
+            assertTrue(notes.localToScene(0, 0).getY() >= second.lookup("#name")
+                    .localToScene(second.lookup("#name").getBoundsInLocal()).getMaxY());
+            assertEquals(Color.web("#0F1626"), first.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#161F30"), second.getBackground().getFills().get(0).getFill());
+            assertEquals(Color.web("#1E293B"), first.getBorder().getStrokes().get(0).getBottomStroke());
+            assertEquals(1, first.getBorder().getStrokes().get(0).getWidths().getBottom());
+            assertEquals(0, first.getBackground().getFills().get(0).getRadii().getTopLeftHorizontalRadius());
+            assertEquals(0, first.getBorder().getStrokes().get(0).getRadii().getTopLeftHorizontalRadius());
+            Label noteLabel = (Label) notes.getChildren().get(0);
+            assertEquals(notes.getWidth(), noteLabel.getWidth(), 0.01);
+            assertEquals(Pos.CENTER_LEFT, noteLabel.getAlignment());
+            assertEquals(Color.web("#202C40"), noteLabel.getBackground().getFills().get(0).getFill());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void studentCard_displaysNotesInStoredOrderWithReadableTimestamps() throws Exception {
         if (GuiTestProcess.isRequired()) {
             GuiTestProcess.run(getClass(), "studentCard_displaysNotesInStoredOrderWithReadableTimestamps",
@@ -358,6 +408,24 @@ public class CourseClassUiTest {
             VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
             VBox initialNotesBox = (VBox) studentsBox.getChildren().get(0).lookup("#notesBox");
             assertFalse(initialNotesBox.isManaged());
+            Scene scene = new Scene(card.getRoot(), 700, 300);
+            scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
+            card.getRoot().applyCss();
+            card.getRoot().layout();
+            Rectangle clip = (Rectangle) studentsBox.getClip();
+            assertEquals(8, clip.getArcWidth());
+            assertEquals(8, clip.getArcHeight());
+            assertEquals(studentsBox.getWidth(), clip.getWidth());
+            assertEquals(studentsBox.getHeight(), clip.getHeight());
+            assertEquals(4, studentsBox.getBackground().getFills().get(0).getRadii().getTopLeftHorizontalRadius());
+            Region outline = (Region) studentsBox.getParent();
+            assertEquals(5, outline.getBorder().getStrokes().get(0).getRadii().getTopLeftHorizontalRadius());
+            assertEquals(Color.web("#1E293B"), outline.getBorder().getStrokes().get(0).getBottomStroke());
+            assertEquals(1, outline.getBorder().getStrokes().get(0).getWidths().getBottom());
+            assertEquals(1, studentsBox.getLayoutX(), 0.01);
+            Region studentRow = (Region) studentsBox.getChildren().get(0);
+            assertEquals(0, studentRow.getBorder().getStrokes().get(0).getWidths().getBottom());
+            double initialHeight = studentsBox.getHeight();
 
             Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
             courseClass.removeStudent(student.getTelehandle());
@@ -368,6 +436,10 @@ public class CourseClassUiTest {
             assertEquals(1, refreshedNotesBox.getChildren().size());
             Label refreshedNoteLabel = (Label) refreshedNotesBox.getChildren().get(0);
             assertEquals("[08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
+            card.getRoot().applyCss();
+            card.getRoot().layout();
+            assertTrue(studentsBox.getHeight() > initialHeight);
+            assertEquals(studentsBox.getHeight(), clip.getHeight());
             return null;
         });
         Platform.runLater(task);

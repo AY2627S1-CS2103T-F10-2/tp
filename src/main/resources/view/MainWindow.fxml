@@ -30,7 +30,7 @@
 
       <VBox>
         <HBox fx:id="titleBar" styleClass="title-bar" alignment="CENTER_LEFT"
-              minHeight="30" prefHeight="30" maxHeight="30" VBox.vgrow="NEVER">
+              minHeight="40" prefHeight="40" maxHeight="40" VBox.vgrow="NEVER">
           <HBox fx:id="titleDragArea" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <padding>
               <Insets left="12" />
