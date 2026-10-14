@@ -132,6 +132,14 @@
     -fx-text-fill: #010504;
 }
 
+.student-note {
+    -fx-background-color: derive(#1d1d1d, 35%);
+    -fx-background-radius: 3;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 12px;
+    -fx-padding: 4 6 4 6;
+}
+
 .stack-pane {
      -fx-background-color: derive(#1d1d1d, 20%);
 }
