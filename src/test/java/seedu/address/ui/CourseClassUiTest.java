@@ -20,16 +20,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import javafx.application.Platform;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import seedu.address.MainApp;
 import seedu.address.commons.core.GuiSettings;
@@ -149,6 +157,87 @@ public class CourseClassUiTest {
     private static void enterCommand(TextField input, String command) {
         input.setText(command);
         input.fireEvent(new ActionEvent());
+    }
+
+    @Test
+    public void mainWindow_customTitleBar_stylesAndWindowControls() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "mainWindow_customTitleBar_stylesAndWindowControls", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Model model = new ModelManager();
+            model.setGuiSettings(new GuiSettings(800, 650, 20, 30));
+            Logic logic = new LogicManager(model, new StorageManager(
+                    new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json")),
+                    new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
+            Stage stage = new Stage();
+            try {
+                MainWindow window = new MainWindow(stage, logic, temporaryFolder.resolve("classes.json"));
+                window.show();
+                stage.getScene().getRoot().applyCss();
+                stage.getScene().getRoot().layout();
+                HBox titleBar = (HBox) stage.getScene().lookup("#titleBar");
+                assertEquals(StageStyle.UNDECORATED, stage.getStyle());
+                assertEquals(40, titleBar.getHeight(), 0.01);
+                assertEquals(Color.web("#0B111E"), titleBar.getBackground().getFills().get(0).getFill());
+                assertEquals(Color.web("#2D3B4E"), titleBar.getBorder().getStrokes().get(0).getBottomStroke());
+                assertEquals("Course Classes", ((Label) stage.getScene().lookup("#windowTitle")).getText());
+
+                Button close = (Button) stage.getScene().lookup("#closeButton");
+                assertEquals(5, titleBar.getWidth() - close.getBoundsInParent().getMaxX(), 1);
+                PseudoClass hover = PseudoClass.getPseudoClass("hover");
+                close.pseudoClassStateChanged(hover, true);
+                close.applyCss();
+                assertEquals(Color.web("#D94C4C"), close.getBackground().getFills().get(0).getFill());
+                close.pseudoClassStateChanged(hover, false);
+                close.applyCss();
+                assertEquals(Color.web("#0B111E"), close.getBackground().getFills().get(0).getFill());
+
+                HBox dragArea = (HBox) stage.getScene().lookup("#titleDragArea");
+                double initialX = stage.getX();
+                double initialY = stage.getY();
+                dragArea.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 20, 20, 100, 100));
+                dragArea.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 20, 20, 130, 120));
+                assertEquals(initialX + 30, stage.getX(), 0.01);
+                assertEquals(initialY + 20, stage.getY(), 0.01);
+
+                double width = stage.getWidth();
+                stage.getScene().getRoot().fireEvent(
+                        mouseEvent(MouseEvent.MOUSE_PRESSED, width - 1, 200, 900, 200));
+                stage.getScene().getRoot().fireEvent(
+                        mouseEvent(MouseEvent.MOUSE_DRAGGED, width - 1, 200, 920, 200));
+                assertEquals(width + 20, stage.getWidth(), 0.01);
+                stage.getScene().getRoot().fireEvent(
+                        mouseEvent(MouseEvent.MOUSE_RELEASED, width - 1, 200, 920, 200));
+
+                Button maximize = (Button) stage.getScene().lookup("#maximizeButton");
+                maximize.fire();
+                assertTrue(stage.isMaximized());
+                assertEquals("Restore window", maximize.getAccessibleText());
+                maximize.fire();
+                assertFalse(stage.isMaximized());
+                Button minimize = (Button) stage.getScene().lookup("#minimizeButton");
+                minimize.fire();
+                assertTrue(stage.isIconified());
+                stage.setIconified(false);
+                close.fire();
+                assertFalse(stage.isShowing());
+                assertEquals((int) stage.getX(), model.getGuiSettings().getWindowCoordinates().x);
+            } finally {
+                stage.close();
+            }
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    private static MouseEvent mouseEvent(EventType<MouseEvent> type, double x, double y,
+                                        double screenX, double screenY) {
+        return new MouseEvent(type, x, y, screenX, screenY, MouseButton.PRIMARY, 1,
+                false, false, false, false, type != MouseEvent.MOUSE_RELEASED,
+                false, false, false, false, false, null);
     }
 
     @Test

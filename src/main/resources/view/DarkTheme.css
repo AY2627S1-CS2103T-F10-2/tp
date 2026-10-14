@@ -15,6 +15,48 @@
     background-color: #151E2E; /* Used in the default.html file */
 }
 
+.title-bar {
+    -fx-background-color: #0B111E;
+    -fx-border-color: #2D3B4E;
+    -fx-border-width: 0 0 1 0;
+    /* Keep hover fills inside the window's 5px resize edge. */
+    -fx-padding: 0 5 0 0;
+}
+
+.title-bar .window-title {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-text-fill: #FFFFFF;
+}
+
+.title-bar .button.window-control {
+    -fx-min-width: 46px;
+    -fx-pref-width: 46px;
+    -fx-max-width: 46px;
+    -fx-max-height: Infinity;
+    -fx-padding: 0;
+    -fx-background-color: #0B111E;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 18px;
+    -fx-text-fill: #FFFFFF;
+}
+
+.title-bar .button.window-control:hover {
+    -fx-background-color: #2D3B4E;
+}
+
+.title-bar .button.window-control:pressed {
+    -fx-background-color: #2A7B82;
+}
+
+.title-bar .button.window-close:hover, .title-bar .button.window-close:pressed {
+    -fx-background-color: #D94C4C;
+}
+
 .label {
     -fx-font-size: 11pt;
     -fx-font-family: "Segoe UI Semibold";
@@ -185,7 +227,7 @@
 .result-display {
     -fx-background-color: transparent;
     -fx-font-family: "Segoe UI Light";
-    -fx-font-size: 13pt;
+    -fx-font-size: 10pt;
     -fx-text-fill: white;
 }
 

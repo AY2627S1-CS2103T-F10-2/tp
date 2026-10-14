@@ -5,12 +5,16 @@ import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.Logic;
@@ -36,6 +40,15 @@ public class MainWindow extends UiPart<Stage> {
     private CourseClassListPanel courseClassListPanel;
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
+
+    @FXML
+    private HBox titleDragArea;
+
+    @FXML
+    private Label windowTitle;
+
+    @FXML
+    private Button maximizeButton;
 
     @FXML
     private StackPane commandBoxPlaceholder;
@@ -65,6 +78,13 @@ public class MainWindow extends UiPart<Stage> {
         this.dataFilePath = dataFilePath;
 
         // Configure the UI
+        primaryStage.initStyle(StageStyle.UNDECORATED);
+        windowTitle.textProperty().bind(primaryStage.titleProperty());
+        primaryStage.maximizedProperty().addListener((observable, previous, maximized) -> {
+            maximizeButton.setText(maximized ? "\u2750" : "\u25a1");
+            maximizeButton.setAccessibleText(maximized ? "Restore window" : "Maximize window");
+        });
+        new WindowFrame(primaryStage, titleDragArea);
         setWindowDefaultSize(logic.getGuiSettings());
 
         setAccelerators();
@@ -74,6 +94,16 @@ public class MainWindow extends UiPart<Stage> {
 
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    @FXML
+    private void handleMinimize() {
+        primaryStage.setIconified(true);
+    }
+
+    @FXML
+    private void handleMaximize() {
+        primaryStage.setMaximized(!primaryStage.isMaximized());
     }
 
     private void setAccelerators() {
