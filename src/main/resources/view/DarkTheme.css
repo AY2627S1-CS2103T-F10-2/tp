@@ -390,16 +390,22 @@
 
 }
 
+.bottomMenu .separator:vertical .line {
+    -fx-border-color: #9CA3AF;
+    -fx-border-width: 0 0 0 1;
+
+}
+
 #commandTextField {
     -fx-background-color: #151E2E;
-    -fx-background-radius:20;
+    -fx-background-radius:5;
 
     -fx-background-insets: 0;
     -fx-border-color: #9CA3AF;
     -fx-border-insets: 0;
     -fx-border-width: 1;
     -fx-font-family: "Segoe UI Light";
-    -fx-border-radius: 20;
+    -fx-border-radius: 5;
 
     -fx-font-size: 13pt;
 

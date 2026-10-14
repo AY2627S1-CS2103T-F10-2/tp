@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Separator?>
 
 <fx:root type="javafx.stage.Stage" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
          title="Course Classes" minWidth="450" minHeight="600" onCloseRequest="#handleExit">
@@ -48,14 +49,24 @@
           <StackPane fx:id="courseClassListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
         </VBox>
 
-        <HBox fx:id="bottomMenu" styleClass="bottomMenu" minHeight="80">
-            <StackPane HBox.hgrow="ALWAYS" fx:id="commandBoxPlaceholder" styleClass="pane-with-border">
+        <HBox fx:id="bottomMenu" styleClass="bottomMenu, pane-with-border" minHeight="80">
+            <StackPane HBox.hgrow="ALWAYS" fx:id="commandBoxPlaceholder">
             <padding>
                 <Insets top="5" right="10" bottom="5" left="10" />
             </padding>
             </StackPane>
+            <Separator orientation="VERTICAL">
+                <HBox.margin>
+                    <Insets top="15" right="10" bottom="15" left="10"/>
+                </HBox.margin>
+            </Separator>
 
-            <StackPane fx:id="statusbarPlaceholder" />
+
+            <StackPane fx:id="statusbarPlaceholder">
+            <padding>
+                <Insets top="5" right="10" bottom="5" left="10" />
+            </padding>
+            </StackPane>
         </HBox>
 
 
