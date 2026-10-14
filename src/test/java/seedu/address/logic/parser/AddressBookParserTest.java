@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCourseClassCommand;
+import seedu.address.logic.commands.AddNoteCommand;
 import seedu.address.logic.commands.AddStudentCommand;
 import seedu.address.logic.commands.ClearCourseClassCommand;
 import seedu.address.logic.commands.DeleteCourseClassCommand;
@@ -55,6 +56,16 @@ public class AddressBookParserTest {
                 new ClassGroup("T05"), new CourseCode("CS2103T"));
 
         assertEquals(expected, parser.parseCommand("add n/John Doe t/birdman c/T05 m/CS2103T"));
+    }
+
+    @Test
+    public void parseCommand_addNote() throws Exception {
+        AddNoteCommand expected = new AddNoteCommand(
+                new Telehandle("birdman"), new ClassGroup("T05"),
+                new CourseCode("CS2103T"), "Needs follow-up");
+
+        assertEquals(expected, parser.parseCommand(
+                "note t/birdman c/T05 m/CS2103T o/Needs follow-up"));
     }
 
     @Test

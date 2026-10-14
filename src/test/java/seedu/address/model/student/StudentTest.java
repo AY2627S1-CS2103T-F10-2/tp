@@ -51,6 +51,19 @@ public class StudentTest {
     }
 
     @Test
+    public void withNote_returnsUpdatedCopyAndPreservesOriginal() {
+        Student student = new Student(name, telehandle);
+
+        Student updatedStudent = student.withNote(note);
+
+        assertTrue(student.getNotes().isEmpty());
+        assertEquals(List.of(note), updatedStudent.getNotes());
+        assertEquals(name, updatedStudent.getName());
+        assertEquals(telehandle, updatedStudent.getTelehandle());
+        assertThrows(NullPointerException.class, () -> student.withNote(null));
+    }
+
+    @Test
     public void isSameStudent_comparesTelehandles() {
         Student student = new Student(name, telehandle);
         Student sameStudent = new Student(new StudentName("Jane Doe"), telehandle);

@@ -63,10 +63,38 @@ public class UniqueStudentListTest {
     }
 
     @Test
+    public void setStudent_replacesInPlaceAndEnforcesIdentity() {
+        students.add(first);
+        students.add(second);
+        Student editedFirst = new Student(first.getName(), first.getTelehandle(),
+                List.of(new Note("Needs follow-up", java.time.LocalDateTime.of(2026, 10, 13, 12, 0))));
+
+        students.setStudent(first, editedFirst);
+
+        assertEquals(List.of(editedFirst, second), students.asUnmodifiableObservableList());
+        assertThrows(StudentNotFoundException.class, () -> students.setStudent(first, editedFirst));
+        assertThrows(DuplicateStudentException.class, () -> students.setStudent(
+                editedFirst, createStudent("John Doe", "janedoe")));
+    }
+
+    @Test
+    public void setStudent_uniqueDifferentIdentity_replacesInPlace() {
+        students.add(first);
+        students.add(second);
+        Student editedFirst = createStudent("John Tan", "johntan");
+
+        students.setStudent(first, editedFirst);
+
+        assertEquals(List.of(editedFirst, second), students.asUnmodifiableObservableList());
+    }
+
+    @Test
     public void operations_nullArguments_throwNullPointerException() {
         assertThrows(NullPointerException.class, () -> students.contains(null));
         assertThrows(NullPointerException.class, () -> students.add(null));
         assertThrows(NullPointerException.class, () -> students.setStudents(null));
+        assertThrows(NullPointerException.class, () -> students.setStudent(null, first));
+        assertThrows(NullPointerException.class, () -> students.setStudent(first, null));
     }
 
     @Test
