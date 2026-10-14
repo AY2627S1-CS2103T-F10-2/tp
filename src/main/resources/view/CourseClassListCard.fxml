@@ -27,9 +27,18 @@
         </Label>
         <Label fx:id="name" text="\$first" styleClass="cell_big_label" />
         <Label fx:id="courseCode" styleClass="cell_small_label" text="Course code" />
-        <Label fx:id="studentCount" styleClass="cell_small_label" text="Students" />
         <FlowPane fx:id="tags" alignment = "CENTER_LEFT" prefWrapLength="10"/>
       </HBox>
+      <Label fx:id="studentCount" 
+             styleClass="cell_small_label"
+             text="Students"
+             maxWidth="Infinity"
+             alignment="CENTER_RIGHT">
+
+        <padding>
+            <Insets right="10" />
+        </padding>
+      </Label>
       <VBox fx:id="studentsBox" spacing="5" fillWidth="true">
         <padding>
             <Insets top="5" bottom="5" />

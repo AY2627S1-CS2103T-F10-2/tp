@@ -88,7 +88,12 @@
 }
 
 .table-row-cell:filled:selected {
-    -fx-background-color: #2A7B82;
+    -fx-background-color: #151E2E;
+    -fx-background-insets: 0;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: derive(#151E2E, 10%);
 }
 
 .table-cell {
@@ -127,12 +132,12 @@
 }
 
 .list-cell:filled:selected {
-    -fx-background-color: #2A7B82;
+    -fx-background-color: #151E2E;
+    -fx-background-insets: 0;
 }
 
-.list-cell:filled:selected #cardPane {
-    -fx-border-color: #2A7B82;
-    -fx-border-width: 1;
+.list-cell:filled:hover {
+    -fx-background-color: derive(#151E2E, 10%);
 }
 
 .list-cell .label {
@@ -141,10 +146,6 @@
 
 .list-cell .cell_small_label, .list-cell .student-note {
     -fx-text-fill: #9CA3AF;
-}
-
-.list-cell:filled:selected .label {
-    -fx-text-fill: #FFFFFF;
 }
 
 .cell_big_label {

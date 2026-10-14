@@ -17,15 +17,15 @@
       <padding>
         <Insets top="5" right="5" bottom="5" left="15" />
       </padding>
-      <HBox spacing="0.5" alignment="CENTER_LEFT">
+      <HBox spacing="10" alignment="BASELINE_LEFT">
         <Label fx:id="id" styleClass="cell_big_label">
           <minWidth>
             <Region fx:constant="USE_PREF_SIZE" />
           </minWidth>
         </Label>
         <Label fx:id="name" styleClass="cell_big_label" />
+        <Label fx:id="telehandle" styleClass="cell_small_label" />
       </HBox>
-      <Label fx:id="telehandle" styleClass="cell_small_label" />
       <VBox fx:id="notesBox" fillWidth="true" maxWidth="Infinity" spacing="3">
         <padding>
           <Insets top="4" />
