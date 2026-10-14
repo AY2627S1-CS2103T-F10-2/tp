@@ -52,19 +52,19 @@
         <HBox fx:id="bottomMenu" styleClass="bottomMenu, pane-with-border" minHeight="80">
             <StackPane HBox.hgrow="ALWAYS" fx:id="commandBoxPlaceholder">
             <padding>
-                <Insets top="5" right="10" bottom="5" left="10" />
+                <Insets top="5" right="0" bottom="5" left="10" />
             </padding>
             </StackPane>
             <Separator orientation="VERTICAL">
                 <HBox.margin>
-                    <Insets top="15" right="10" bottom="15" left="10"/>
+                    <Insets top="15" right="10" bottom="15" left="25"/>
                 </HBox.margin>
             </Separator>
 
 
             <StackPane fx:id="statusbarPlaceholder">
             <padding>
-                <Insets top="5" right="10" bottom="5" left="10" />
+                <Insets top="5" right="10" bottom="5" left="0" />
             </padding>
             </StackPane>
         </HBox>

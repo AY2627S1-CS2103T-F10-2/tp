@@ -377,7 +377,8 @@
 
 #cardPane {
     -fx-background-color: transparent;
-    -fx-border-width: 0;
+    -fx-border-width: 1;
+    -fx-border-color: #2D3B4E;
 }
 
 #commandTypeLabel {
@@ -411,6 +412,8 @@
 
     -fx-padding: 8 14;
     -fx-text-fill: white;
+
+    -fx-pref-height: 50px;
 }
 
 #filterField, #personListPanel, #personWebpage {
