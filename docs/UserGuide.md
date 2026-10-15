@@ -119,6 +119,26 @@ Example:
 
 * `dclass 1` deletes the first displayed course class.
 
+### Adding a class: `aclass`
+
+Adds a class group to the system.
+
+Format: `aclass n/NAME c/COURSE_CODE [t/TAG]…​`
+
+* `NAME` is the class group name.
+* `COURSE_CODE` identifies the module containing the class group.
+* `t/TAG` is optional and can be provided multiple times.
+* The `n/` and `c/` prefixes are required and can be entered in either order. Each can be used only once.
+* A class is considered a duplicate when it has the same name and course code as an existing class, regardless of tags.
+* After a class is added, it appears in the class list and is saved automatically.
+
+Examples:
+* `aclass n/F10-2 c/CS2103T` adds a class group without tags.
+* `aclass n/F10-2 c/CS2103T t/tutorial t/odd-week` adds a class group with two tags.
+
+If the required prefixes are missing, duplicated, or contain invalid values, the application shows the command format
+and does not add the class. Attempting to add an existing class shows `This class already exists in the system.`
+
 ### Removing a student from a class group: `dstudent`
 
 Removes a student's enrolment from one class group without removing the student's enrolments in other classes.
@@ -261,6 +281,7 @@ from your previous Aiken Duet home folder.
 
 Action | Format, Examples
 --------|------------------
+**Add class** | `aclass n/NAME c/COURSE_CODE [t/TAG]…​`<br> e.g., `aclass n/F10-2 c/CS2103T t/tutorial`
 **Add student to class** | `add n/NAME t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `add n/John Doe t/birdman c/T05 m/CS2103T`
 **Edit course class** | `eclass INDEX [n/CLASS_GROUP] [c/MODULE_NAME] [t/TAG]…​`<br> e.g., `eclass 1 n/L01 t/lab`
 **Delete course class** | `dclass INDEX`<br> e.g., `dclass 1`
