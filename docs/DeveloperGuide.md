@@ -122,11 +122,10 @@ How the parsing works:
 
 The `Model` component,
 
-* stores address book data and course-class data. Each `CourseClass` stores its enrolled students in a `UniqueStudentList`.
-* identifies a student by telehandle and identifies an enrolment by the combination of class group and module.
-* stores the course classes selected by the current filter in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<CourseClass>` that the UI can observe and bind to.
+* stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
+* stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
-* does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components).
+* does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
 <div markdown="span" class="alert alert-info">:information_source: **Note:** The alternative, arguably more object-oriented, design below keeps a unique list of tags in `AddressBook`, and each `Person` references tags from that list. This lets `AddressBook` maintain one `Tag` object per unique tag instead of each `Person` holding its own `Tag` objects.<br>
 
@@ -142,8 +141,8 @@ The `Model` component,
 <img src="images/StorageClassDiagram.png" width="550" />
 
 The `Storage` component,
-* can save address book data, course-class data, and user preference data in JSON format, and read them back into corresponding objects.
-* is implemented by `StorageManager`, which delegates course-class JSON access to `JsonCourseClassBookStorage` and user preference JSON access to `JsonUserPrefsStorage`.
+* can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
+* is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
 
 ### Common classes
@@ -493,7 +492,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
   * 4a1. Aiken Duet informs the Teaching Assistant that no matching student was found.
   * Use case ends.
 
-#### UC05 — Delete a student
+#### UC05 — Remove a student from a class group
 
 **System:** Aiken Duet
 
@@ -521,11 +520,11 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 * 2b. The specified student is not enrolled in the class group.
   * 2b1. Aiken Duet informs the Teaching Assistant that the enrolment cannot be found.
   * Use case ends.
-* 3a. The Teaching Assistant enters a value other than `yes` or `no`.
-  * 3a1. Aiken Duet asks the Teaching Assistant to enter `yes` or `no` again.
-  * Use case resumes from step 3.
-* 4a. The Teaching Assistant enters `no`.
-  * 4a1. Aiken Duet cancels the operation and confirms that no records were changed.
+* 4a. The Teaching Assistant enters a value other than `yes` or `no`.
+  * 4a1. Aiken Duet asks the Teaching Assistant to enter `yes` or `no` again.
+  * Use case resumes from step 4.
+* 4b. The Teaching Assistant enters `no`.
+  * 4b1. Aiken Duet cancels the operation and confirms that no records were changed.
   * Use case ends.
 
 ### Non-Functional Requirements
@@ -634,6 +633,9 @@ testers are expected to do more *exploratory* testing.
 
    1. Test case: `dstudent t/birdman c/T05 m/CS2103T`, followed by `maybe`<br>
       Expected: The application asks for `yes` or `no`, and the pending deletion remains available for confirmation.
+
+   1. Test case: `no`<br>
+      Expected: The application cancels the pending deletion and confirms that no records were changed.
 
 ### Saving data
 
