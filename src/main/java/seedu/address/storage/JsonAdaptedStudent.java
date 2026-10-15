@@ -1,9 +1,14 @@
 package seedu.address.storage;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
@@ -15,6 +20,7 @@ class JsonAdaptedStudent {
 
     private final String name;
     private final String telehandle;
+    private final List<JsonAdaptedNote> notes = new ArrayList<>();
 
     /**
      * Constructs a {@code JsonAdaptedStudent} with the given student details.
@@ -24,15 +30,25 @@ class JsonAdaptedStudent {
      */
     @JsonCreator
     public JsonAdaptedStudent(@JsonProperty("name") String name,
-            @JsonProperty("telehandle") String telehandle) {
+            @JsonProperty("telehandle") String telehandle,
+            @JsonProperty("notes") List<JsonAdaptedNote> notes) {
         this.name = name;
         this.telehandle = telehandle;
+        if (notes != null) {
+            this.notes.addAll(notes);
+        }
+    }
+
+    /** Creates an adapted student without notes from older stored data. */
+    public JsonAdaptedStudent(String name, String telehandle) {
+        this(name, telehandle, null);
     }
 
     /** Converts a given {@code Student} into this class for Jackson use. */
     public JsonAdaptedStudent(Student source) {
         name = source.getName().fullName;
         telehandle = source.getTelehandle().value;
+        notes.addAll(source.getNotes().stream().map(JsonAdaptedNote::new).collect(Collectors.toList()));
     }
 
     /**
@@ -58,6 +74,14 @@ class JsonAdaptedStudent {
             throw new IllegalValueException(Telehandle.MESSAGE_CONSTRAINTS);
         }
 
-        return new Student(new StudentName(name), new Telehandle(telehandle));
+        List<Note> modelNotes = new ArrayList<>();
+        for (JsonAdaptedNote note : notes) {
+            if (note == null) {
+                throw new IllegalValueException("Student notes must not contain null entries.");
+            }
+            modelNotes.add(note.toModelType());
+        }
+
+        return new Student(new StudentName(name), new Telehandle(telehandle), modelNotes);
     }
 }

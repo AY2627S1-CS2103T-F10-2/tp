@@ -15,6 +15,7 @@ import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.student.Note;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
 import seedu.address.model.tag.Tag;
@@ -94,6 +95,20 @@ public class ParserUtil {
             throw new ParseException(ClassGroup.MESSAGE_CONSTRAINTS);
         }
         return new ClassGroup(trimmedClassGroup);
+    }
+
+    /**
+     * Parses note text, trimming leading and trailing whitespace.
+     *
+     * @throws ParseException if the note text is invalid
+     */
+    public static String parseNoteText(String noteText) throws ParseException {
+        requireNonNull(noteText);
+        String trimmedNoteText = noteText.trim();
+        if (!Note.isValidText(trimmedNoteText)) {
+            throw new ParseException(Note.MESSAGE_CONSTRAINTS);
+        }
+        return trimmedNoteText;
     }
 
     /**

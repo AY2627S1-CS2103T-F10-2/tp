@@ -1,9 +1,14 @@
 package seedu.address.ui;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
 
 /**
@@ -12,6 +17,8 @@ import seedu.address.model.student.Student;
 public class StudentCard extends UiPart<Region> {
 
     private static final String FXML = "StudentListCard.fxml";
+    private static final DateTimeFormatter NOTE_TIMESTAMP_FORMAT =
+            DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm", Locale.ENGLISH);
 
     /** The student represented by this card. */
     public final Student student;
@@ -24,6 +31,8 @@ public class StudentCard extends UiPart<Region> {
     private Label id;
     @FXML
     private Label telehandle;
+    @FXML
+    private VBox notesBox;
 
     /**
      * Creates a {@code StudentCard} with the given student and index to display.
@@ -37,5 +46,24 @@ public class StudentCard extends UiPart<Region> {
         id.setText(displayedIndex + ". ");
         name.setText(student.getName().fullName);
         telehandle.setText("@" + student.getTelehandle().value);
+        displayNotes();
+    }
+
+    /** Displays the student's notes in their stored order. */
+    private void displayNotes() {
+        boolean hasNotes = !student.getNotes().isEmpty();
+        notesBox.setManaged(hasNotes);
+        notesBox.setVisible(hasNotes);
+
+        for (Note note : student.getNotes()) {
+            String timestamp = NOTE_TIMESTAMP_FORMAT.format(note.getTimestamp());
+            Label noteLabel = new Label(String.format("[%s] %s", timestamp, note.getText()));
+            noteLabel.setWrapText(true);
+            noteLabel.setMinWidth(0);
+            noteLabel.setPrefWidth(0);
+            noteLabel.setMaxWidth(Double.MAX_VALUE);
+            noteLabel.getStyleClass().add("student-note");
+            notesBox.getChildren().add(noteLabel);
+        }
     }
 }

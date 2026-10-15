@@ -66,6 +66,29 @@ public class UniqueStudentList implements Iterable<Student> {
         internalList.add(toAdd);
     }
 
+    /**
+     * Replaces {@code target} with {@code editedStudent} while preserving its position.
+     *
+     * @param target student to replace
+     * @param editedStudent replacement student
+     * @throws StudentNotFoundException if {@code target} is not in the list
+     * @throws DuplicateStudentException if the replacement duplicates another student's telehandle
+     */
+    public void setStudent(Student target, Student editedStudent) {
+        requireAllNonNull(target, editedStudent);
+
+        int index = internalList.indexOf(target);
+        if (index == -1) {
+            throw new StudentNotFoundException();
+        }
+
+        if (!target.isSameStudent(editedStudent) && contains(editedStudent)) {
+            throw new DuplicateStudentException();
+        }
+
+        internalList.set(index, editedStudent);
+    }
+
     /** Removes the student with the given telehandle from the list. */
     public void remove(Telehandle telehandle) {
         requireNonNull(telehandle);
