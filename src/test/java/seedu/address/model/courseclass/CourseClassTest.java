@@ -92,4 +92,14 @@ public class CourseClassTest {
         assertNotEquals(courseClass, new CourseClass(name, new CourseCode("CS2101"), Set.of()));
         assertNotEquals(courseClass, new CourseClass(name, code, Set.of(new Tag("tutorial"))));
     }
+
+    @Test
+    public void equals_ignoresStudentEnrollment() {
+        CourseClass courseClass = new CourseClass(name, code, Set.of());
+        CourseClass copy = new CourseClass(name, code, Set.of());
+        copy.addStudent(new Student(new StudentName("John Doe"), new Telehandle("john_doe")));
+
+        assertEquals(courseClass, copy);
+        assertEquals(courseClass.hashCode(), copy.hashCode());
+    }
 }
