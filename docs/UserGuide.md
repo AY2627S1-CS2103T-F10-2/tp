@@ -146,7 +146,7 @@ Adds a class group to the system.
 
 Format: `aclass n/NAME c/COURSE_CODE [t/TAG]…​`
 
-* `NAME` is the class-group name.
+* `NAME` is the class group name.
 * `COURSE_CODE` identifies the module containing the class group.
 * `t/TAG` is optional and can be provided multiple times.
 * The `n/` and `c/` prefixes are required and can be entered in either order. Each can be used only once.
