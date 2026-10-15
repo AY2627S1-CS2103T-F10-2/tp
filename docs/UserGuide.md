@@ -142,7 +142,8 @@ Examples:
 
 ### Removing a student from a class group: `dstudent`
 
-Removes a student from one class group without removing the student's enrolments in other classes.
+Removes a student's enrolment from one class group without removing the student's enrolments in other classes.
+The student is identified by their telehandle, while the class group and module identify the enrolment to remove.
 The module name is required so that class groups with the same name in different modules are distinguished.
 
 Format: `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`
@@ -150,12 +151,21 @@ Format: `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`
 * `TELEHANDLE` identifies the student.
 * `CLASS_GROUP` identifies the tutorial, laboratory, or recitation group.
 * `MODULE_NAME` identifies the module containing the class group.
-* The command first displays the matching student and asks for confirmation.
-  Type `yes` to remove the enrolment or `no` to cancel without changing any data.
+* All three prefixes are required. The prefixes can be entered in any order, but each prefix can only be used once.
+* The command first displays the matching student and asks for confirmation before changing any data.
+* Type `yes` to remove the enrolment, or `no` to cancel without changing any data.
+* If the input is neither `yes` nor `no`, the application asks for a valid confirmation again and keeps the deletion pending.
+* If the class group or enrolment cannot be found, an error is shown and no data is changed.
 
 Example:
 
-* `dstudent t/birdman c/T05 m/CS2103T` removes `@birdman` from `T05` in `CS2103T` after confirmation.
+1. Enter `dstudent t/birdman c/T05 m/CS2103T`.<br>
+   The application displays `Remove John Doe (@birdman) from T05 in CS2103T? Type yes to confirm or no to cancel.`
+1. Enter `yes` to remove `@birdman` from `T05` in `CS2103T`.<br>
+   The application displays `Student @birdman has been removed from T05 in CS2103T`.
+
+To cancel the operation, enter `no` after the confirmation prompt. The application displays
+`Student deletion cancelled. No records were changed.`
 
 ### Adding a note to a student: `note`
 
@@ -263,7 +273,7 @@ Action | Format, Examples
 **Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
-**Remove student** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
+**Remove student from class** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
 **Add student note** | `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`<br> e.g., `note t/birdman c/T05 m/CS2103T o/Needs follow-up`
 **Find student** | `fstudent KEYWORD [MORE_KEYWORDS]`<br> e.g., `fstudent Alex Bernice`
 **Find class** | `fclass KEYWORD [MORE_KEYWORDS]`<br> e.g., `fclass T05 L01`

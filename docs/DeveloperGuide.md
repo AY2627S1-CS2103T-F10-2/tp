@@ -155,6 +155,51 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Removing a student from a class group: `dstudent`
+
+The `dstudent` command removes one student's enrolment from one class group. It does not delete the student globally,
+and it does not affect the student's enrolments in other class groups. A student's telehandle identifies the student,
+while the class group and module identify the specific enrolment.
+
+#### Command parsing
+
+`AddressBookParser` routes the `dstudent` command to `DeleteStudentCommandParser`. The parser requires exactly one
+value for each of the following prefixes:
+
+* `t/` for the student's telehandle;
+* `c/` for the class group; and
+* `m/` for the module name.
+
+`DeleteStudentCommandParser` rejects commands with missing or duplicate prefixes, a non-empty preamble, or invalid
+field values. The parsed values are converted to `Telehandle`, `ClassGroup`, and `CourseCode` objects before a
+`DeleteStudentCommand` is created.
+
+#### Confirmation and execution
+
+The command uses a two-step confirmation flow to prevent accidental removal:
+
+1. `DeleteStudentCommand#execute` locates the `CourseClass` using the class group and module. If the class does not
+   exist, it returns `Class group not found: CLASS_GROUP in MODULE_NAME`.
+2. The command checks whether the class contains the supplied telehandle. If not, it returns
+   `Student @TELEHANDLE is not enrolled in CLASS_GROUP in MODULE_NAME`.
+3. Before confirmation, the command returns a preview message and does not modify the model.
+4. `LogicManager` stores the unconfirmed command in `pendingDeleteStudentCommand`.
+5. A subsequent `yes` creates a confirmed copy of the command. The command removes the student from the target
+   `CourseClass`, and `LogicManager` persists the updated `CourseClassBook` through `Storage#saveCourseClassBook`.
+6. A subsequent `no` clears the pending command and returns a cancellation message without changing or saving data.
+7. Any other confirmation input returns an error and leaves the pending deletion unchanged, allowing the user to
+   enter `yes` or `no` again.
+
+The model operation is scoped to the selected class: `CourseClass#removeStudent` delegates to
+`UniqueStudentList#remove`, which removes the student by telehandle. Because each `CourseClass` owns its own enrolled
+student list, removing an enrolment from one class does not remove the same student from another class.
+
+#### Testing
+
+The feature is covered at parser, command, and logic-integration levels. The tests verify valid and invalid command
+formats, missing classes, missing enrolments, confirmation and cancellation, invalid confirmation input, persistence,
+and the case where the same student is enrolled in multiple classes.
+
 ### Student search feature
 
 The student search feature is implemented by `FindStudentCommand`,
@@ -350,7 +395,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 | `* * *` | teaching assistant | search for a class by name | quickly retrieve its details |
 | `* * *` | teaching assistant | edit a student's details | keep their information up to date |
 | `* * *` | teaching assistant | add a note about a student | remember important teaching-related observations |
-| `* *` | teaching assistant | delete a student | remove students I no longer manage |
+| `* *` | teaching assistant | remove a student from a class group | stop managing that student's enrolment in the class without affecting other classes |
 | `* *` | teaching assistant | delete a class | remove classes I no longer manage |
 | `* *` | teaching assistant | undo a deletion of a student | undo the removal of a student I made by mistake |
 | `* *` | teaching assistant | undo a deletion of a class | undo the removal of a class I made by mistake |
@@ -493,7 +538,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
   * 4a1. Aiken Duet informs the Teaching Assistant that no matching student was found.
   * Use case ends.
 
-#### UC05 — Delete a student
+#### UC05 — Remove a student from a class group
 
 **System:** Aiken Duet
 
@@ -501,28 +546,31 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 **MSS:**
 
-1. The Teaching Assistant requests to delete a student.
-2. Aiken Duet requests the student details.
-3. The Teaching Assistant provides the requested details.
-4. Aiken Duet displays the matching student and requests confirmation.
-5. The Teaching Assistant confirms the deletion.
-6. Aiken Duet deletes the student record and confirms the deletion.
+1. The Teaching Assistant enters `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`.
+2. Aiken Duet locates the specified class group and enrolled student.
+3. Aiken Duet displays the matching student and asks the Teaching Assistant to enter `yes` or `no`.
+4. The Teaching Assistant enters `yes`.
+5. Aiken Duet removes the student's enrolment from the specified class group, saves the updated class data, and
+   confirms the removal.
 
    Use case ends.
 
 **Extensions:**
 
-* 3a. Aiken Duet detects an error in the provided details.
-  * 3a1. Aiken Duet informs the Teaching Assistant of the error.
-  * 3a2. Aiken Duet requests the correct details.
-  * 3a3. The Teaching Assistant provides new details.
-  * Steps 3a1–3a3 are repeated until the details are valid.
-  * Use case resumes from step 4.
-* 4a. The specified student does not exist.
-  * 4a1. Aiken Duet informs the Teaching Assistant that the student cannot be found.
+* 1a. Aiken Duet detects missing, duplicate, or invalid command fields.
+  * 1a1. Aiken Duet displays the valid command format.
   * Use case ends.
-* 5a. The Teaching Assistant cancels the deletion.
-  * 5a1. Aiken Duet confirms that the student record was not changed.
+* 2a. The specified class group does not exist.
+  * 2a1. Aiken Duet informs the Teaching Assistant that the class group cannot be found.
+  * Use case ends.
+* 2b. The specified student is not enrolled in the class group.
+  * 2b1. Aiken Duet informs the Teaching Assistant that the enrolment cannot be found.
+  * Use case ends.
+* 4a. The Teaching Assistant enters a value other than `yes` or `no`.
+  * 4a1. Aiken Duet asks the Teaching Assistant to enter `yes` or `no` again.
+  * Use case resumes from step 4.
+* 4b. The Teaching Assistant enters `no`.
+  * 4b1. Aiken Duet cancels the operation and confirms that no records were changed.
   * Use case ends.
 
 ### Non-Functional Requirements
@@ -600,6 +648,40 @@ testers are expected to do more *exploratory* testing.
       Expected: Similar to previous.
 
 1. _{ more test cases …​ }_
+
+### Removing a student from a class group
+
+1. Removing an enrolled student after confirmation
+
+   1. Prerequisites: Create a class group using `aclass n/T05 c/CS2103T`, then add a student using
+      `add n/John Doe t/birdman c/T05 m/CS2103T`.
+
+   1. Test case: `dstudent t/birdman c/T05 m/CS2103T`<br>
+      Expected: The application displays a confirmation prompt and does not change the enrolment.
+
+   1. Test case: `yes`<br>
+      Expected: The student is removed from `T05` in `CS2103T`, and the application displays a success message.
+
+1. Cancelling a removal
+
+   1. Prerequisites: Add the student again using the `add` command.
+
+   1. Test case: `dstudent t/birdman c/T05 m/CS2103T`, followed by `no`<br>
+      Expected: The application reports that the deletion was cancelled and the student remains enrolled.
+
+1. Invalid removal requests
+
+   1. Test case: `dstudent t/birdman c/T05`<br>
+      Expected: The application displays the invalid command format and does not change any data.
+
+   1. Test case: `dstudent t/unknown c/T05 m/CS2103T`<br>
+      Expected: The application reports that the student is not enrolled in the specified class group.
+
+   1. Test case: `dstudent t/birdman c/T05 m/CS2103T`, followed by `maybe`<br>
+      Expected: The application asks for `yes` or `no`, and the pending deletion remains available for confirmation.
+
+   1. Test case: `no`<br>
+      Expected: The application cancels the pending deletion and confirms that no records were changed.
 
 ### Saving data
 
