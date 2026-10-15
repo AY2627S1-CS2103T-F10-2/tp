@@ -18,7 +18,7 @@ import seedu.address.model.tag.Tag;
 
 /**
  * Represents a class in the system.
- * Guarantees: details are present and not null, field values are validated, immutable.
+ * Guarantees: details are present and not null, field values are validated.
  */
 public class CourseClass {
 
@@ -173,8 +173,9 @@ public class CourseClass {
     }
 
     /**
-     * Returns true if both course classes have the same identity and data fields.
-     * This defines a stronger notion of equality between two course classes.
+     * Returns true if both course classes have the same identity and class metadata.
+     * Class metadata consists of the class group, module, and tags. Student enrolment data is not included.
+     * This defines a stronger notion of equality than {@link #isSameCourseClass(CourseClass)}.
      */
     @Override
     public boolean equals(Object other) {

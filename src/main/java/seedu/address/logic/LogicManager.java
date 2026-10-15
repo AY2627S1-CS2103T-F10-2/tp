@@ -46,24 +46,18 @@ public class LogicManager implements Logic {
     public CommandResult execute(String commandText) throws CommandException, ParseException {
         logger.info("----------------[USER COMMAND][" + commandText + "]");
 
-        CommandResult commandResult;
-        Command command;
         if (pendingDeleteStudentCommand != null) {
-            String confirmation = commandText.trim();
-            if (confirmation.equalsIgnoreCase("yes")) {
-                command = pendingDeleteStudentCommand.confirm();
-                pendingDeleteStudentCommand = null;
-            } else if (confirmation.equalsIgnoreCase("no")) {
-                pendingDeleteStudentCommand = null;
-                return new CommandResult(DeleteStudentCommand.MESSAGE_CANCELLED);
-            } else {
-                throw new CommandException(DeleteStudentCommand.MESSAGE_EXPECTED_CONFIRMATION);
-            }
-        } else {
-            command = addressBookParser.parseCommand(commandText);
+            return executePendingDeleteConfirmation(commandText);
         }
 
-        commandResult = command.execute(model);
+        return executeCommand(addressBookParser.parseCommand(commandText));
+    }
+
+    /**
+     * Executes a command and persists the updated course-class book when appropriate.
+     */
+    private CommandResult executeCommand(Command command) throws CommandException {
+        CommandResult commandResult = command.execute(model);
 
         if (command instanceof DeleteStudentCommand deleteStudentCommand
                 && !deleteStudentCommand.isConfirmed()) {
@@ -71,6 +65,31 @@ public class LogicManager implements Logic {
             return commandResult;
         }
 
+        saveCourseClassBook();
+        return commandResult;
+    }
+
+    /**
+     * Handles the confirmation response for a pending student deletion.
+     */
+    private CommandResult executePendingDeleteConfirmation(String commandText) throws CommandException {
+        String confirmation = commandText.trim();
+        if (confirmation.equalsIgnoreCase("yes")) {
+            Command command = pendingDeleteStudentCommand.confirm();
+            pendingDeleteStudentCommand = null;
+            return executeCommand(command);
+        }
+        if (confirmation.equalsIgnoreCase("no")) {
+            pendingDeleteStudentCommand = null;
+            return new CommandResult(DeleteStudentCommand.MESSAGE_CANCELLED);
+        }
+        throw new CommandException(DeleteStudentCommand.MESSAGE_EXPECTED_CONFIRMATION);
+    }
+
+    /**
+     * Saves the current course-class book and translates storage failures into command errors.
+     */
+    private void saveCourseClassBook() throws CommandException {
         try {
             storage.saveCourseClassBook(model.getCourseClassBook());
         } catch (AccessDeniedException e) {
@@ -78,8 +97,6 @@ public class LogicManager implements Logic {
         } catch (IOException ioe) {
             throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
         }
-
-        return commandResult;
     }
 
     @Override
