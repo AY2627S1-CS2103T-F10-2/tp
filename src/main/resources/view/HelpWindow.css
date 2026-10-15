@@ -1,3 +1,7 @@
+* {
+    -fx-effect: null;
+}
+
 #copyButton, #helpMessage {
     -fx-text-fill: white;
 }

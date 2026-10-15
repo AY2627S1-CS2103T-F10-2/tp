@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
@@ -16,9 +17,9 @@
     </columnConstraints>
     <VBox alignment="TOP_LEFT" minHeight="105" GridPane.columnIndex="0">
       <padding>
-        <Insets top="5" right="5" bottom="5" left="15" />
+        <Insets top="5" right="15" bottom="5" left="15" />
       </padding>
-      <HBox spacing="0.5" alignment="CENTER_LEFT">
+      <HBox spacing="10" alignment="BASELINE_LEFT">
         <Label fx:id="id" styleClass="cell_big_label">
           <minWidth>
             <!-- Ensures that the label text is never truncated -->
@@ -26,15 +27,25 @@
           </minWidth>
         </Label>
         <Label fx:id="name" text="\$first" styleClass="cell_big_label" />
+        <Label fx:id="courseCode" styleClass="cell_small_label" text="Course code" />
+        <FlowPane fx:id="tags" alignment = "CENTER_LEFT" prefWrapLength="10"/>
       </HBox>
-      <FlowPane fx:id="tags" />
-      <Label fx:id="courseCode" styleClass="cell_small_label" text="Course code" />
-      <Label fx:id="studentCount" styleClass="cell_small_label" text="Students" />
-      <VBox fx:id="studentsBox" spacing="5" fillWidth="true">
+      <Label fx:id="studentCount"
+             styleClass="cell_small_label"
+             text="Students"
+             maxWidth="Infinity"
+             alignment="CENTER_RIGHT">
+
         <padding>
-            <Insets top="5" bottom="5" />
+            <Insets right="10" />
         </padding>
-      </VBox>
+      </Label>
+      <StackPane styleClass="student-list">
+        <VBox.margin>
+          <Insets top="10" bottom="10" />
+        </VBox.margin>
+        <VBox fx:id="studentsBox" spacing="0" fillWidth="true" />
+      </StackPane>
     </VBox>
   </GridPane>
 </HBox>

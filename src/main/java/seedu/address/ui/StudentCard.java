@@ -43,6 +43,9 @@ public class StudentCard extends UiPart<Region> {
     public StudentCard(Student student, int displayedIndex) {
         super(FXML);
         this.student = student;
+        if (displayedIndex % 2 == 0) {
+            cardPane.getStyleClass().add("student-row-alternate");
+        }
         id.setText(displayedIndex + ". ");
         name.setText(student.getName().fullName);
         telehandle.setText("@" + student.getTelehandle().value);
