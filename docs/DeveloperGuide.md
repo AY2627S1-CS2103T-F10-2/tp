@@ -538,8 +538,8 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 * 1a. The command does not contain a keyword.
   * 1a1. Aiken Duet displays the valid command format.
   * Use case ends.
-* 3a. No matching student enrolment is found.
-  * 3a1. Aiken Duet informs the Teaching Assistant that no matching student enrolment was found.
+* 2a. No matching student enrolment is found.
+  * 2a1. Aiken Duet informs the Teaching Assistant that no matching student enrolment was found.
   * Use case ends.
 
 #### UC05 — Remove a student from a class group
