@@ -222,6 +222,13 @@ introducing a separate global student index. It keeps the first feature
 increment small and avoids duplicating enrolment data, while still satisfying
 the current requirement to search across all classes.
 
+#### Testing
+
+The feature is tested at the parser, predicate, command, and top-level command-routing levels.
+The tests cover blank input, whitespace-separated keywords, case-insensitive full-word matching,
+OR matching for multiple keywords, no matches, result details, and the same student enrolled in
+multiple classes.
+
 ### Student notes feature
 
 The student notes feature is implemented by `AddNoteCommandParser`,
@@ -519,23 +526,20 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 **MSS:**
 
-1. The Teaching Assistant requests to search for a student.
-2. Aiken Duet requests a search keyword.
-3. The Teaching Assistant provides a keyword.
-4. Aiken Duet displays the matching students with sufficient details to distinguish them.
+1. The Teaching Assistant enters `fstudent KEYWORD [MORE_KEYWORDS]`.
+2. Aiken Duet searches student enrolments across all class groups by name.
+3. Aiken Duet displays each matching enrolment with the student's name, Telegram handle,
+   class group, and module.
 
    Use case ends.
 
 **Extensions:**
 
-* 3a. The Teaching Assistant provides an empty keyword.
-  * 3a1. Aiken Duet informs the Teaching Assistant that the keyword cannot be empty.
-  * 3a2. Aiken Duet requests a new keyword.
-  * 3a3. The Teaching Assistant provides a new keyword.
-  * Steps 3a1–3a3 are repeated until the keyword is valid.
-  * Use case resumes from step 4.
-* 4a. No matching record is found.
-  * 4a1. Aiken Duet informs the Teaching Assistant that no matching student was found.
+* 1a. The command does not contain a keyword.
+  * 1a1. Aiken Duet displays the valid command format.
+  * Use case ends.
+* 3a. No matching student enrolment is found.
+  * 3a1. Aiken Duet informs the Teaching Assistant that no matching student enrolment was found.
   * Use case ends.
 
 #### UC05 — Remove a student from a class group
@@ -682,6 +686,33 @@ testers are expected to do more *exploratory* testing.
 
    1. Test case: `no`<br>
       Expected: The application cancels the pending deletion and confirms that no records were changed.
+
+### Finding enrolled students by name
+
+1. Finding the same student in multiple class groups
+
+   1. Prerequisites: Create two classes using `aclass n/T05 c/CS2103T` and
+      `aclass n/L01 c/CS2101`. Add the same student to both classes using
+      `add n/Alex Tan t/alextan c/T05 m/CS2103T` and
+      `add n/Alex Tan t/alextan c/L01 m/CS2101`.
+
+   1. Test case: `fstudent alex`<br>
+      Expected: Two matching enrolments are displayed. Both show `Alex Tan` and `@alextan`;
+      one shows `T05, CS2103T` and the other shows `L01, CS2101`.
+
+   1. Test case: `fstudent ALEX nobody`<br>
+      Expected: The same two enrolments are displayed because matching is case-insensitive and
+      a student may match any supplied keyword.
+
+1. Searching with no matching name or invalid input
+
+   1. Prerequisites: `Alex Tan` is enrolled in at least one class.
+
+   1. Test case: `fstudent Ale`<br>
+      Expected: `No matching student enrolments found.` is displayed because only full words match.
+
+   1. Test case: `fstudent`<br>
+      Expected: The command is rejected and the valid command format is displayed.
 
 ### Saving data
 

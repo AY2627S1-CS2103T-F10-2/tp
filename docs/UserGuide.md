@@ -202,11 +202,18 @@ Format: `fstudent KEYWORD [MORE_KEYWORDS]`
 * Only full words in student names match; for example, `Alex` matches `Alex Tan`, but `Ale` does not.
 * When several keywords are supplied, a student matching any keyword is returned.
 * A student enrolled in multiple classes is shown once for each enrolment.
+* At least one non-blank keyword must be supplied. Otherwise, Aiken Duet displays the valid command format.
+* If no student enrolment matches, Aiken Duet displays `No matching student enrolments found.`
+* This command only displays results; it does not modify any student or class data.
 
 Examples:
 
-* `fstudent Alex` finds every enrolled student with `Alex` as a full word in their name.
+* If `Alex Tan` (`@alextan`) is enrolled in `T05` for `CS2103T`, `fstudent Alex` returns:<br>
+  `1 matching student enrolment(s) found:`<br>
+  `1. Alex Tan (@alextan) — T05, CS2103T`
 * `fstudent Alex Bernice` finds students whose names contain either `Alex` or `Bernice`.
+* `fstudent Ale` does not match `Alex Tan` and displays `No matching student enrolments found.`
+* `fstudent` is rejected and displays the valid command format because no keyword was supplied.
 
 ### Finding classes by class-group name: `fclass`
 
