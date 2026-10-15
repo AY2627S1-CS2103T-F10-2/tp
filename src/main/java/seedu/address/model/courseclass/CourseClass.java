@@ -18,7 +18,7 @@ import seedu.address.model.tag.Tag;
 
 /**
  * Represents a class in the system.
- * Guarantees: details are present and not null, field values are validated, immutable.
+ * Guarantees: details are present and not null, field values are validated.
  */
 public class CourseClass {
 
