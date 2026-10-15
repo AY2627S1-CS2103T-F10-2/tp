@@ -3,7 +3,7 @@ layout: page
 title: User Guide
 ---
 
-Aiken Duet is a **desktop application for Teaching Assistants (TA) to manage students, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI).
+Aiken Duet is a **desktop application for Teaching Assistants (TA) to manage students in their classes, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI).
 
 * Table of Contents
 {:toc}
