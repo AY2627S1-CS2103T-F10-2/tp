@@ -167,6 +167,29 @@ Example:
 To cancel the operation, enter `no` after the confirmation prompt. The application displays
 `Student deletion cancelled. No records were changed.`
 
+### Adding a note to a student: `note`
+
+Adds a timestamped teaching observation to a student enrolled in a specific class group.
+The module name is required so that class groups with the same name in different modules are distinguished.
+
+Format: `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`
+
+* `TELEHANDLE` identifies the student.
+* `CLASS_GROUP` identifies the tutorial, laboratory, or recitation group.
+* `MODULE_NAME` identifies the module containing the class group.
+* `OBSERVATION` is the non-blank note to record.
+* `o/OBSERVATION` must be the final parameter. Everything after `o/` is treated as observation text, so the
+  observation may contain prefix-like text such as `m/ath`.
+* The date and time are generated automatically when the command is executed.
+* Notes appear below the student's name and Telegram handle in the selected class. They are displayed in recorded
+  order, from oldest to newest, for example `[14 Oct 2026, 21:30] Needs follow-up`. Long observations wrap within the
+  student card.
+
+Example:
+
+* `note t/birdman c/T05 m/CS2103T o/Needs follow-up on tutorial participation` records the observation for
+  `@birdman` in `T05` of `CS2103T`.
+
 ### Finding enrolled students by name: `fstudent`
 
 Finds students enrolled in any class whose names contain at least one of the supplied keywords.
@@ -251,6 +274,7 @@ Action | Format, Examples
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
 **Remove student from class** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
+**Add student note** | `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`<br> e.g., `note t/birdman c/T05 m/CS2103T o/Needs follow-up`
 **Find student** | `fstudent KEYWORD [MORE_KEYWORDS]`<br> e.g., `fstudent Alex Bernice`
 **Find class** | `fclass KEYWORD [MORE_KEYWORDS]`<br> e.g., `fclass T05 L01`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`

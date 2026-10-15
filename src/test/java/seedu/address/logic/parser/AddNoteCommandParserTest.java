@@ -24,8 +24,18 @@ public class AddNoteCommandParserTest {
                 new CourseCode("CS2103T"), "Needs follow-up");
 
         assertParseSuccess(parser, " t/birdman c/T05 m/CS2103T o/Needs follow-up", expected);
-        assertParseSuccess(parser, " o/Needs follow-up m/CS2103T t/birdman c/T05", expected);
+        assertParseSuccess(parser, " m/CS2103T t/birdman c/T05 o/Needs follow-up", expected);
         assertParseSuccess(parser, " t/birdman c/T05 m/CS2103T o/  Needs follow-up  ", expected);
+    }
+
+    @Test
+    public void parse_noteContainsPrefixLikeText_success() {
+        String noteText = "Discussed m/ath skills using c/++ in t/utorial with o/ther examples";
+        AddNoteCommand expected = new AddNoteCommand(
+                new Telehandle("birdman"), new ClassGroup("T05"),
+                new CourseCode("CS2103T"), noteText);
+
+        assertParseSuccess(parser, " t/birdman c/T05 m/CS2103T o/" + noteText, expected);
     }
 
     @Test
@@ -36,6 +46,7 @@ public class AddNoteCommandParserTest {
         assertParseFailure(parser, " t/birdman m/CS2103T o/Needs follow-up", expected);
         assertParseFailure(parser, " t/birdman c/T05 o/Needs follow-up", expected);
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T", expected);
+        assertParseFailure(parser, " o/Needs follow-up t/birdman c/T05 m/CS2103T", expected);
         assertParseFailure(parser, "unexpected t/birdman c/T05 m/CS2103T o/Needs follow-up", expected);
     }
 
@@ -47,8 +58,6 @@ public class AddNoteCommandParserTest {
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_CLASS_GROUP));
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T m/CS2101 o/Needs follow-up",
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_MODULE_NAME));
-        assertParseFailure(parser, " t/birdman c/T05 m/CS2103T o/First o/Second",
-                Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_NOTE));
     }
 
     @Test

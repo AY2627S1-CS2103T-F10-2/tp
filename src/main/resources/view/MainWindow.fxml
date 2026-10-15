@@ -4,12 +4,17 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Scene?>
 <?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Separator?>
 
 <fx:root type="javafx.stage.Stage" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
          title="Course Classes" minWidth="450" minHeight="600" onCloseRequest="#handleExit">
@@ -24,6 +29,22 @@
       </stylesheets>
 
       <VBox>
+        <HBox fx:id="titleBar" styleClass="title-bar" alignment="CENTER_LEFT"
+              minHeight="40" prefHeight="40" maxHeight="40" VBox.vgrow="NEVER">
+          <HBox fx:id="titleDragArea" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <padding>
+              <Insets left="12" />
+            </padding>
+            <Label fx:id="windowTitle" styleClass="window-title" />
+            <Region HBox.hgrow="ALWAYS" />
+          </HBox>
+          <Button fx:id="minimizeButton" text="&#x2014;" accessibleText="Minimize window"
+                  styleClass="window-control" onAction="#handleMinimize" focusTraversable="false" />
+          <Button fx:id="maximizeButton" text="&#x25A1;" accessibleText="Maximize window"
+                  styleClass="window-control" onAction="#handleMaximize" focusTraversable="false" />
+          <Button fx:id="closeButton" text="&#x00D7;" accessibleText="Close window"
+                  styleClass="window-control, window-close" onAction="#handleExit" focusTraversable="false" />
+        </HBox>
         <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
           <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
@@ -32,12 +53,6 @@
             <MenuItem fx:id="helpMenuItem" mnemonicParsing="false" onAction="#handleHelp" text="Help" />
           </Menu>
         </MenuBar>
-
-        <StackPane VBox.vgrow="NEVER" fx:id="commandBoxPlaceholder" styleClass="pane-with-border">
-          <padding>
-            <Insets top="5" right="10" bottom="5" left="10" />
-          </padding>
-        </StackPane>
 
         <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="pane-with-border"
                    minHeight="100" prefHeight="100" maxHeight="100">
@@ -53,7 +68,27 @@
           <StackPane fx:id="courseClassListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
         </VBox>
 
-        <StackPane fx:id="statusbarPlaceholder" VBox.vgrow="NEVER" />
+        <HBox fx:id="bottomMenu" styleClass="bottomMenu, pane-with-border" minHeight="80">
+            <StackPane HBox.hgrow="ALWAYS" fx:id="commandBoxPlaceholder">
+            <padding>
+                <Insets top="5" right="0" bottom="5" left="10" />
+            </padding>
+            </StackPane>
+            <Separator orientation="VERTICAL">
+                <HBox.margin>
+                    <Insets top="15" right="10" bottom="15" left="25"/>
+                </HBox.margin>
+            </Separator>
+
+
+            <StackPane fx:id="statusbarPlaceholder">
+            <padding>
+                <Insets top="5" right="10" bottom="5" left="0" />
+            </padding>
+            </StackPane>
+        </HBox>
+
+
       </VBox>
     </Scene>
   </scene>

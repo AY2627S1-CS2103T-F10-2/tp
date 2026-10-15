@@ -10,6 +10,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.person.Person;
 import seedu.address.model.student.Student;
@@ -55,6 +56,12 @@ public class CourseClassCard extends UiPart<Region> {
         id.setText(displayedIndex + ". ");
         name.setText(courseClass.getName().fullName);
         courseCode.setText(courseClass.getCourseCode().value);
+        Rectangle studentListClip = new Rectangle();
+        studentListClip.setArcWidth(8);
+        studentListClip.setArcHeight(8);
+        studentListClip.widthProperty().bind(studentsBox.widthProperty());
+        studentListClip.heightProperty().bind(studentsBox.heightProperty());
+        studentsBox.setClip(studentListClip);
         refreshStudents();
 
         courseClass.getStudents().getPersonList().addListener(
@@ -88,6 +95,10 @@ public class CourseClassCard extends UiPart<Region> {
         for (int i = 0; i < enrolledStudents.size(); i++) {
             studentsBox.getChildren().add(
                     new StudentCard(enrolledStudents.get(i), legacyStudents.size() + i + 1).getRoot());
+        }
+        if (!studentsBox.getChildren().isEmpty()) {
+            studentsBox.getChildren().get(studentsBox.getChildren().size() - 1)
+                    .getStyleClass().add("student-row-last");
         }
     }
 }

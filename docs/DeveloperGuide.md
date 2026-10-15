@@ -222,6 +222,52 @@ introducing a separate global student index. It keeps the first feature
 increment small and avoids duplicating enrolment data, while still satisfying
 the current requirement to search across all classes.
 
+### Student notes feature
+
+The student notes feature is implemented by `AddNoteCommandParser`,
+`AddNoteCommand`, `Note`, and the note-related behaviour in `Student` and
+`StudentCard`.
+
+#### Model and command execution
+
+`Note` is an immutable value object containing non-blank text and a
+`LocalDateTime` timestamp. Each `Student` stores an unmodifiable list of notes.
+`Student#withNote` creates a new `Student` with the new note appended, preserving
+the order in which notes were recorded.
+
+The command execution flow is as follows:
+
+1. `AddressBookParser` delegates a `note` command to `AddNoteCommandParser`.
+1. `AddNoteCommandParser` parses the telehandle, class group, and module name.
+   The `o/` parameter must appear last and marks the start of the remaining
+   free-text observation, allowing the observation itself to contain
+   prefix-like text.
+1. `AddNoteCommand` locates the `CourseClass` using the class group and module
+   name, then locates the enrolled `Student` using the telehandle. The command
+   fails without modifying data if either cannot be found.
+1. The command creates a `Note` using the observation and the current system
+   date and time. It calls `Student#withNote` and replaces the original student
+   through `CourseClass#setStudent`; `UniqueStudentList#setStudent` preserves
+   the student's position in the class.
+1. After successful execution, `LogicManager` asks `StorageManager` to save the
+   updated course-class book.
+
+#### Persistence
+
+`JsonAdaptedStudent` converts each note using `JsonAdaptedNote`, which stores
+the note text and timestamp in `data/courseclasses.json`. When the application
+starts, the storage component validates and restores both fields, preserving
+the order of the student's notes. Stored students without a `notes` field
+remain compatible and are loaded with an empty note list.
+
+#### UI display
+
+`CourseClassCard` listens for changes to its observable student list and
+refreshes the affected student cards after a note is added. `StudentCard`
+displays each note below the student's name and Telegram handle in stored order.
+Timestamps use the format `dd MMM yyyy, HH:mm`, and note labels wrap long text.
+The notes container is hidden for students without notes.
+
 ### \[Proposed\] Undo/redo feature
 
 #### Proposed Implementation

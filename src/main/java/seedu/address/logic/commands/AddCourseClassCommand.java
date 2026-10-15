@@ -24,7 +24,7 @@ public class AddCourseClassCommand extends Command {
             + PREFIX_CODE + "COURSE_CODE "
             + "[" + PREFIX_TAG + "TAG]...\n"
             + "Example: " + COMMAND_WORD + " "
-            + PREFIX_NAME + "Software Engineering F10-2 "
+            + PREFIX_NAME + "F10-2 "
             + PREFIX_CODE + "CS2103T "
             + PREFIX_TAG + "tutorial";
 
