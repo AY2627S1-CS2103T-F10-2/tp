@@ -155,6 +155,42 @@ Classes used by multiple components are in the `seedu.address.commons` package.
 
 This section describes some noteworthy details on how certain features are implemented.
 
+### Adding a class: `aclass`
+
+The `aclass` command creates a new `CourseClass` and adds it to the application's `CourseClassBook`. A course class
+contains a class-group name, a course code, an optional set of tags, and an initially empty list of enrolled students.
+
+#### Command parsing
+
+`AddressBookParser` routes `aclass` to `AddCourseClassCommandParser`. The parser uses `ArgumentTokenizer` to read:
+
+* `n/` for the class-group name; and
+* `c/` for the course code.
+
+Both prefixes are required and may appear in either order. `t/` is optional and may be repeated; repeated identical
+tags are stored once because tags are represented as a set. The parser rejects a non-empty preamble, missing required
+prefixes, and duplicate `n/` or `c/` prefixes. `ParserUtil` validates the name, course code, and tags before the
+parser constructs the `CourseClass` and `AddCourseClassCommand` objects.
+
+#### Execution and persistence
+
+`AddCourseClassCommand#execute` first calls `Model#hasCourseClass`. Course-class identity is defined by
+`CourseClass#isSameCourseClass`, which compares the class-group name and course code and ignores tags. If that identity
+already exists, the command throws `This class already exists in the system.` Otherwise, it adds the class through
+`Model#addCourseClass` and returns a formatted success message containing the class name, course code, and tags.
+
+`ModelManager#addCourseClass` delegates to `CourseClassBook`, then resets the filtered course-class list so the new
+class is immediately visible in the UI. After a successful command, `LogicManager` saves the complete
+`CourseClassBook` through `Storage#saveCourseClassBook`, so the new class is persisted automatically.
+
+#### Testing
+
+The feature is covered by parser, command, integration, UI, and storage tests. In particular,
+`AddCourseClassCommandParserTest` covers valid prefix order, optional and repeated tags, missing fields, preambles,
+duplicate prefixes, and invalid values. `AddCourseClassCommandIntegrationTest` verifies that a class is added and that
+an identical class is rejected. The broader course-class integration and storage tests verify display and persistence
+behaviour.
+
 ### Removing a student from a class group: `dstudent`
 
 The `dstudent` command removes one student's enrolment from one class group. It does not delete the student globally,
@@ -434,7 +470,7 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 1. The Teaching Assistant requests to create a class group.
 2. Aiken Duet requests the class group name and details.
 3. The Teaching Assistant provides the requested details.
-4. Aiken Duet creates the class group with the relavent details.
+4. Aiken Duet creates the class group with the relevant details.
 
    Use case ends.
 
@@ -648,6 +684,26 @@ testers are expected to do more *exploratory* testing.
       Expected: Similar to previous.
 
 1. _{ more test cases …​ }_
+
+### Adding a class group
+
+1. Adding a class without tags
+
+   1. Test case: `aclass n/T05 c/CS2103T`<br>
+      Expected: A class group named `T05` appears in the class list with course code `CS2103T`.
+
+1. Adding a class with tags
+
+   1. Test case: `aclass n/L01 c/CS2103T t/lab t/odd-week`<br>
+      Expected: The class group appears in the class list with both tags.
+
+1. Rejecting invalid or duplicate classes
+
+   1. Test case: `aclass n/T05`<br>
+      Expected: The application displays the invalid command format and does not add a class.
+
+   1. Test case: `aclass n/T05 c/CS2103T` again<br>
+      Expected: The application reports `This class already exists in the system.` and does not create a duplicate.
 
 ### Removing a student from a class group
 
