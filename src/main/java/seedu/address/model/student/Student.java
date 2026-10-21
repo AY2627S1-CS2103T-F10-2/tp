@@ -82,6 +82,8 @@ public class Student {
                 "Note index must refer to an existing note");
         List<Note> updatedNotes = new ArrayList<>(notes);
         updatedNotes.remove(zeroBasedIndex);
+        assert updatedNotes.size() == notes.size() - 1
+                : "Deleting one note must reduce the note count by one";
         return new Student(name, telehandle, updatedNotes);
     }
 

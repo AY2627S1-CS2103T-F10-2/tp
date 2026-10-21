@@ -6,6 +6,9 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_INDEX;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_MODULE_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TELEHANDLE;
 
+import java.util.logging.Logger;
+
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
@@ -41,6 +44,8 @@ public class DeleteNoteCommand extends Command {
     public static final String MESSAGE_INVALID_NOTE_INDEX =
             "Note index %1$d is invalid for @%2$s, who has %3$d note(s)";
 
+    private static final Logger logger = LogsCenter.getLogger(DeleteNoteCommand.class);
+
     private final Telehandle telehandle;
     private final ClassGroup classGroup;
     private final CourseCode moduleName;
@@ -74,7 +79,13 @@ public class DeleteNoteCommand extends Command {
                     noteIndex.getOneBased(), telehandle, targetStudent.getNotes().size()));
         }
 
-        targetClass.setStudent(targetStudent, targetStudent.withoutNoteAt(noteIndex.getZeroBased()));
+        Student updatedStudent = targetStudent.withoutNoteAt(noteIndex.getZeroBased());
+        targetClass.setStudent(targetStudent, updatedStudent);
+
+        logger.info(() -> String.format(
+                "action=deleteStudentNote classGroup=%s courseCode=%s noteIndex=%d remainingNoteCount=%d",
+                classGroup, moduleName, noteIndex.getOneBased(), updatedStudent.getNotes().size()));
+
         return new CommandResult(String.format(MESSAGE_SUCCESS, noteIndex.getOneBased(),
                 targetStudent.getName(), telehandle, classGroup, moduleName));
     }
