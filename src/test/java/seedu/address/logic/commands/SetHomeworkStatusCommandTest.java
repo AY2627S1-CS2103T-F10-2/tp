@@ -71,6 +71,8 @@ public class SetHomeworkStatusCommandTest {
 
         assertTrue(command.equals(command));
         assertEquals(command, new SetHomeworkStatusCommand(Index.fromOneBased(1), HomeworkStatus.PENDING));
+        assertEquals(command.hashCode(), new SetHomeworkStatusCommand(
+                Index.fromOneBased(1), HomeworkStatus.PENDING).hashCode());
         assertFalse(command.equals(null));
         assertFalse(command.equals("command"));
         assertFalse(command.equals(new SetHomeworkStatusCommand(Index.fromOneBased(2), HomeworkStatus.PENDING)));
