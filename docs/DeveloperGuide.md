@@ -268,15 +268,17 @@ multiple classes.
 ### Student notes feature
 
 The student notes feature is implemented by `AddNoteCommandParser`,
-`AddNoteCommand`, `Note`, and the note-related behaviour in `Student` and
-`StudentCard`.
+`AddNoteCommand`, `DeleteNoteCommandParser`, `DeleteNoteCommand`, `Note`, and
+the note-related behaviour in `Student` and `StudentCard`.
 
 #### Model and command execution
 
 `Note` is an immutable value object containing non-blank text and a
 `LocalDateTime` timestamp. Each `Student` stores an unmodifiable list of notes.
-`Student#withNote` creates a new `Student` with the new note appended, preserving
-the order in which notes were recorded.
+`Student#withNote` creates a new `Student` with the new note appended, while
+`Student#withoutNoteAt` creates a new `Student` without the note at a validated
+zero-based index. Both operations preserve the original `Student` and the order
+of all retained notes.
 
 The command execution flow is as follows:
 
@@ -295,6 +297,19 @@ The command execution flow is as follows:
 1. After successful execution, `LogicManager` asks `StorageManager` to save the
    updated course-class book.
 
+Note deletion proceeds as follows:
+
+1. `AddressBookParser` delegates a `dnote` command to
+   `DeleteNoteCommandParser`, which parses the class, student, and one-based note
+   index.
+1. `DeleteNoteCommand` locates the specified class and student. It validates the
+   index against that enrolment's current note list before making any change.
+1. The command calls `Student#withoutNoteAt` using the zero-based index and
+   replaces the original student through `CourseClass#setStudent`.
+1. `LogicManager` saves the updated course-class book. If the class, student, or
+   note index is invalid, the command throws a `CommandException` before
+   replacing the student, so stored data remains unchanged.
+
 #### Persistence
 
 `JsonAdaptedStudent` converts each note using `JsonAdaptedNote`, which stores
@@ -306,10 +321,18 @@ remain compatible and are loaded with an empty note list.
 #### UI display
 
 `CourseClassCard` listens for changes to its observable student list and
-refreshes the affected student cards after a note is added. `StudentCard`
-displays each note below the student's name and Telegram handle in stored order.
-Timestamps use the format `dd MMM yyyy, HH:mm`, and note labels wrap long text.
-The notes container is hidden for students without notes.
+refreshes the affected student cards after a note is added or deleted.
+`StudentCard` numbers and displays each note below the student's name and
+Telegram handle in stored order. The one-based number shown here is the index
+accepted by `dnote`. Timestamps use the format `dd MMM yyyy, HH:mm`, and note
+labels wrap long text. The notes container is hidden for students without notes.
+
+#### Testing
+
+The feature is tested at the model, parser, command, routing, storage-integration,
+and UI levels. Tests cover deletion from different list positions, invalid
+indexes, missing classes and students, isolation between enrolments, immutable
+student updates, UI renumbering, and persistence after reloading the data file.
 
 ### \[Proposed\] Undo/redo feature
 
@@ -742,6 +765,33 @@ testers are expected to do more *exploratory* testing.
 
    1. Test case: `no`<br>
       Expected: The application cancels the pending deletion and confirms that no records were changed.
+
+### Adding and deleting student notes
+
+1. Adding numbered notes
+
+   1. Prerequisites: Create a class group using `aclass n/T05 c/CS2103T`, then add a student using
+      `add n/John Doe t/birdman c/T05 m/CS2103T`.
+
+   1. Test case: `note t/birdman c/T05 m/CS2103T o/Participated actively`, followed by
+      `note t/birdman c/T05 m/CS2103T o/Needs follow-up`.<br>
+      Expected: Two notes appear below the student in recorded order, numbered `1` and `2`.
+
+1. Deleting a note
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/1`<br>
+      Expected: The first note is deleted immediately. `Needs follow-up` remains and is renumbered as note `1`.
+
+   1. Restart the application.<br>
+      Expected: The deleted note remains absent and `Needs follow-up` is restored from storage.
+
+1. Invalid deletion requests
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/0`<br>
+      Expected: The application reports that the index must be a positive integer and does not change any notes.
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/2` after the first note has been deleted.<br>
+      Expected: The application reports that note index `2` is invalid and does not change the remaining note.
 
 ### Finding enrolled students by name
 

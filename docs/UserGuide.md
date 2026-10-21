@@ -180,14 +180,35 @@ Format: `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`
 * `o/OBSERVATION` must be the final parameter. Everything after `o/` is treated as observation text, so the
   observation may contain prefix-like text such as `m/ath`.
 * The date and time are generated automatically when the command is executed.
-* Notes appear below the student's name and Telegram handle in the selected class. They are displayed in recorded
-  order, from oldest to newest, for example `[14 Oct 2026, 21:30] Needs follow-up`. Long observations wrap within the
-  student card.
+* Notes appear below the student's name and Telegram handle in the selected class. They are numbered and displayed
+  in recorded order, from oldest to newest, for example `1. [14 Oct 2026, 21:30] Needs follow-up`. Long observations
+  wrap within the student card.
 
 Example:
 
 * `note t/birdman c/T05 m/CS2103T o/Needs follow-up on tutorial participation` records the observation for
   `@birdman` in `T05` of `CS2103T`.
+
+### Deleting a note from a student: `dnote`
+
+Deletes a numbered note from a student enrolled in a specific class group. The module name is required so that class
+groups with the same name in different modules are distinguished.
+
+Format: `dnote t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME i/NOTE_INDEX`
+
+* `TELEHANDLE` identifies the student.
+* `CLASS_GROUP` identifies the tutorial, laboratory, or recitation group.
+* `MODULE_NAME` identifies the module containing the class group.
+* `NOTE_INDEX` is the positive number displayed beside the note.
+* All four prefixes are required. They can be entered in any order, but each prefix can only be used once.
+* The note is deleted immediately and cannot be recovered through the application.
+* The command changes only the specified enrolment. Notes belonging to the same student in another class are not
+  affected.
+* If the class, student, or note index cannot be found, an error is shown and no data is changed.
+
+Example:
+
+* `dnote t/birdman c/T05 m/CS2103T i/2` deletes note 2 from `@birdman` in `T05` of `CS2103T`.
 
 ### Finding enrolled students by name: `fstudent`
 
@@ -294,6 +315,7 @@ Action | Format, Examples
 **Delete course class** | `dclass INDEX`<br> e.g., `dclass 1`
 **Remove student from class** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
 **Add student note** | `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`<br> e.g., `note t/birdman c/T05 m/CS2103T o/Needs follow-up`
+**Delete student note** | `dnote t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME i/NOTE_INDEX`<br> e.g., `dnote t/birdman c/T05 m/CS2103T i/2`
 **Find student** | `fstudent KEYWORD [MORE_KEYWORDS]`<br> e.g., `fstudent Alex Bernice`
 **Find class** | `fclass KEYWORD [MORE_KEYWORDS]`<br> e.g., `fclass T05 L01`
 **List course classes** | `lclass`
