@@ -30,29 +30,20 @@ public class CourseClass {
     private final Set<Tag> tags = new HashSet<>();
     private final AddressBook students;
     private final UniqueStudentList enrolledStudents;
+    private HomeworkStatus homeworkStatus;
 
     /**
      * Every field must be present and not null.
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags) {
-        requireAllNonNull(name, code, tags);
-        this.name = name;
-        this.code = code;
-        this.tags.addAll(tags);
-        this.students = new AddressBook();
-        this.enrolledStudents = new UniqueStudentList();
+        this(name, code, tags, new AddressBook(), new UniqueStudentList(), HomeworkStatus.NOT_SET);
     }
 
     /**
      * Every field must be present and not null.
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students) {
-        requireAllNonNull(name, code, tags, students);
-        this.name = name;
-        this.code = code;
-        this.tags.addAll(tags);
-        this.students = students;
-        this.enrolledStudents = new UniqueStudentList();
+        this(name, code, tags, students, new UniqueStudentList(), HomeworkStatus.NOT_SET);
     }
 
     /**
@@ -66,12 +57,28 @@ public class CourseClass {
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
             UniqueStudentList enrolledStudents) {
-        requireAllNonNull(name, code, tags, students, enrolledStudents);
+        this(name, code, tags, students, enrolledStudents, HomeworkStatus.NOT_SET);
+    }
+
+    /**
+     * Every field must be present and not null.
+     *
+     * @param name class group name
+     * @param code module code
+     * @param tags class tags
+     * @param students legacy student data
+     * @param enrolledStudents students using the current student model
+     * @param homeworkStatus status of the homework assigned to the class
+     */
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
+            UniqueStudentList enrolledStudents, HomeworkStatus homeworkStatus) {
+        requireAllNonNull(name, code, tags, students, enrolledStudents, homeworkStatus);
         this.name = name;
         this.code = code;
         this.tags.addAll(tags);
         this.students = students;
         this.enrolledStudents = new UniqueStudentList(enrolledStudents);
+        this.homeworkStatus = homeworkStatus;
     }
 
     /**
@@ -85,13 +92,20 @@ public class CourseClass {
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
             List<Student> enrolledStudents) {
-        requireAllNonNull(name, code, tags, students, enrolledStudents);
+        this(name, code, tags, students, enrolledStudents, HomeworkStatus.NOT_SET);
+    }
+
+    /** Creates a course class with current-model students and a homework status. */
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
+            List<Student> enrolledStudents, HomeworkStatus homeworkStatus) {
+        requireAllNonNull(name, code, tags, students, enrolledStudents, homeworkStatus);
         this.name = name;
         this.code = code;
         this.tags.addAll(tags);
         this.students = students;
         this.enrolledStudents = new UniqueStudentList();
         this.enrolledStudents.setStudents(enrolledStudents);
+        this.homeworkStatus = homeworkStatus;
     }
 
     public Name getName() {
@@ -100,6 +114,17 @@ public class CourseClass {
 
     public CourseCode getCourseCode() {
         return code;
+    }
+
+    /** Returns the homework status shared by all students in this class. */
+    public HomeworkStatus getHomeworkStatus() {
+        return homeworkStatus;
+    }
+
+    /** Updates the homework status shared by all students in this class. */
+    public void setHomeworkStatus(HomeworkStatus homeworkStatus) {
+        requireAllNonNull(homeworkStatus);
+        this.homeworkStatus = homeworkStatus;
     }
 
     public AddressBook getStudents() {
@@ -190,13 +215,14 @@ public class CourseClass {
 
         return name.equals(otherCourseClass.name)
                 && code.equals(otherCourseClass.code)
-                && tags.equals(otherCourseClass.tags);
+                && tags.equals(otherCourseClass.tags)
+                && homeworkStatus.equals(otherCourseClass.homeworkStatus);
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, code, tags);
+        return Objects.hash(name, code, tags, homeworkStatus);
     }
 
     @Override
@@ -205,6 +231,7 @@ public class CourseClass {
                 .add("name", name)
                 .add("code", code)
                 .add("tags", tags)
+                .add("homeworkStatus", homeworkStatus)
                 .toString();
     }
 

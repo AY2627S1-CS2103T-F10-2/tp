@@ -18,6 +18,7 @@ import seedu.address.model.CourseClassBook;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
@@ -56,6 +57,7 @@ public class JsonCourseClassBookStorageTest {
         CourseClassBook book = new CourseClassBook();
         CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"),
                 Set.of(new Tag("tutorial")));
+        courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
         courseClass.getStudents().addPerson(TypicalPersons.ALICE);
         Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
         Student student = new Student(new StudentName("John Doe"), new Telehandle("birdman"), List.of(note));
@@ -66,6 +68,7 @@ public class JsonCourseClassBookStorageTest {
         assertEquals(book, restored);
         assertEquals(courseClass.getStudents(), restored.getCourseClassList().get(0).getStudents());
         assertEquals(List.of(student), restored.getCourseClassList().get(0).getStudentList());
+        assertEquals(HomeworkStatus.PENDING, restored.getCourseClassList().get(0).getHomeworkStatus());
     }
 
     @Test

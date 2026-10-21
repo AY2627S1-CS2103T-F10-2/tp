@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
@@ -68,5 +69,19 @@ public class JsonAdaptedCourseClassTest {
     public void toModelType_nullEnrolledStudent_rejectsMalformedData() {
         assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
                 null, Arrays.asList((JsonAdaptedStudent) null)).toModelType());
+    }
+
+    @Test
+    public void toModelType_homeworkStatus_restoresStatus() throws Exception {
+        CourseClass restored = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, null, "completed").toModelType();
+
+        assertEquals(HomeworkStatus.COMPLETED, restored.getHomeworkStatus());
+    }
+
+    @Test
+    public void toModelType_invalidHomeworkStatus_rejectsMalformedData() {
+        assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, null, "unknown").toModelType());
     }
 }

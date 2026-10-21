@@ -96,7 +96,7 @@ public class EditCourseClassCommand extends Command {
         Set<Tag> updatedTags = editCourseClassDescriptor.getTags().orElse(courseClassToEdit.getTags());
 
         return new CourseClass(updatedName, updatedCourseCode, updatedTags, courseClassToEdit.getStudents(),
-                courseClassToEdit.getStudentList());
+                courseClassToEdit.getStudentList(), courseClassToEdit.getHomeworkStatus());
 
     }
 
