@@ -3,7 +3,10 @@ package seedu.address.storage;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -110,7 +113,19 @@ public class JsonCourseClassBookStorage {
         requireNonNull(filePath);
 
         FileUtil.createIfMissing(filePath);
-        JsonUtil.saveJsonFile(new JsonSerializableCourseClassBook(courseClassBook, undoHistory), filePath);
+        Path absoluteFilePath = filePath.toAbsolutePath();
+        Path temporaryFile = Files.createTempFile(absoluteFilePath.getParent(), "courseclassbook", ".tmp");
+        try {
+            JsonUtil.saveJsonFile(new JsonSerializableCourseClassBook(courseClassBook, undoHistory), temporaryFile);
+            try {
+                Files.move(temporaryFile, absoluteFilePath,
+                        StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporaryFile, absoluteFilePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temporaryFile);
+        }
     }
 
 }

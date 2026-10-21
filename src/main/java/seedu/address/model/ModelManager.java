@@ -3,6 +3,9 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -25,27 +28,41 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final CourseClassBook courseClassBook;
     private final UserPrefs userPrefs;
+    private final Deque<CourseClassBook> undoHistory = new ArrayDeque<>();
     private final FilteredList<Person> filteredPersons;
     private final FilteredList<CourseClass> filteredCourseClasses;
 
     /** Initializes the model with student data and an empty course class book. */
     public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyUserPrefs userPrefs) {
-        this(addressBook, new CourseClassBook(), userPrefs);
+        this(addressBook, new CourseClassBook(), userPrefs, List.of());
     }
 
     /** Initializes the model with course class data and an empty student address book. */
     public ModelManager(ReadOnlyCourseClassBook courseClassBook, ReadOnlyUserPrefs userPrefs) {
-        this(new AddressBook(), courseClassBook, userPrefs);
+        this(courseClassBook, userPrefs, List.of());
+    }
+
+    /** Initializes the model with course class data and persisted undo history. */
+    public ModelManager(ReadOnlyCourseClassBook courseClassBook, ReadOnlyUserPrefs userPrefs,
+            List<? extends ReadOnlyCourseClassBook> undoHistory) {
+        this(new AddressBook(), courseClassBook, userPrefs, undoHistory);
     }
 
     /** Initializes the model with both books and shared user preferences. */
     public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyCourseClassBook courseClassBook,
             ReadOnlyUserPrefs userPrefs) {
-        requireAllNonNull(addressBook, courseClassBook, userPrefs);
+        this(addressBook, courseClassBook, userPrefs, List.of());
+    }
+
+    /** Initializes the model with both books, user preferences, and persisted undo history. */
+    public ModelManager(ReadOnlyAddressBook addressBook, ReadOnlyCourseClassBook courseClassBook,
+            ReadOnlyUserPrefs userPrefs, List<? extends ReadOnlyCourseClassBook> undoHistory) {
+        requireAllNonNull(addressBook, courseClassBook, userPrefs, undoHistory);
         logger.fine("Initializing with address book: " + addressBook + " and course class book: " + courseClassBook);
         this.addressBook = new AddressBook(addressBook);
         this.courseClassBook = new CourseClassBook(courseClassBook);
         this.userPrefs = new UserPrefs(userPrefs);
+        setUndoHistory(undoHistory);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
         filteredCourseClasses = new FilteredList<>(this.courseClassBook.getCourseClassList());
     }
@@ -129,7 +146,34 @@ public class ModelManager implements Model {
 
     @Override
     public void setCourseClassBook(ReadOnlyCourseClassBook courseClassBook) {
-        this.courseClassBook.resetData(courseClassBook);
+        this.courseClassBook.resetData(new CourseClassBook(courseClassBook));
+    }
+
+    @Override
+    public List<? extends ReadOnlyCourseClassBook> getUndoHistory() {
+        return undoHistory.stream().map(CourseClassBook::new).toList();
+    }
+
+    @Override
+    public void addUndoSnapshot(ReadOnlyCourseClassBook courseClassBook) {
+        undoHistory.addLast(new CourseClassBook(courseClassBook));
+    }
+
+    @Override
+    public void setUndoHistory(List<? extends ReadOnlyCourseClassBook> undoHistory) {
+        requireNonNull(undoHistory);
+        this.undoHistory.clear();
+        undoHistory.forEach(this::addUndoSnapshot);
+    }
+
+    @Override
+    public Optional<ReadOnlyCourseClassBook> undoCourseClassBook() {
+        if (undoHistory.isEmpty()) {
+            return Optional.empty();
+        }
+        CourseClassBook restored = undoHistory.removeLast();
+        setCourseClassBook(restored);
+        return Optional.of(new CourseClassBook(restored));
     }
 
     @Override

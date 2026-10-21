@@ -3,6 +3,7 @@ package seedu.address;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -20,6 +21,7 @@ import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.ReadOnlyUserPrefs;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.util.SampleDataUtil;
+import seedu.address.storage.CourseClassBookStorageData;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.Storage;
@@ -61,30 +63,37 @@ public class MainApp extends Application {
     }
 
     /**
-     * Returns a {@code ModelManager} with the data from {@code storage}'s address book and {@code
+     * Returns a {@code ModelManager} with the data and persisted undo history from {@code storage} and {@code
      * userPrefs}. <br>
-     * The data from the sample address book will be used instead if {@code storage}'s address book is not found,
-     * or an empty address book will be used instead if errors occur when reading {@code storage}'s address book.
+     * The sample course-class book is used if storage is not found, or an empty course-class book is used if
+     * errors occur when reading storage.
      */
     private Model initModelManager(Storage storage, ReadOnlyUserPrefs userPrefs) {
         logger.info("Using data file : " + storage.getCourseClassBookFilePath());
 
-        Optional<ReadOnlyCourseClassBook> courseClassBookOptional;
+        Optional<CourseClassBookStorageData> courseClassBookOptional;
         ReadOnlyCourseClassBook initialData;
+        List<? extends ReadOnlyCourseClassBook> undoHistory = List.of();
         try {
-            courseClassBookOptional = storage.readCourseClassBook();
+            courseClassBookOptional = storage.readCourseClassBookData();
             if (courseClassBookOptional.isEmpty()) {
                 logger.info("Creating a new data file " + storage.getCourseClassBookFilePath()
                         + " populated with a sample CourseClassBook.");
             }
-            initialData = courseClassBookOptional.orElseGet(SampleDataUtil::getSampleCourseClassBook);
+            if (courseClassBookOptional.isPresent()) {
+                CourseClassBookStorageData storageData = courseClassBookOptional.get();
+                initialData = storageData.getCourseClassBook();
+                undoHistory = storageData.getUndoHistory();
+            } else {
+                initialData = SampleDataUtil.getSampleCourseClassBook();
+            }
         } catch (DataLoadingException e) {
             logger.warning("Data file at " + storage.getCourseClassBookFilePath() + " could not be loaded."
                     + " Will be starting with an empty CourseClassBook.");
             initialData = new CourseClassBook();
         }
 
-        return new ModelManager(initialData, userPrefs);
+        return new ModelManager(initialData, userPrefs, undoHistory);
     }
 
     /**

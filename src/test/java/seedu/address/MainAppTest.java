@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,21 @@ public class MainAppTest {
         book.addCourseClass(new CourseClass(new Name("Saved class"), new CourseCode("CS2101"), Set.of()));
         new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json")).saveCourseClassBook(book);
         assertEquals(book, initializeModel().getCourseClassBook());
+    }
+
+    @Test
+    public void initModel_savedDataAlsoRestoresUndoHistory() throws Exception {
+        CourseClassBook currentBook = new CourseClassBook();
+        currentBook.addCourseClass(new CourseClass(new Name("Saved class"), new CourseCode("CS2101"), Set.of()));
+        CourseClassBook previousBook = new CourseClassBook();
+        new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json"))
+                .saveCourseClassBookData(currentBook, List.of(previousBook));
+
+        Model model = initializeModel();
+
+        assertEquals(1, model.getUndoHistory().size());
+        assertEquals(previousBook, model.undoCourseClassBook().orElseThrow());
+        assertTrue(model.getCourseClassBook().getCourseClassList().isEmpty());
     }
 
     @Test

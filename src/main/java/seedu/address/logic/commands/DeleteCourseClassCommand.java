@@ -32,6 +32,11 @@ public class DeleteCourseClassCommand extends Command {
     }
 
     @Override
+    public boolean isMutating() {
+        return true;
+    }
+
+    @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
         List<CourseClass> lastShownList = model.getFilteredCourseClassList();

@@ -8,7 +8,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,9 +22,6 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.UserPrefs;
-import seedu.address.model.courseclass.CourseClass;
-import seedu.address.model.courseclass.CourseCode;
-import seedu.address.model.courseclass.Name;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -148,7 +145,8 @@ public class LogicManagerTest {
         // Inject LogicManager with a JsonCourseClassBookStorage that throws the IOException e when saving
         JsonCourseClassBookStorage addressBookStorage = new JsonCourseClassBookStorage(prefPath) {
             @Override
-            public void saveCourseClassBook(ReadOnlyCourseClassBook addressBook) throws IOException {
+            public void saveCourseClassBookData(ReadOnlyCourseClassBook addressBook,
+                    List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
                 throw e;
             }
         };
@@ -161,9 +159,7 @@ public class LogicManagerTest {
 
         // Triggers the saveCourseClassBook method by executing an add command
         String addCommand = "aclass n/F10-2 c/CS2103T";
-        CourseClass expectedClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
         ModelManager expectedModel = new ModelManager();
-        expectedModel.addCourseClass(expectedClass);
         assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
     }
 }
