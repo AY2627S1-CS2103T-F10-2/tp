@@ -696,6 +696,35 @@ public class CourseClassUiTest {
     }
 
     @Test
+    public void courseClassCard_refreshesNumberedNotesAfterDeletion() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_refreshesNumberedNotesAfterDeletion",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note firstNote = new Note("Participated actively", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Note secondNote = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 9, 9, 0));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"),
+                    List.of(firstNote, secondNote));
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+
+            courseClass.setStudent(student, student.withoutNoteAt(0));
+
+            VBox notesBox = (VBox) studentsBox.getChildren().getFirst().lookup("#notesBox");
+            assertEquals(1, notesBox.getChildren().size());
+            Label remainingNoteLabel = (Label) notesBox.getChildren().getFirst();
+            assertEquals("1. [09 Oct 2026, 09:00] Needs follow-up", remainingNoteLabel.getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void studentCard_withoutNotes_hidesNotesContainer() throws Exception {
         if (GuiTestProcess.isRequired()) {
             GuiTestProcess.run(getClass(), "studentCard_withoutNotes_hidesNotesContainer", temporaryFolder);
