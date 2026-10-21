@@ -72,6 +72,32 @@ public class JsonCourseClassBookStorageTest {
     }
 
     @Test
+    public void saveAndRead_roundTrip_preservesUndoHistory() throws Exception {
+        Path file = temporaryFolder.resolve("history/classes.json");
+        JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
+        CourseClassBook currentBook = new CourseClassBook();
+        currentBook.addCourseClass(new CourseClass(new Name("F10-3"), new CourseCode("CS2103T"), Set.of()));
+
+        CourseClass previousClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+        previousClass.setHomeworkStatus(HomeworkStatus.COMPLETED);
+        Student previousStudent = new Student(new StudentName("John Doe"), new Telehandle("birdman"),
+                List.of(new Note("Follow up", LocalDateTime.of(2026, 10, 8, 14, 30))));
+        previousClass.addStudent(previousStudent);
+        CourseClassBook previousBook = new CourseClassBook();
+        previousBook.addCourseClass(previousClass);
+
+        storage.saveCourseClassBookData(currentBook, List.of(previousBook));
+
+        CourseClassBookStorageData restored = storage.readCourseClassBookData().orElseThrow();
+        assertEquals(currentBook, restored.getCourseClassBook());
+        CourseClass restoredHistoryClass = restored.getUndoHistory().getFirst().getCourseClassList().getFirst();
+        assertEquals(previousClass.getName(), restoredHistoryClass.getName());
+        assertEquals(previousClass.getCourseCode(), restoredHistoryClass.getCourseCode());
+        assertEquals(HomeworkStatus.COMPLETED, restoredHistoryClass.getHomeworkStatus());
+        assertEquals(List.of(previousStudent), restoredHistoryClass.getStudentList());
+    }
+
+    @Test
     public void read_studentWithoutNotes_restoresEmptyNotes() throws Exception {
         Path file = temporaryFolder.resolve("classes.json");
         JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
@@ -98,6 +124,7 @@ public class JsonCourseClassBookStorageTest {
                 .getCourseClassList().getFirst();
 
         assertEquals(HomeworkStatus.NOT_SET, restored.getHomeworkStatus());
+        assertTrue(storage.readCourseClassBookData().orElseThrow().getUndoHistory().isEmpty());
     }
 
     @Test
