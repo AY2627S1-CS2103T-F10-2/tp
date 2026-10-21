@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -118,14 +119,19 @@ public class JsonCourseClassBookStorage {
         try {
             JsonUtil.saveJsonFile(new JsonSerializableCourseClassBook(courseClassBook, undoHistory), temporaryFile);
             try {
-                Files.move(temporaryFile, absoluteFilePath,
+                moveFile(temporaryFile, absoluteFilePath,
                         StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException e) {
-                Files.move(temporaryFile, absoluteFilePath, StandardCopyOption.REPLACE_EXISTING);
+                moveFile(temporaryFile, absoluteFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
         } finally {
             Files.deleteIfExists(temporaryFile);
         }
+    }
+
+    /** Moves a temporary storage file into its final location. */
+    Path moveFile(Path source, Path target, CopyOption... options) throws IOException {
+        return Files.move(source, target, options);
     }
 
 }

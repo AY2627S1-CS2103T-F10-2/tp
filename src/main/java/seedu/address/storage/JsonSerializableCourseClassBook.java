@@ -84,9 +84,6 @@ class JsonSerializableCourseClassBook {
 
     /** Converts the persisted undo history to model objects. */
     public List<CourseClassBook> toUndoHistory() throws IllegalValueException {
-        if (undoHistory == null) {
-            return List.of();
-        }
         List<CourseClassBook> history = new ArrayList<>();
         for (JsonSerializableCourseClassBook historyEntry : undoHistory) {
             if (historyEntry == null) {
