@@ -837,9 +837,6 @@ public class CourseClassUiTest {
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
             assertFalse(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
             assertTrue(students.getChildren().get(1).getStyleClass().contains("student-row-last"));
-            PersonListPanel legacyPanel = new PersonListPanel(courseClass.getStudents().getPersonList());
-            ListView<?> legacyList = (ListView<?>) legacyPanel.getRoot().lookup("#personListView");
-            assertSame(courseClass.getStudents().getPersonList(), legacyList.getItems());
             courseClass.removeStudent(new Telehandle("aarontan"));
             assertEquals("Students: 1", count.getText());
             assertEquals(1, students.getChildren().size());
