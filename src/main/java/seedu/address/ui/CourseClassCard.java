@@ -12,6 +12,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.person.Person;
 import seedu.address.model.student.Student;
 
@@ -45,6 +46,8 @@ public class CourseClassCard extends UiPart<Region> {
     @FXML
     private FlowPane tags;
     @FXML
+    private Label homeworkStatus;
+    @FXML
     private VBox studentsBox;
 
     /**
@@ -56,6 +59,7 @@ public class CourseClassCard extends UiPart<Region> {
         id.setText(displayedIndex + ". ");
         name.setText(courseClass.getName().fullName);
         courseCode.setText(courseClass.getCourseCode().value);
+        refreshHomeworkStatus();
         Rectangle studentListClip = new Rectangle();
         studentListClip.setArcWidth(8);
         studentListClip.setArcHeight(8);
@@ -72,6 +76,14 @@ public class CourseClassCard extends UiPart<Region> {
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+    }
+
+    /** Refreshes the class-wide homework status badge. */
+    private void refreshHomeworkStatus() {
+        HomeworkStatus status = courseClass.getHomeworkStatus();
+        homeworkStatus.setText("Homework: " + status.getSerializedValue());
+        homeworkStatus.getStyleClass().removeIf(styleClass -> styleClass.startsWith("homework-status-"));
+        homeworkStatus.getStyleClass().add("homework-status-" + status.getSerializedValue());
     }
 
     /**
