@@ -74,6 +74,97 @@ public class UndoLogicIntegrationTest {
     }
 
     @Test
+    public void execute_classEdit_canBeUndone() throws Exception {
+        JsonCourseClassBookStorage bookStorage = createBookStorage();
+        Logic logic = createLogic(new ModelManager(), bookStorage);
+        logic.execute("aclass n/T05 c/CS2103T");
+
+        logic.execute("eclass 1 n/L01");
+        assertEquals("L01", logic.getFilteredCourseClassList().get(0).getName().fullName);
+
+        logic.execute(UndoCommand.COMMAND_WORD);
+
+        assertEquals("T05", logic.getFilteredCourseClassList().get(0).getName().fullName);
+    }
+
+    @Test
+    public void execute_studentAddition_canBeUndone() throws Exception {
+        JsonCourseClassBookStorage bookStorage = createBookStorage();
+        Logic logic = createLogic(new ModelManager(), bookStorage);
+        logic.execute("aclass n/T05 c/CS2103T");
+
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        assertEquals(1, logic.getFilteredCourseClassList().get(0).getStudentList().size());
+
+        logic.execute(UndoCommand.COMMAND_WORD);
+
+        assertTrue(logic.getFilteredCourseClassList().get(0).getStudentList().isEmpty());
+    }
+
+    @Test
+    public void execute_noteAddition_canBeUndone() throws Exception {
+        JsonCourseClassBookStorage bookStorage = createBookStorage();
+        Logic logic = createLogic(new ModelManager(), bookStorage);
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+
+        logic.execute("note t/birdman c/T05 m/CS2103T o/Needs follow-up");
+        assertEquals(1, logic.getFilteredCourseClassList().get(0).getStudentList().get(0)
+                .getNotes().size());
+
+        logic.execute(UndoCommand.COMMAND_WORD);
+
+        assertTrue(logic.getFilteredCourseClassList().get(0).getStudentList().get(0)
+                .getNotes().isEmpty());
+    }
+
+    @Test
+    public void execute_noteDeletion_canBeUndone() throws Exception {
+        JsonCourseClassBookStorage bookStorage = createBookStorage();
+        Logic logic = createLogic(new ModelManager(), bookStorage);
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        logic.execute("note t/birdman c/T05 m/CS2103T o/Needs follow-up");
+
+        logic.execute("dnote t/birdman c/T05 m/CS2103T i/1");
+        assertTrue(logic.getFilteredCourseClassList().get(0).getStudentList().get(0)
+                .getNotes().isEmpty());
+
+        logic.execute(UndoCommand.COMMAND_WORD);
+
+        assertEquals("Needs follow-up", logic.getFilteredCourseClassList().get(0).getStudentList().get(0)
+                .getNotes().get(0).getText());
+    }
+
+    @Test
+    public void execute_clearCourseClasses_canBeUndone() throws Exception {
+        JsonCourseClassBookStorage bookStorage = createBookStorage();
+        Logic logic = createLogic(new ModelManager(), bookStorage);
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("aclass n/L01 c/CS2101");
+
+        logic.execute("cclass");
+        assertTrue(logic.getFilteredCourseClassList().isEmpty());
+
+        logic.execute(UndoCommand.COMMAND_WORD);
+
+        assertEquals(2, logic.getFilteredCourseClassList().size());
+    }
+
+    @Test
+    public void execute_successfulNoOpChange_doesNotCreateUndoEntry() throws Exception {
+        JsonCourseClassBookStorage bookStorage = createBookStorage();
+        Logic logic = createLogic(new ModelManager(), bookStorage);
+        logic.execute("aclass n/T05 c/CS2103T");
+
+        logic.execute("hwork 1 s/not-set");
+        logic.execute(UndoCommand.COMMAND_WORD);
+
+        assertTrue(logic.getFilteredCourseClassList().isEmpty());
+        assertThrows(CommandException.class, () -> logic.execute(UndoCommand.COMMAND_WORD));
+    }
+
+    @Test
     public void execute_afterRestart_usesPersistedUndoHistory() throws Exception {
         JsonCourseClassBookStorage bookStorage = createBookStorage();
         Logic firstLogic = createLogic(new ModelManager(), bookStorage);
