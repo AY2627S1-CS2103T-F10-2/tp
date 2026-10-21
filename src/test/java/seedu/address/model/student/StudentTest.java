@@ -64,6 +64,27 @@ public class StudentTest {
     }
 
     @Test
+    public void withoutNoteAt_validIndexes_returnsUpdatedCopyAndPreservesOriginal() {
+        Note secondNote = new Note("Participated actively", LocalDateTime.of(2026, 10, 9, 9, 0));
+        Note thirdNote = new Note("Asked for clarification", LocalDateTime.of(2026, 10, 10, 10, 0));
+        Student student = new Student(name, telehandle, List.of(note, secondNote, thirdNote));
+
+        assertEquals(List.of(secondNote, thirdNote), student.withoutNoteAt(0).getNotes());
+        assertEquals(List.of(note, thirdNote), student.withoutNoteAt(1).getNotes());
+        assertEquals(List.of(note, secondNote), student.withoutNoteAt(2).getNotes());
+        assertEquals(List.of(note, secondNote, thirdNote), student.getNotes());
+    }
+
+    @Test
+    public void withoutNoteAt_invalidIndex_throwsIllegalArgumentException() {
+        Student student = new Student(name, telehandle, List.of(note));
+
+        assertThrows(IllegalArgumentException.class, () -> student.withoutNoteAt(-1));
+        assertThrows(IllegalArgumentException.class, () -> student.withoutNoteAt(1));
+        assertThrows(IllegalArgumentException.class, () -> new Student(name, telehandle).withoutNoteAt(0));
+    }
+
+    @Test
     public void isSameStudent_comparesTelehandles() {
         Student student = new Student(name, telehandle);
         Student sameStudent = new Student(new StudentName("Jane Doe"), telehandle);

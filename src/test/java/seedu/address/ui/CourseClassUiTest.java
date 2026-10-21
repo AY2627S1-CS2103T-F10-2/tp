@@ -629,8 +629,8 @@ public class CourseClassUiTest {
 
             Label firstNoteLabel = (Label) notesBox.getChildren().get(0);
             Label secondNoteLabel = (Label) notesBox.getChildren().get(1);
-            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
-            assertEquals("[09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
+            assertEquals("1. [08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
+            assertEquals("2. [09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
             assertTrue(firstNoteLabel.isWrapText());
             assertTrue(secondNoteLabel.isWrapText());
             assertEquals(0, firstNoteLabel.getMinWidth());
@@ -684,11 +684,67 @@ public class CourseClassUiTest {
             assertTrue(refreshedNotesBox.isManaged());
             assertEquals(1, refreshedNotesBox.getChildren().size());
             Label refreshedNoteLabel = (Label) refreshedNotesBox.getChildren().get(0);
-            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
+            assertEquals("1. [08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
             card.getRoot().applyCss();
             card.getRoot().layout();
             assertTrue(studentsBox.getHeight() > initialHeight);
             assertEquals(studentsBox.getHeight(), clip.getHeight());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void courseClassCard_refreshesNumberedNotesAfterDeletion() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_refreshesNumberedNotesAfterDeletion",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note firstNote = new Note("Participated actively", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Note secondNote = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 9, 9, 0));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"),
+                    List.of(firstNote, secondNote));
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+
+            courseClass.setStudent(student, student.withoutNoteAt(0));
+
+            VBox notesBox = (VBox) studentsBox.getChildren().getFirst().lookup("#notesBox");
+            assertEquals(1, notesBox.getChildren().size());
+            Label remainingNoteLabel = (Label) notesBox.getChildren().getFirst();
+            assertEquals("1. [09 Oct 2026, 09:00] Needs follow-up", remainingNoteLabel.getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void courseClassCard_deletingLastNote_hidesNotesContainer() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_deletingLastNote_hidesNotesContainer",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"), List.of(note));
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+
+            courseClass.setStudent(student, student.withoutNoteAt(0));
+
+            VBox notesBox = (VBox) studentsBox.getChildren().getFirst().lookup("#notesBox");
+            assertFalse(notesBox.isManaged());
+            assertFalse(notesBox.isVisible());
+            assertTrue(notesBox.getChildren().isEmpty());
             return null;
         });
         Platform.runLater(task);
