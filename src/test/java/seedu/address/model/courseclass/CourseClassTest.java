@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,17 @@ public class CourseClassTest {
         assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(), null));
         assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(),
                 new AddressBook(), new UniqueStudentList(), null));
+    }
+
+    @Test
+    public void legacyConstructors_defaultHomeworkStatusToNotSet() {
+        CourseClass withUniqueStudentList = new CourseClass(name, code, Set.of(),
+                new AddressBook(), new UniqueStudentList());
+        CourseClass withStudentList = new CourseClass(name, code, Set.of(),
+                new AddressBook(), List.of());
+
+        assertEquals(HomeworkStatus.NOT_SET, withUniqueStudentList.getHomeworkStatus());
+        assertEquals(HomeworkStatus.NOT_SET, withStudentList.getHomeworkStatus());
     }
 
     @Test
