@@ -12,6 +12,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -190,5 +191,11 @@ public class ParserUtilTest {
         Set<Tag> expectedTagSet = Set.of(new Tag(VALID_TAG_1), new Tag(VALID_TAG_2));
 
         assertEquals(expectedTagSet, actualTagSet);
+    }
+
+    @Test
+    public void parseHomeworkStatus_validAndInvalidValues() throws Exception {
+        assertEquals(HomeworkStatus.PENDING, ParserUtil.parseHomeworkStatus(" pending "));
+        assertThrows(ParseException.class, () -> ParserUtil.parseHomeworkStatus("unknown"));
     }
 }

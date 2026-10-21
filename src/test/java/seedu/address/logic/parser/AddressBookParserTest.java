@@ -26,10 +26,12 @@ import seedu.address.logic.commands.FindCourseClassCommand;
 import seedu.address.logic.commands.FindStudentCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
+import seedu.address.logic.commands.SetHomeworkStatusCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
 import seedu.address.model.student.Student;
@@ -66,6 +68,12 @@ public class AddressBookParserTest {
 
         assertEquals(expected, parser.parseCommand(
                 "note t/birdman c/T05 m/CS2103T o/Needs follow-up"));
+    }
+
+    @Test
+    public void parseCommand_setHomeworkStatus() throws Exception {
+        assertEquals(new SetHomeworkStatusCommand(INDEX_FIRST_PERSON, HomeworkStatus.COMPLETED),
+                parser.parseCommand("hwork 1 s/completed"));
     }
 
     @Test

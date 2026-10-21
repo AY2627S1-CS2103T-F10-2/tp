@@ -12,6 +12,7 @@ import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -110,6 +111,17 @@ public class ParserUtil {
             throw new ParseException(Note.MESSAGE_CONSTRAINTS);
         }
         return trimmedNoteText;
+    }
+
+    /**
+     * Parses a homework status, trimming leading and trailing whitespace.
+     *
+     * @throws ParseException if the status is not supported
+     */
+    public static HomeworkStatus parseHomeworkStatus(String homeworkStatus) throws ParseException {
+        requireNonNull(homeworkStatus);
+        return HomeworkStatus.fromSerializedValue(homeworkStatus)
+                .orElseThrow(() -> new ParseException(HomeworkStatus.MESSAGE_CONSTRAINTS));
     }
 
     /**
