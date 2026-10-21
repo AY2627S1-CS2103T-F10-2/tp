@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AddCourseClassCommand;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
@@ -59,7 +58,7 @@ public class ModelManagerCourseClassTest {
     @Test
     public void execute_studentAndClassCommands_shareModelWithIndependentFilters() throws Exception {
         Model model = new ModelManager();
-        new AddCommand(TypicalPersons.ALICE).execute(model);
+        model.addPerson(TypicalPersons.ALICE);
         new AddCourseClassCommand(first).execute(model);
         model.updateFilteredPersonList(unused -> false);
         assertEquals(List.of(first), model.getFilteredCourseClassList());
