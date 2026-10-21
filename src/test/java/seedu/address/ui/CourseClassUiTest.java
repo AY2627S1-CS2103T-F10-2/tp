@@ -49,6 +49,7 @@ import seedu.address.MainApp;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.logic.Logic;
 import seedu.address.logic.LogicManager;
+import seedu.address.logic.commands.UndoCommand;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
@@ -529,6 +530,56 @@ public class CourseClassUiTest {
             logic.execute("cclass");
             assertEquals(0, list.getItems().size());
             stage.close();
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void mainWindow_undoRestoresDeletedClassAndStudentInList() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "mainWindow_undoRestoresDeletedClassAndStudentInList",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Model model = new ModelManager();
+            Logic logic = new LogicManager(model, new StorageManager(
+                    new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json")),
+                    new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
+            Stage stage = new Stage();
+            try {
+                MainWindow window = new MainWindow(stage, logic, temporaryFolder.resolve("classes.json"));
+                window.fillInnerParts();
+                window.show();
+                ListView<?> list = (ListView<?>) window.getCourseClassListPanel().getRoot()
+                        .lookup("#courseClassListView");
+                TextField input = (TextField) stage.getScene().lookup("#commandTextField");
+                TextArea feedback = (TextArea) stage.getScene().lookup("#resultDisplay");
+
+                enterCommand(input, "aclass n/T05 c/CS2103T");
+                enterCommand(input, "add n/John Doe t/birdman c/T05 m/CS2103T");
+                assertEquals(1, list.getItems().size());
+                assertEquals(1, ((CourseClass) list.getItems().get(0)).getStudentList().size());
+
+                enterCommand(input, "dstudent t/birdman c/T05 m/CS2103T");
+                enterCommand(input, "yes");
+                assertTrue(((CourseClass) list.getItems().get(0)).getStudentList().isEmpty());
+
+                enterCommand(input, UndoCommand.COMMAND_WORD);
+                assertEquals(UndoCommand.MESSAGE_SUCCESS, feedback.getText());
+                assertEquals(1, ((CourseClass) list.getItems().get(0)).getStudentList().size());
+
+                enterCommand(input, "dclass 1");
+                assertTrue(list.getItems().isEmpty());
+                enterCommand(input, UndoCommand.COMMAND_WORD);
+                assertEquals(1, list.getItems().size());
+                assertEquals("T05", ((CourseClass) list.getItems().get(0)).getName().fullName);
+                assertEquals(1, ((CourseClass) list.getItems().get(0)).getStudentList().size());
+            } finally {
+                stage.close();
+            }
             return null;
         });
         Platform.runLater(task);

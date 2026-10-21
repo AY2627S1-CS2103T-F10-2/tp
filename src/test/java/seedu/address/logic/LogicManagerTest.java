@@ -1,6 +1,7 @@
 package seedu.address.logic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COURSE_CLASS_DISPLAYED_INDEX;
 import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -73,6 +74,32 @@ public class LogicManagerTest {
     public void execute_storageThrowsAdException_throwsCommandException() {
         assertCommandFailureForExceptionFromStorage(DUMMY_AD_EXCEPTION, String.format(
                 LogicManager.FILE_OPS_PERMISSION_ERROR_FORMAT, DUMMY_AD_EXCEPTION.getMessage()));
+    }
+
+    @Test
+    public void execute_undoStorageThrowsIoException_restoresStateAndHistory() throws Exception {
+        logic.execute("aclass n/F10-2 c/CS2103T");
+
+        JsonCourseClassBookStorage failingCourseClassStorage =
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("undoFailure.json")) {
+                    @Override
+                    public void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+                            List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
+                        throw DUMMY_IO_EXCEPTION;
+                    }
+                };
+        logic = new LogicManager(model, new StorageManager(failingCourseClassStorage,
+                new JsonUserPrefsStorage(temporaryFolder.resolve("undoFailurePrefs.json"))));
+
+        CommandException exception = org.junit.jupiter.api.Assertions
+                .assertThrows(CommandException.class, () -> logic.execute("undo"));
+
+        assertEquals(String.format(LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage()),
+                exception.getMessage());
+        assertEquals(1, model.getFilteredCourseClassList().size());
+        assertEquals("F10-2", model.getFilteredCourseClassList().get(0).getName().fullName);
+        assertEquals(1, model.getUndoHistory().size());
+        assertTrue(model.getUndoHistory().get(0).getCourseClassList().isEmpty());
     }
 
     @Test

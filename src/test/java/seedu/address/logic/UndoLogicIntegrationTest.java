@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -169,6 +170,9 @@ public class UndoLogicIntegrationTest {
         JsonCourseClassBookStorage bookStorage = createBookStorage();
         Logic firstLogic = createLogic(new ModelManager(), bookStorage);
         firstLogic.execute("aclass n/T05 c/CS2103T");
+        firstLogic.execute("add n/John Doe t/birdman c/T05 m/CS2103T");
+        firstLogic.execute("note t/birdman c/T05 m/CS2103T o/Needs follow-up");
+        firstLogic.execute("hwork 1 s/completed");
         firstLogic.execute("aclass n/L01 c/CS2101");
         firstLogic.execute("dclass 2");
 
@@ -180,8 +184,20 @@ public class UndoLogicIntegrationTest {
         restartedLogic.execute(UndoCommand.COMMAND_WORD);
 
         assertEquals(2, restartedLogic.getFilteredCourseClassList().size());
-        assertEquals(2, bookStorage.readCourseClassBook().orElseThrow().getCourseClassList().size());
-        assertEquals(2, bookStorage.readCourseClassBookData().orElseThrow().getUndoHistory().size());
+        assertEquals(List.of("T05", "L01"), restartedLogic.getFilteredCourseClassList().stream()
+                .map(courseClass -> courseClass.getName().fullName).toList());
+        assertEquals(1, restartedLogic.getFilteredCourseClassList().get(0).getStudentList().size());
+        assertEquals("birdman", restartedLogic.getFilteredCourseClassList().get(0).getStudentList().get(0)
+                .getTelehandle().value);
+        assertEquals("Needs follow-up", restartedLogic.getFilteredCourseClassList().get(0).getStudentList().get(0)
+                .getNotes().get(0).getText());
+        assertEquals(HomeworkStatus.COMPLETED,
+                restartedLogic.getFilteredCourseClassList().get(0).getHomeworkStatus());
+
+        CourseClassBookStorageData persisted = bookStorage.readCourseClassBookData().orElseThrow();
+        assertEquals(List.of("T05", "L01"), persisted.getCourseClassBook().getCourseClassList().stream()
+                .map(courseClass -> courseClass.getName().fullName).toList());
+        assertEquals(5, persisted.getUndoHistory().size());
     }
 
     @Test
