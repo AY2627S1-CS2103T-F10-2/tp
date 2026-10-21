@@ -42,6 +42,18 @@ public class SetHomeworkStatusCommandTest {
     }
 
     @Test
+    public void execute_validIndex_resetsCourseClassFilter() throws Exception {
+        CourseClass otherClass = new CourseClass(new Name("F10-3"), new CourseCode("CS2103T"), Set.of());
+        model.addCourseClass(courseClass);
+        model.addCourseClass(otherClass);
+        model.updateFilteredCourseClassList(courseClass::equals);
+
+        new SetHomeworkStatusCommand(Index.fromOneBased(1), HomeworkStatus.COMPLETED).execute(model);
+
+        assertEquals(2, model.getFilteredCourseClassList().size());
+    }
+
+    @Test
     public void execute_invalidIndex_throwsCommandException() {
         model.addCourseClass(courseClass);
 
