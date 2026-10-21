@@ -8,9 +8,13 @@ import java.util.Optional;
  * Represents the status of the homework assigned to an entire course class.
  */
 public enum HomeworkStatus {
+    /** Status values accepted by the homework command and persisted in class data. */
     NOT_SET("not-set"),
     PENDING("pending"),
     COMPLETED("completed");
+
+    public static final String MESSAGE_CONSTRAINTS =
+            "Homework status must be one of: not-set, pending, completed.";
 
     private final String serializedValue;
 
