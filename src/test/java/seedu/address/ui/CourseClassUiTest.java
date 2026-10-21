@@ -725,6 +725,33 @@ public class CourseClassUiTest {
     }
 
     @Test
+    public void courseClassCard_deletingLastNote_hidesNotesContainer() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_deletingLastNote_hidesNotesContainer",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"), List.of(note));
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+
+            courseClass.setStudent(student, student.withoutNoteAt(0));
+
+            VBox notesBox = (VBox) studentsBox.getChildren().getFirst().lookup("#notesBox");
+            assertFalse(notesBox.isManaged());
+            assertFalse(notesBox.isVisible());
+            assertTrue(notesBox.getChildren().isEmpty());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void studentCard_withoutNotes_hidesNotesContainer() throws Exception {
         if (GuiTestProcess.isRequired()) {
             GuiTestProcess.run(getClass(), "studentCard_withoutNotes_hidesNotesContainer", temporaryFolder);

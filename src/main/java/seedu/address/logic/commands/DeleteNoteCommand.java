@@ -83,8 +83,9 @@ public class DeleteNoteCommand extends Command {
         targetClass.setStudent(targetStudent, updatedStudent);
 
         logger.info(() -> String.format(
-                "action=deleteStudentNote classGroup=%s courseCode=%s noteIndex=%d remainingNoteCount=%d",
-                classGroup, moduleName, noteIndex.getOneBased(), updatedStudent.getNotes().size()));
+                "action=deleteStudentNote telehandle=%s classGroup=%s courseCode=%s "
+                        + "noteIndex=%d remainingNoteCount=%d",
+                telehandle, classGroup, moduleName, noteIndex.getOneBased(), updatedStudent.getNotes().size()));
 
         return new CommandResult(String.format(MESSAGE_SUCCESS, noteIndex.getOneBased(),
                 targetStudent.getName(), telehandle, classGroup, moduleName));
