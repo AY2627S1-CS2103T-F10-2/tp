@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.AddressBook;
@@ -30,7 +33,7 @@ public class CourseClass {
     private final Set<Tag> tags = new HashSet<>();
     private final AddressBook students;
     private final UniqueStudentList enrolledStudents;
-    private HomeworkStatus homeworkStatus;
+    private final ObjectProperty<HomeworkStatus> homeworkStatus = new SimpleObjectProperty<>();
 
     /**
      * Every field must be present and not null.
@@ -78,7 +81,7 @@ public class CourseClass {
         this.tags.addAll(tags);
         this.students = students;
         this.enrolledStudents = new UniqueStudentList(enrolledStudents);
-        this.homeworkStatus = homeworkStatus;
+        this.homeworkStatus.set(homeworkStatus);
     }
 
     /**
@@ -105,7 +108,7 @@ public class CourseClass {
         this.students = students;
         this.enrolledStudents = new UniqueStudentList();
         this.enrolledStudents.setStudents(enrolledStudents);
-        this.homeworkStatus = homeworkStatus;
+        this.homeworkStatus.set(homeworkStatus);
     }
 
     public Name getName() {
@@ -118,13 +121,18 @@ public class CourseClass {
 
     /** Returns the homework status shared by all students in this class. */
     public HomeworkStatus getHomeworkStatus() {
+        return homeworkStatus.get();
+    }
+
+    /** Returns the observable homework status shared by all students in this class. */
+    public ReadOnlyObjectProperty<HomeworkStatus> homeworkStatusProperty() {
         return homeworkStatus;
     }
 
     /** Updates the homework status shared by all students in this class. */
     public void setHomeworkStatus(HomeworkStatus homeworkStatus) {
         requireAllNonNull(homeworkStatus);
-        this.homeworkStatus = homeworkStatus;
+        this.homeworkStatus.set(homeworkStatus);
     }
 
     public AddressBook getStudents() {
@@ -216,13 +224,13 @@ public class CourseClass {
         return name.equals(otherCourseClass.name)
                 && code.equals(otherCourseClass.code)
                 && tags.equals(otherCourseClass.tags)
-                && homeworkStatus.equals(otherCourseClass.homeworkStatus);
+                && getHomeworkStatus().equals(otherCourseClass.getHomeworkStatus());
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, code, tags, homeworkStatus);
+        return Objects.hash(name, code, tags, getHomeworkStatus());
     }
 
     @Override
@@ -231,7 +239,7 @@ public class CourseClass {
                 .add("name", name)
                 .add("code", code)
                 .add("tags", tags)
-                .add("homeworkStatus", homeworkStatus)
+                .add("homeworkStatus", getHomeworkStatus())
                 .toString();
     }
 

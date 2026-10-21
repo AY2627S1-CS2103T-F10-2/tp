@@ -34,6 +34,9 @@ public class HomeworkStatusLogicIntegrationTest {
         logic.execute("aclass n/T05 c/CS2103T");
         logic.execute("add n/John Doe t/john_doe c/T05 m/CS2103T");
         logic.execute("add n/Jane Doe t/jane_doe c/T05 m/CS2103T");
+        logic.execute("aclass n/T06 c/CS2101");
+        logic.execute("add n/Alice Tan t/alice_tan c/T06 m/CS2101");
+        logic.execute("hwork 2 s/pending");
         var result = logic.execute("hwork 1 s/completed");
 
         assertEquals(String.format(SetHomeworkStatusCommand.MESSAGE_SUCCESS, "T05", "completed"),
@@ -42,7 +45,12 @@ public class HomeworkStatusLogicIntegrationTest {
         assertEquals(List.of(new Student(new StudentName("John Doe"), new Telehandle("john_doe")),
                         new Student(new StudentName("Jane Doe"), new Telehandle("jane_doe"))),
                 model.getFilteredCourseClassList().getFirst().getStudentList());
+        assertEquals(HomeworkStatus.PENDING, model.getFilteredCourseClassList().get(1).getHomeworkStatus());
+        assertEquals(List.of(new Student(new StudentName("Alice Tan"), new Telehandle("alice_tan"))),
+                model.getFilteredCourseClassList().get(1).getStudentList());
         assertEquals(HomeworkStatus.COMPLETED, classStorage.readCourseClassBook().orElseThrow()
                 .getCourseClassList().getFirst().getHomeworkStatus());
+        assertEquals(HomeworkStatus.PENDING, classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().get(1).getHomeworkStatus());
     }
 }

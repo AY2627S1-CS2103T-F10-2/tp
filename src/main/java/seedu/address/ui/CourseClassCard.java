@@ -72,6 +72,8 @@ public class CourseClassCard extends UiPart<Region> {
                 (ListChangeListener<Person>) change -> refreshStudents());
         courseClass.getStudentList().addListener(
                 (ListChangeListener<Student>) change -> refreshStudents());
+        courseClass.homeworkStatusProperty().addListener((observable, oldStatus, newStatus)
+                -> refreshHomeworkStatus());
 
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))

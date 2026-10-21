@@ -191,6 +191,31 @@ duplicate prefixes, and invalid values. `AddCourseClassCommandIntegrationTest` v
 an identical class is rejected. The broader course-class integration and storage tests verify display and persistence
 behaviour.
 
+### Updating class homework status: `hwork`
+
+The `hwork` command stores one `HomeworkStatus` on the selected `CourseClass`. This value is shared by all enrolled
+students in that class; it is not stored on individual `Student` objects.
+
+#### Command parsing and execution
+
+`AddressBookParser` routes `hwork` to `SetHomeworkStatusCommandParser`. The parser requires a positive displayed class
+index and an `s/` status prefix. `ParserUtil` converts the status to one of `PENDING`, `COMPLETED`, or `NOT_SET`.
+During execution, `SetHomeworkStatusCommand` validates the displayed index, updates only the selected class, refreshes
+the filtered course-class list, logs the previous and new statuses, and returns a success message. `LogicManager` then
+saves the updated course-class book.
+
+#### Persistence and UI display
+
+`JsonAdaptedCourseClass` serializes the status using its value such as `pending` or `completed`. When the field is absent
+from older JSON data, storage defaults it to `NOT_SET`. `CourseClassCard` observes the class status property so the
+homework badge updates when `hwork` changes an already displayed class card.
+
+#### Testing
+
+The feature is covered by parser, command, model, integration, storage, and UI tests. These tests verify class-level
+updates, logging-related command execution, persistence, isolation between classes, preservation through class edits,
+legacy JSON compatibility, and refresh of an existing homework-status badge.
+
 ### Removing a student from a class group: `dstudent`
 
 The `dstudent` command removes one student's enrolment from one class group. It does not delete the student globally,

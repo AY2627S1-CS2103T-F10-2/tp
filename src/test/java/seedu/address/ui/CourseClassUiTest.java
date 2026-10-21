@@ -53,7 +53,6 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
-import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
@@ -544,13 +543,23 @@ public class CourseClassUiTest {
         }
         FutureTask<Void> task = new FutureTask<>(() -> {
             CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
-            courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
+            Model model = new ModelManager();
+            model.addCourseClass(courseClass);
+            Logic logic = new LogicManager(model, new StorageManager(
+                    new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json")),
+                    new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
             CourseClassCard card = new CourseClassCard(courseClass, 1);
             Scene scene = new Scene(card.getRoot(), 700, 300);
             scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
             card.getRoot().applyCss();
 
             Label status = (Label) card.getRoot().lookup("#homeworkStatus");
+            assertEquals("Homework: not-set", status.getText());
+            assertTrue(status.getStyleClass().contains("homework-status-not-set"));
+
+            logic.execute("hwork 1 s/pending");
+
+            status.applyCss();
             assertEquals("Homework: pending", status.getText());
             assertTrue(status.getStyleClass().contains("homework-status-pending"));
             assertEquals(Color.web("#8A6D1D"), status.getBackground().getFills().get(0).getFill());
