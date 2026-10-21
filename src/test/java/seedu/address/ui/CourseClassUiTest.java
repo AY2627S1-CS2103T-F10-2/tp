@@ -629,8 +629,8 @@ public class CourseClassUiTest {
 
             Label firstNoteLabel = (Label) notesBox.getChildren().get(0);
             Label secondNoteLabel = (Label) notesBox.getChildren().get(1);
-            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
-            assertEquals("[09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
+            assertEquals("1. [08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
+            assertEquals("2. [09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
             assertTrue(firstNoteLabel.isWrapText());
             assertTrue(secondNoteLabel.isWrapText());
             assertEquals(0, firstNoteLabel.getMinWidth());
@@ -684,7 +684,7 @@ public class CourseClassUiTest {
             assertTrue(refreshedNotesBox.isManaged());
             assertEquals(1, refreshedNotesBox.getChildren().size());
             Label refreshedNoteLabel = (Label) refreshedNotesBox.getChildren().get(0);
-            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
+            assertEquals("1. [08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
             card.getRoot().applyCss();
             card.getRoot().layout();
             assertTrue(studentsBox.getHeight() > initialHeight);
