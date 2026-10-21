@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,18 @@ import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.CourseClassBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.UserPrefs;
+import seedu.address.model.courseclass.CourseClass;
+import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.Name;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
+import seedu.address.testutil.TypicalPersons;
 
 public class LogicManagerTest {
     private static final IOException DUMMY_IO_EXCEPTION = new IOException("dummy IO exception");
@@ -100,6 +106,28 @@ public class LogicManagerTest {
         assertEquals("F10-2", model.getFilteredCourseClassList().get(0).getName().fullName);
         assertEquals(1, model.getUndoHistory().size());
         assertTrue(model.getUndoHistory().get(0).getCourseClassList().isEmpty());
+    }
+
+    @Test
+    public void execute_legacyStudentDataChange_createsUndoEntry() throws Exception {
+        CourseClassBook initialBook = new CourseClassBook();
+        initialBook.addCourseClass(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()));
+        ModelManager legacyMutatingModel = new ModelManager(initialBook, new UserPrefs()) {
+            @Override
+            public void setCourseClass(CourseClass target, CourseClass editedCourseClass) {
+                super.setCourseClass(target, editedCourseClass);
+                editedCourseClass.getStudents().addPerson(TypicalPersons.ALICE);
+            }
+        };
+        logic = new LogicManager(legacyMutatingModel, new StorageManager(
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("legacyStudents.json")),
+                new JsonUserPrefsStorage(temporaryFolder.resolve("legacyStudentsPrefs.json"))));
+
+        logic.execute("eclass 1 n/F10-2");
+
+        assertEquals(1, legacyMutatingModel.getUndoHistory().size());
+        assertTrue(legacyMutatingModel.getUndoHistory().get(0).getCourseClassList().getFirst()
+                .getStudents().getPersonList().isEmpty());
     }
 
     @Test
