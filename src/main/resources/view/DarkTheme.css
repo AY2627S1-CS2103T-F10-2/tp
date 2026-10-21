@@ -207,6 +207,26 @@
     -fx-text-fill: #9CA3AF;
 }
 
+.homework-status {
+    -fx-background-radius: 10;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 12px;
+    -fx-padding: 3 8 3 8;
+    -fx-text-fill: #FFFFFF;
+}
+
+.homework-status-not-set {
+    -fx-background-color: #2D3B4E;
+}
+
+.homework-status-pending {
+    -fx-background-color: #8A6D1D;
+}
+
+.homework-status-completed {
+    -fx-background-color: #2A7B82;
+}
+
 .student-card .cell_big_label {
     -fx-font-size: 14px;
 }

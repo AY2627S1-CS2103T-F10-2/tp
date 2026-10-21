@@ -87,6 +87,20 @@ public class JsonCourseClassBookStorageTest {
     }
 
     @Test
+    public void read_legacyClassWithoutHomeworkStatus_defaultsToNotSet() throws Exception {
+        Path file = temporaryFolder.resolve("legacy-classes.json");
+        JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
+        String json = "{\"courseClasses\":[{\"name\":\"F10-2\",\"courseCode\":\"CS2103T\","
+                + "\"tags\":[],\"enrolledStudents\":[]}]}";
+        Files.writeString(file, json);
+
+        CourseClass restored = storage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().getFirst();
+
+        assertEquals(HomeworkStatus.NOT_SET, restored.getHomeworkStatus());
+    }
+
+    @Test
     public void read_invalidOrDuplicateClasses_throwsDataLoadingException() throws Exception {
         Path file = temporaryFolder.resolve("classes.json");
         JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);

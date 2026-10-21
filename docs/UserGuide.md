@@ -106,6 +106,21 @@ Example:
 
 * `eclass 1 n/L01 t/lab` updates the first displayed course class to `L01` and replaces its tags with `lab`.
 
+### Updating class homework status: `hwork`
+
+Sets the homework status shared by every student in a displayed course class. The status is shown on the class card
+and is saved automatically.
+
+Format: `hwork INDEX s/STATUS`
+
+* `INDEX` identifies the course class in the displayed list and must be a positive integer.
+* `STATUS` must be one of `pending`, `completed`, or `not-set`.
+* Updating the status changes the class-level status only; students and their notes are unchanged.
+
+Example:
+
+* `hwork 1 s/completed` marks the first displayed course class's homework as completed for the whole class.
+
 ### Deleting a course class: `dclass`
 
 Deletes a course class identified by its index in the displayed course-class list. The course class and its enrolled
@@ -312,6 +327,7 @@ Action | Format, Examples
 **Add class** | `aclass n/NAME c/COURSE_CODE [t/TAG]…​`<br> e.g., `aclass n/F10-2 c/CS2103T t/tutorial`
 **Add student to class** | `add n/NAME t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `add n/John Doe t/birdman c/T05 m/CS2103T`
 **Edit course class** | `eclass INDEX [n/CLASS_GROUP] [c/MODULE_NAME] [t/TAG]…​`<br> e.g., `eclass 1 n/L01 t/lab`
+**Update class homework status** | `hwork INDEX s/STATUS`<br> e.g., `hwork 1 s/completed`
 **Delete course class** | `dclass INDEX`<br> e.g., `dclass 1`
 **Remove student from class** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
 **Add student note** | `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`<br> e.g., `note t/birdman c/T05 m/CS2103T o/Needs follow-up`

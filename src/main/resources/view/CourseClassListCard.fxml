@@ -29,6 +29,7 @@
         <Label fx:id="name" text="\$first" styleClass="cell_big_label" />
         <Label fx:id="courseCode" styleClass="cell_small_label" text="Course code" />
         <FlowPane fx:id="tags" alignment = "CENTER_LEFT" prefWrapLength="10"/>
+        <Label fx:id="homeworkStatus" styleClass="homework-status" text="Homework: not-set" />
       </HBox>
       <Label fx:id="studentCount"
              styleClass="cell_small_label"

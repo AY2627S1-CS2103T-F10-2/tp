@@ -521,6 +521,7 @@ public class CourseClassUiTest {
             assertEquals("F10-2", ((Label) card.getRoot().lookup("#name")).getText());
             assertEquals("CS2103T", ((Label) card.getRoot().lookup("#courseCode")).getText());
             assertEquals("Students: 0", ((Label) card.getRoot().lookup("#studentCount")).getText());
+            assertEquals("Homework: not-set", ((Label) card.getRoot().lookup("#homeworkStatus")).getText());
             assertEquals("lab", ((Label) ((FlowPane) card.getRoot().lookup("#tags"))
                     .getChildren().get(0)).getText());
             logic.execute("aclass n/F10-3 c/CS2103T");
@@ -528,6 +529,40 @@ public class CourseClassUiTest {
             logic.execute("cclass");
             assertEquals(0, list.getItems().size());
             stage.close();
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void courseClassCard_displaysHomeworkStatusBadge() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_displaysHomeworkStatusBadge", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+            Model model = new ModelManager();
+            model.addCourseClass(courseClass);
+            Logic logic = new LogicManager(model, new StorageManager(
+                    new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json")),
+                    new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            Scene scene = new Scene(card.getRoot(), 700, 300);
+            scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
+            card.getRoot().applyCss();
+
+            Label status = (Label) card.getRoot().lookup("#homeworkStatus");
+            assertEquals("Homework: not-set", status.getText());
+            assertTrue(status.getStyleClass().contains("homework-status-not-set"));
+
+            logic.execute("hwork 1 s/pending");
+
+            status.applyCss();
+            assertEquals("Homework: pending", status.getText());
+            assertTrue(status.getStyleClass().contains("homework-status-pending"));
+            assertEquals(Color.web("#8A6D1D"), status.getBackground().getFills().get(0).getFill());
             return null;
         });
         Platform.runLater(task);

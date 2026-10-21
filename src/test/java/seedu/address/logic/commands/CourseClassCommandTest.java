@@ -19,6 +19,7 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
 import seedu.address.model.tag.Tag;
@@ -153,6 +154,19 @@ public class CourseClassCommandTest {
         assertEquals(first.getTags(), edited.getTags());
         assertEquals(new CourseCode("CS2101"), edited.getCourseCode());
         assertSame(first.getStudents(), edited.getStudents());
+    }
+
+    @Test
+    public void edit_codeOnly_preservesHomeworkStatus() throws Exception {
+        first.setHomeworkStatus(HomeworkStatus.COMPLETED);
+        model.addCourseClass(first);
+        EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
+        descriptor.setCourseCode(new CourseCode("CS2101"));
+
+        new EditCourseClassCommand(Index.fromOneBased(1), descriptor).execute(model);
+
+        assertEquals(HomeworkStatus.COMPLETED,
+                model.getFilteredCourseClassList().getFirst().getHomeworkStatus());
     }
 
     @Test
