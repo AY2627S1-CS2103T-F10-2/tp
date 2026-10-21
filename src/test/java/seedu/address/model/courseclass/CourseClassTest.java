@@ -15,6 +15,7 @@ import seedu.address.model.AddressBook;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
+import seedu.address.model.student.UniqueStudentList;
 import seedu.address.model.student.exceptions.DuplicateStudentException;
 import seedu.address.model.student.exceptions.StudentNotFoundException;
 import seedu.address.model.tag.Tag;
@@ -29,6 +30,8 @@ public class CourseClassTest {
         assertThrows(NullPointerException.class, () -> new CourseClass(name, null, Set.of()));
         assertThrows(NullPointerException.class, () -> new CourseClass(name, code, null));
         assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(), null));
+        assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(),
+                new AddressBook(), new UniqueStudentList(), null));
     }
 
     @Test
@@ -91,5 +94,17 @@ public class CourseClassTest {
         assertNotEquals(courseClass, new CourseClass(new Name("F10-3"), code, Set.of()));
         assertNotEquals(courseClass, new CourseClass(name, new CourseCode("CS2101"), Set.of()));
         assertNotEquals(courseClass, new CourseClass(name, code, Set.of(new Tag("tutorial"))));
+    }
+
+    @Test
+    public void homeworkStatus_isSharedByTheWholeClass() {
+        CourseClass courseClass = new CourseClass(name, code, Set.of());
+        assertEquals(HomeworkStatus.NOT_SET, courseClass.getHomeworkStatus());
+
+        courseClass.setHomeworkStatus(HomeworkStatus.COMPLETED);
+
+        assertEquals(HomeworkStatus.COMPLETED, courseClass.getHomeworkStatus());
+        assertThrows(NullPointerException.class, () -> courseClass.setHomeworkStatus(null));
+        assertNotEquals(courseClass, new CourseClass(name, code, Set.of()));
     }
 }

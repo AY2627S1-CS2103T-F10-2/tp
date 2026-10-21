@@ -13,6 +13,7 @@ import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.UniqueStudentList;
@@ -25,13 +26,15 @@ class JsonAdaptedCourseClass {
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
     private final JsonSerializableAddressBook students;
     private final List<JsonAdaptedStudent> enrolledStudents = new ArrayList<>();
+    private final String homeworkStatus;
 
     /** Creates an adapted class from its JSON fields. */
     @JsonCreator
     public JsonAdaptedCourseClass(@JsonProperty("name") String name,
             @JsonProperty("courseCode") String courseCode, @JsonProperty("tags") List<JsonAdaptedTag> tags,
             @JsonProperty("students") JsonSerializableAddressBook students,
-            @JsonProperty("enrolledStudents") List<JsonAdaptedStudent> enrolledStudents) {
+            @JsonProperty("enrolledStudents") List<JsonAdaptedStudent> enrolledStudents,
+            @JsonProperty("homeworkStatus") String homeworkStatus) {
         this.name = name;
         this.courseCode = courseCode;
         if (tags != null) {
@@ -41,6 +44,8 @@ class JsonAdaptedCourseClass {
         if (enrolledStudents != null) {
             this.enrolledStudents.addAll(enrolledStudents);
         }
+        this.homeworkStatus = homeworkStatus == null
+                ? HomeworkStatus.NOT_SET.getSerializedValue() : homeworkStatus;
     }
 
     /**
@@ -53,7 +58,13 @@ class JsonAdaptedCourseClass {
      */
     public JsonAdaptedCourseClass(String name, String courseCode, List<JsonAdaptedTag> tags,
             JsonSerializableAddressBook students) {
-        this(name, courseCode, tags, students, null);
+        this(name, courseCode, tags, students, null, null);
+    }
+
+    /** Creates an adapted class without current-model student data and with a status. */
+    public JsonAdaptedCourseClass(String name, String courseCode, List<JsonAdaptedTag> tags,
+            JsonSerializableAddressBook students, List<JsonAdaptedStudent> enrolledStudents) {
+        this(name, courseCode, tags, students, enrolledStudents, null);
     }
 
     /** Copies a course class for serialization. */
@@ -64,6 +75,7 @@ class JsonAdaptedCourseClass {
         students = new JsonSerializableAddressBook(source.getStudents());
         enrolledStudents.addAll(source.getStudentList().stream()
                 .map(JsonAdaptedStudent::new).collect(Collectors.toList()));
+        homeworkStatus = source.getHomeworkStatus().getSerializedValue();
     }
 
     /**
@@ -96,7 +108,9 @@ class JsonAdaptedCourseClass {
             }
             enrolledStudentList.add(student);
         }
+        HomeworkStatus modelHomeworkStatus = HomeworkStatus.fromSerializedValue(homeworkStatus)
+                .orElseThrow(() -> new IllegalValueException("Invalid homework status: " + homeworkStatus));
         return new CourseClass(new Name(name), new CourseCode(courseCode), modelTags,
-                studentBook, enrolledStudentList);
+                studentBook, enrolledStudentList, modelHomeworkStatus);
     }
 }
