@@ -6,16 +6,10 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_CODE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-
 import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.EditCourseClassCommand;
 import seedu.address.logic.commands.EditCourseClassCommand.EditCourseClassDescriptor;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.tag.Tag;
 
 /**
  * Parses input arguments and creates a new EditCourseClassCommand object
@@ -52,28 +46,14 @@ public class EditCourseClassCommandParser implements Parser<EditCourseClassComma
             editCourseClassDescriptor.setCourseCode(
                     ParserUtil.parseCourseCode(argMultimap.getValue(PREFIX_CODE).get()));
         }
-        parseTagsForEdit(argMultimap.getAllValues(PREFIX_TAG)).ifPresent(editCourseClassDescriptor::setTags);
+        ParserUtil.parseTagsForEdit(argMultimap.getAllValues(PREFIX_TAG))
+                .ifPresent(editCourseClassDescriptor::setTags);
 
         if (!editCourseClassDescriptor.isAnyFieldEdited()) {
             throw new ParseException(EditCourseClassCommand.MESSAGE_NOT_EDITED);
         }
 
         return new EditCourseClassCommand(index, editCourseClassDescriptor);
-    }
-
-    /**
-     * Parses {@code Collection<String> tags} into a {@code Set<Tag>} if {@code tags} is non-empty.
-     * If {@code tags} contains only one element which is an empty string, it will be parsed into a
-     * {@code Set<Tag>} containing zero tags.
-     */
-    private Optional<Set<Tag>> parseTagsForEdit(Collection<String> tags) throws ParseException {
-        requireNonNull(tags);
-
-        if (tags.isEmpty()) {
-            return Optional.empty();
-        }
-        Collection<String> tagSet = tags.size() == 1 && tags.contains("") ? Collections.emptySet() : tags;
-        return Optional.of(ParserUtil.parseTags(tagSet));
     }
 
 }

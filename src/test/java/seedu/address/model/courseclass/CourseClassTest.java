@@ -107,4 +107,14 @@ public class CourseClassTest {
         assertThrows(NullPointerException.class, () -> courseClass.setHomeworkStatus(null));
         assertNotEquals(courseClass, new CourseClass(name, code, Set.of()));
     }
+
+    @Test
+    public void equals_ignoresStudentEnrollment() {
+        CourseClass courseClass = new CourseClass(name, code, Set.of());
+        CourseClass copy = new CourseClass(name, code, Set.of());
+        copy.addStudent(new Student(new StudentName("John Doe"), new Telehandle("john_doe")));
+
+        assertEquals(courseClass, copy);
+        assertEquals(courseClass.hashCode(), copy.hashCode());
+    }
 }

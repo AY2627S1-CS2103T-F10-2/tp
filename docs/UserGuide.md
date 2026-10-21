@@ -3,7 +3,7 @@ layout: page
 title: User Guide
 ---
 
-AddressBook Level 3 (AB3) is a **desktop application for managing contacts, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI). If you type quickly, AB3 can help you manage contacts faster than traditional GUI applications.
+Aiken Duet is a **desktop application for Teaching Assistants (TA) to manage students in their classes, optimized for use through a Command Line Interface (CLI)** while retaining the benefits of a Graphical User Interface (GUI).
 
 * Table of Contents
 {:toc}
@@ -26,15 +26,9 @@ AddressBook Level 3 (AB3) is a **desktop application for managing contacts, opti
 1. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
    Some example commands you can try:
 
-   * `list` : Lists all contacts.
-
-   * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01` : Adds a contact named `John Doe` to the Address Book.
-
-   * `delete 3` : Deletes the 3rd contact shown in the current list.
-
-   * `clear` : Deletes all contacts.
-
-   * `exit` : Exits the app.
+   * `lclass` to show all course classes.
+   * `fclass T05 L01` to find course classes by class-group name.
+   * `fstudent Alex` to find enrolled students by name.
 
 1. Refer to the [Features](#features) section below for details of each command.
 
@@ -55,10 +49,10 @@ AddressBook Level 3 (AB3) is a **desktop application for managing contacts, opti
 * Items followed by `…`​ can appear zero or more times.<br>
   For example, `[t/TAG]…​` may be omitted, or written as `t/friend` or `t/friend t/family`.
 
-* Parameters can be in any order.<br>
+* Parameters can be in any order unless a command states otherwise.<br>
   For example, if the command specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.
 
-* Extraneous parameters for commands that take no parameters, such as `help`, `list`, `exit`, and `clear`, are ignored.<br>
+* Extraneous parameters for commands that take no parameters, such as `help`, `lclass`, `exit`, and `cclass`, are ignored.<br>
   For example, `help 123` is interpreted as `help`.
 
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
@@ -73,72 +67,57 @@ Shows a message explaining how to access the help page.
 Format: `help`
 
 
-### Adding a person: `add`
+### Adding a student to a class group: `add`
 
-Adds a person to the address book.
+Adds a student to an existing class group in a specified module. The module name is required so that class groups with
+the same name in different modules are distinguished.
 
-Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​`
+Format: `add n/NAME t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`
 
-<div markdown="span" class="alert alert-primary">:bulb: **Tip:**
-A person can have any number of tags, including zero.
-</div>
+* `NAME` identifies the student's name.
+* `TELEHANDLE` identifies the student's Telegram handle.
+* `CLASS_GROUP` identifies the tutorial, laboratory, or recitation group.
+* `MODULE_NAME` identifies the module containing the class group.
+* All four prefixes are required. The prefixes can be entered in any order, but each prefix can only be used once.
+* The class group must already exist.
+* A student cannot be enrolled in the same class group more than once, but may be enrolled in different class groups.
+* If the class group does not exist or the student is already enrolled, an error is shown and no data is changed.
 
-Examples:
-* `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
-* `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
+Example:
 
-### Listing all persons: `list`
+* `add n/John Doe t/birdman c/T05 m/CS2103T` adds `John Doe` (@birdman) to `T05` in `CS2103T`.
+  The application displays `John Doe has been successfully added to T05 in CS2103T`.
 
-Shows a list of all persons in the address book.
+### Editing a class group: `eclass`
 
-Format: `list`
+Edits an existing course class identified by its index in the displayed course-class list. Existing values are
+overwritten by the supplied values. Enrolled students and their notes are preserved.
 
-### Editing a person: `edit`
+Format: `eclass INDEX [n/CLASS_GROUP] [c/MODULE_NAME] [t/TAG]…​`
 
-Edits an existing person in the address book.
+* `INDEX` identifies the course class in the displayed list and must be a positive integer.
+* At least one field must be supplied. The `n/` and `c/` prefixes can each be used at most once.
+* `n/CLASS_GROUP` replaces the class-group name.
+* `c/MODULE_NAME` replaces the module name.
+* `t/TAG` replaces the complete set of tags. To remove all tags, use `t/` with no value.
+* The edited class group and module combination must not duplicate another course class.
 
-Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`
+Example:
 
-* Edits the person at the specified `INDEX`. The index refers to the index number shown in the displayed person list. The index **must be a positive integer** 1, 2, 3, …​
-* At least one of the optional fields must be provided.
-* Existing values will be updated to the input values.
-* When editing tags, all of the person's existing tags are removed; adding tags is not cumulative.
-* To remove all of a person's tags, enter `t/` without a tag after it.
+* `eclass 1 n/L01 t/lab` updates the first displayed course class to `L01` and replaces its tags with `lab`.
 
-Examples:
-*  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st person to be `91234567` and `johndoe@example.com` respectively.
-*  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd person to be `Betsy Crower` and clears all existing tags.
+### Deleting a course class: `dclass`
 
-### Locating persons by name: `find`
+Deletes a course class identified by its index in the displayed course-class list. The course class and its enrolled
+students and notes are removed from the course-class book without a confirmation prompt.
 
-Finds persons whose names contain any of the given keywords.
+Format: `dclass INDEX`
 
-Format: `find KEYWORD [MORE_KEYWORDS]`
+* `INDEX` identifies the course class in the displayed list and must be a positive integer.
 
-* The search is case-insensitive; for example, `hans` matches `Hans`.
-* Keyword order does not matter; for example, `Hans Bo` matches `Bo Hans`.
-* The search considers only names.
-* Only full words match; for example, `Han` does not match `Hans`.
-* Persons matching at least one keyword are returned (an `OR` search); for example, `Hans Bo` returns `Hans Gruber` and `Bo Yang`.
+Example:
 
-Examples:
-* `find John` returns `john` and `John Doe`
-* `find alex david` returns `Alex Yeoh`, `David Li`<br>
-  ![result for 'find alex david'](images/findAlexDavidResult.png)
-
-### Deleting a person: `delete`
-
-Deletes the specified person from the address book.
-
-Format: `delete INDEX`
-
-* Deletes the person at the specified `INDEX`.
-* The index refers to the index number shown in the displayed person list.
-* The index **must be a positive integer** 1, 2, 3, …​
-
-Examples:
-* `list` followed by `delete 2` deletes the 2nd person in the address book.
-* `find Betsy` followed by `delete 1` deletes the 1st person in the results of the `find` command.
+* `dclass 1` deletes the first displayed course class.
 
 ### Adding a class: `aclass`
 
@@ -222,11 +201,18 @@ Format: `fstudent KEYWORD [MORE_KEYWORDS]`
 * Only full words in student names match; for example, `Alex` matches `Alex Tan`, but `Ale` does not.
 * When several keywords are supplied, a student matching any keyword is returned.
 * A student enrolled in multiple classes is shown once for each enrolment.
+* At least one non-blank keyword must be supplied. Otherwise, Aiken Duet displays the valid command format.
+* If no student enrolment matches, Aiken Duet displays `No matching student enrolments found.`
+* This command only displays results; it does not modify any student or class data.
 
 Examples:
 
-* `fstudent Alex` finds every enrolled student with `Alex` as a full word in their name.
+* If `Alex Tan` (`@alextan`) is enrolled in `T05` for `CS2103T`, `fstudent Alex` returns:<br>
+  `1 matching student enrolment(s) found:`<br>
+  `1. Alex Tan (@alextan) — T05, CS2103T`
 * `fstudent Alex Bernice` finds students whose names contain either `Alex` or `Bernice`.
+* `fstudent Ale` does not match `Alex Tan` and displays `No matching student enrolments found.`
+* `fstudent` is rejected and displays the valid command format because no keyword was supplied.
 
 ### Finding classes by class-group name: `fclass`
 
@@ -241,11 +227,17 @@ Example:
 
 * `fclass T05 L01` finds class groups whose names contain either `T05` or `L01`.
 
-### Clearing all entries: `clear`
+### Listing all course classes: `lclass`
 
-Clears all entries from the address book.
+Displays all course classes in the course-class book.
 
-Format: `clear`
+Format: `lclass`
+
+### Clearing all course classes: `cclass`
+
+Removes all course classes from the course-class book, including their enrolled students and notes.
+
+Format: `cclass`
 
 ### Exiting the program: `exit`
 
@@ -255,15 +247,20 @@ Format: `exit`
 
 ### Saving the data
 
-AddressBook automatically saves data after every command. You do not need to save manually.
+The application automatically saves the course-class data after every command that completes successfully. You do not
+need to save manually.
 
 ### Editing the data file
 
-AddressBook data is saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are welcome to update data directly by editing that data file.
+Course-class data is saved automatically as a JSON file `[JAR file location]/data/courseclasses.json`. Advanced users are
+welcome to update data directly by editing that data file.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
-If your changes make the data file invalid, AddressBook starts with an empty address book at the next run. The invalid file remains on disk until you run a command (AddressBook saves after every command). Still, we recommend backing up the file before editing it.<br>
-Furthermore, certain edits can cause the AddressBook to behave in unexpected ways (e.g., if a value entered is outside of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
+If your changes make the data file invalid, the application starts with an empty course-class book at the next run. The
+invalid file remains on disk until you run a command (the application saves after every successful command). Still, we
+recommend backing up the file before editing it.<br>
+Furthermore, certain edits can cause the application to behave in unexpected ways (e.g., if a value entered is outside
+of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
 </div>
 
 ### Archiving data files `[coming in v2.0]`
@@ -275,7 +272,8 @@ _Details coming soon ..._
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?<br>
-**A**: Install the app on the other computer and overwrite the data file it creates with the data file from your previous AddressBook home folder.
+**A**: Install the app on the other computer and overwrite the `data/courseclasses.json` file it creates with the file
+from your previous Aiken Duet home folder.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -290,15 +288,15 @@ _Details coming soon ..._
 
 Action | Format, Examples
 --------|------------------
-**Add** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]…​` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
 **Add class** | `aclass n/NAME c/COURSE_CODE [t/TAG]…​`<br> e.g., `aclass n/F10-2 c/CS2103T t/tutorial`
-**Clear** | `clear`
-**Delete** | `delete INDEX`<br> e.g., `delete 3`
+**Add student to class** | `add n/NAME t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `add n/John Doe t/birdman c/T05 m/CS2103T`
+**Edit course class** | `eclass INDEX [n/CLASS_GROUP] [c/MODULE_NAME] [t/TAG]…​`<br> e.g., `eclass 1 n/L01 t/lab`
+**Delete course class** | `dclass INDEX`<br> e.g., `dclass 1`
 **Remove student from class** | `dstudent t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME`<br> e.g., `dstudent t/birdman c/T05 m/CS2103T`, followed by `yes`
 **Add student note** | `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`<br> e.g., `note t/birdman c/T05 m/CS2103T o/Needs follow-up`
 **Find student** | `fstudent KEYWORD [MORE_KEYWORDS]`<br> e.g., `fstudent Alex Bernice`
 **Find class** | `fclass KEYWORD [MORE_KEYWORDS]`<br> e.g., `fclass T05 L01`
-**Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]…​`<br> e.g., `edit 2 n/James Lee e/jameslee@example.com`
-**Find** | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
-**List** | `list`
+**List course classes** | `lclass`
+**Clear course classes** | `cclass`
 **Help** | `help`
+**Exit** | `exit`

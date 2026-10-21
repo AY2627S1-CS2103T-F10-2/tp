@@ -42,6 +42,24 @@ public class FindStudentCommandTest {
     }
 
     @Test
+    public void execute_sameStudentInMultipleClasses_reportsEveryEnrolment() {
+        Model model = new ModelManager();
+        CourseClass tutorial = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+        CourseClass lab = new CourseClass(new Name("L01"), new CourseCode("CS2101"), Set.of());
+        Student alex = new Student(new StudentName("Alex Tan"), new Telehandle("alextan"));
+        tutorial.addStudent(alex);
+        lab.addStudent(alex);
+        model.addCourseClass(tutorial);
+        model.addCourseClass(lab);
+
+        String feedback = new FindStudentCommand(alexPredicate).execute(model).getFeedbackToUser();
+
+        assertEquals(String.format(FindStudentCommand.MESSAGE_MATCHES_FOUND, 2,
+                "1. Alex Tan (@alextan) — T05, CS2103T" + System.lineSeparator()
+                        + "2. Alex Tan (@alextan) — L01, CS2101"), feedback);
+    }
+
+    @Test
     public void execute_noMatchingStudents_reportsNoMatches() {
         assertEquals(FindStudentCommand.MESSAGE_NO_MATCHES,
                 new FindStudentCommand(alexPredicate).execute(new ModelManager()).getFeedbackToUser());

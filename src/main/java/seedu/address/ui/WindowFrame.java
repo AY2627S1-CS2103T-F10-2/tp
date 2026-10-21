@@ -26,6 +26,15 @@ final class WindowFrame {
 
     WindowFrame(Stage stage, Region dragArea) {
         this.stage = stage;
+        configureDragArea(dragArea);
+        configureResizeHandlers();
+        configureMaximizeHandler();
+    }
+
+    /**
+     * Configures dragging and double-click maximize behavior for the title bar.
+     */
+    private void configureDragArea(Region dragArea) {
         dragArea.setOnMousePressed(event -> {
             if (event.getButton() == MouseButton.PRIMARY && !stage.isMaximized()) {
                 rememberBounds(event);
@@ -42,7 +51,12 @@ final class WindowFrame {
                 stage.setMaximized(!stage.isMaximized());
             }
         });
+    }
 
+    /**
+     * Configures scene-level handlers for detecting and performing edge resizing.
+     */
+    private void configureResizeHandlers() {
         Scene scene = stage.getScene();
         scene.addEventFilter(MouseEvent.MOUSE_MOVED, event -> updateResizeEdges(event));
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -66,6 +80,13 @@ final class WindowFrame {
                 event.consume();
             }
         });
+    }
+
+    /**
+     * Resets resize state when the window is maximized or restored.
+     */
+    private void configureMaximizeHandler() {
+        Scene scene = stage.getScene();
         stage.maximizedProperty().addListener((observable, previous, maximized) -> {
             resizing = false;
             scene.setCursor(Cursor.DEFAULT);
