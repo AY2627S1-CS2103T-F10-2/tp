@@ -359,89 +359,42 @@ and UI levels. Tests cover deletion from different list positions, invalid
 indexes, missing classes and students, isolation between enrolments, immutable
 student updates, UI renumbering, and persistence after reloading the data file.
 
-### \[Proposed\] Undo/redo feature
+### Undoing course-class changes: `undo`
 
-#### Proposed Implementation
+#### Implementation
 
-The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It extends `AddressBook` with an undo/redo history, stored internally as an `addressBookStateList` and `currentStatePointer`. Additionally, it implements the following operations:
+The `undo` command restores the course-class data to the state before the most recent successful data-changing command. It uses a last-in-first-out stack of complete `CourseClassBook` snapshots. Each snapshot includes course-class metadata, enrolled students, notes, and homework status.
 
-* `VersionedAddressBook#commit()` — Saves the current address book state in its history.
-* `VersionedAddressBook#undo()` — Restores the previous address book state from its history.
-* `VersionedAddressBook#redo()` — Restores a previously undone address book state from its history.
+`AddressBookParser` routes `undo` to `UndoCommandParser`, which accepts no arguments. `Command#isMutating()` identifies commands that can change course-class data. Before such a command executes, `LogicManager` copies the current course-class book. The snapshot is added to the undo stack only after the command succeeds and actually changes the stored data.
 
-These operations are exposed in the `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
+Commands that create undo snapshots include:
 
-Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
+* `aclass`, `add`, `eclass`, and `cclass`
+* confirmed `dclass` and `dstudent`
+* `note` and `dnote`
+* `hwork`
 
-Step 1. The user launches the application for the first time. The `VersionedAddressBook` will be initialized with the initial address book state, and the `currentStatePointer` pointing to that single address book state.
+Search, list, help, and exit do not create snapshots. Failed commands and cancelled `dstudent` confirmations do not create snapshots. A preview is not recorded; only a confirmed deletion is.
 
-![UndoRedoState0](images/UndoRedoState0.png)
+When `undo` executes, `ModelManager` removes the latest snapshot from its `Deque<CourseClassBook>` and restores it. Repeating `undo` walks backwards through the stack. Redo is not implemented.
 
-Step 2. The user executes `delete 5` command to delete the 5th person in the address book. The `delete` command calls `Model#commitAddressBook()`, causing the modified state of the address book after the `delete 5` command executes to be saved in the `addressBookStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
+#### Persistence
 
-![UndoRedoState1](images/UndoRedoState1.png)
+Undo uses the existing course-class JSON storage rather than a separate storage system. `JsonCourseClassBookStorage` saves the current book and snapshots together in `data/courseclasses.json`. The existing `courseClasses` data remains, with an `undoHistory` list containing serialized previous books.
 
-Step 3. The user executes `add n/David …​` to add a new person. The `add` command also calls `Model#commitAddressBook()`, causing another modified address book state to be saved into the `addressBookStateList`.
+`MainApp` loads both the current book and `undoHistory` into `ModelManager`. After successful commands, `LogicManager` saves both; undo saves the restored current state and the remaining history. Older JSON files without `undoHistory` remain compatible and start with an empty undo stack.
 
-![UndoRedoState2](images/UndoRedoState2.png)
+Course-class saves use a temporary file before moving the completed data into place. An atomic move is used when supported, with a replacement fallback otherwise.
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If a command fails its execution, it will not call `Model#commitAddressBook()`, so the address book state will not be saved into the `addressBookStateList`.
+#### Design considerations
 
-</div>
+* Snapshot history was chosen to keep related course-class data consistent and avoid requiring every command to implement its own inverse operation.
+* Storing complete snapshots uses more memory and storage than storing command-specific inverse data. A history limit could be considered in the future.
+* Reusing the existing JSON file keeps current data and undo history together across application restarts.
 
-Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoAddressBook()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous address book state, and restores the address book to that state.
+#### Testing
 
-![UndoRedoState3](images/UndoRedoState3.png)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index 0, pointing to the initial AddressBook state, then there are no previous AddressBook states to restore. The `undo` command uses `Model#canUndoAddressBook()` to check if this is the case. If so, it will return an error to the user rather
-than attempting to perform the undo.
-
-</div>
-
-The following sequence diagram shows how an undo operation goes through the `Logic` component:
-
-![UndoSequenceDiagram](images/UndoSequenceDiagram-Logic.png)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `UndoCommand` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
-
-</div>
-
-Similarly, how an undo operation goes through the `Model` component is shown below:
-
-![UndoSequenceDiagram](images/UndoSequenceDiagram-Model.png)
-
-The `redo` command does the opposite — it calls `Model#redoAddressBook()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index `addressBookStateList.size() - 1`, pointing to the latest address book state, then there are no undone AddressBook states to restore. The `redo` command uses `Model#canRedoAddressBook()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
-
-</div>
-
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
-
-![UndoRedoState4](images/UndoRedoState4.png)
-
-Step 6. The user executes `clear`, which calls `Model#commitAddressBook()`. Since the `currentStatePointer` is not pointing at the end of the `addressBookStateList`, all address book states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …​` command. This is the behavior that most modern desktop applications follow.
-
-![UndoRedoState5](images/UndoRedoState5.png)
-
-The following activity diagram summarizes what happens when a user executes a new command:
-
-<img src="images/CommitActivityDiagram.png" width="250" />
-
-#### Design considerations:
-
-**Aspect: How undo & redo execute:**
-
-* **Alternative 1 (current choice):** Saves the entire address book.
-  * Pros: Easy to implement.
-  * Cons: May have performance issues in terms of memory usage.
-
-* **Alternative 2:** Individual command knows how to undo/redo by
-  itself.
-  * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
-  * Cons: We must ensure that the implementation of each individual command is correct.
-
-_{more aspects and alternatives to be added}_
+`UndoCommandTest` covers restoration and an empty undo stack. `UndoLogicIntegrationTest` covers last-in-first-out behaviour, class deletion, student removal, homework status, failed and cancelled commands, and restart persistence. `MainAppTest` verifies startup history loading, while storage tests verify round-trip persistence and compatibility with legacy JSON without `undoHistory`.
 
 ### \[Proposed\] Data archiving
 
