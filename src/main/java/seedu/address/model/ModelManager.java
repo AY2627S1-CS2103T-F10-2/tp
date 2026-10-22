@@ -157,6 +157,7 @@ public class ModelManager implements Model {
     @Override
     public void addUndoSnapshot(ReadOnlyCourseClassBook courseClassBook) {
         undoHistory.addLast(new CourseClassBook(courseClassBook));
+        logger.fine("Added undo snapshot; history size is now " + undoHistory.size());
     }
 
     @Override
@@ -169,10 +170,12 @@ public class ModelManager implements Model {
     @Override
     public Optional<ReadOnlyCourseClassBook> undoCourseClassBook() {
         if (undoHistory.isEmpty()) {
+            logger.fine("Undo requested with no available history.");
             return Optional.empty();
         }
         CourseClassBook restored = undoHistory.removeLast();
         setCourseClassBook(restored);
+        logger.info("Undid most recent course-class book change; remaining undo snapshots: " + undoHistory.size());
         return Optional.of(new CourseClassBook(restored));
     }
 
