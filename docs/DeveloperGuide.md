@@ -141,9 +141,12 @@ The `Model` component,
 <img src="images/StorageClassDiagram.png" width="550" />
 
 The `Storage` component,
-* can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
-* is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
-* depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
+* can save course-class data and user preference data in JSON format, and read them back into corresponding objects.
+* is implemented by `StorageManager`, which delegates the actual file access to `JsonCourseClassBookStorage` and `JsonUserPrefsStorage`.
+* uses `JsonSerializableCourseClassBook` to represent the current course-class book in JSON. Each item in `courseClasses` is represented by a `JsonAdaptedCourseClass`.
+* stores the current course-class book and its `undoHistory` together in `data/courseclasses.json`. Each undo entry uses the same serializable structure and represents a complete previous `CourseClassBook` state.
+* returns the current course-class book and its undo snapshots together through `CourseClassBookStorageData`, so the undo history is available after restarting the application.
+* depends on some classes in the `Model` component because its job is to save and retrieve objects that belong to the `Model`.
 
 ### Common classes
 
@@ -377,6 +380,38 @@ Commands that create undo snapshots include:
 Search, list, help, and exit do not create snapshots. Failed commands and cancelled `dstudent` confirmations do not create snapshots. A preview is not recorded; only a confirmed deletion is.
 
 When `undo` executes, `ModelManager` removes the latest snapshot from its `Deque<CourseClassBook>` and restores it. Repeating `undo` walks backwards through the stack. Redo is not implemented.
+
+#### Undo command sequence
+
+Read both diagrams from top to bottom. Each horizontal arrow represents one
+method call.
+
+##### Logic-level diagram
+
+![Interactions inside the Logic component for the `undo` command](images/UndoSequenceDiagram-Logic.png)
+
+The user first enters `undo`. `LogicManager` sends the command text to
+`AddressBookParser`, which creates an `UndoCommand`. `LogicManager` then
+executes the command, and `UndoCommand` asks the `Model` to run
+`undoCourseClassBook()`.
+
+The `Model` returns either a restored snapshot or an empty result if there is no
+history. If the operation succeeds, `UndoCommand` creates a success result.
+`LogicManager` then saves the restored course-class book and the remaining undo
+history through `Storage`. Finally, the success message is returned to the user
+interface. The diagram simplifies the parser step by treating
+`UndoCommandParser` as part of `AddressBookParser`.
+
+##### Model-level diagram
+
+![Undo snapshot restoration inside the Model component](images/UndoSequenceDiagram-Model.png)
+
+This diagram zooms in on the model restoration step. `UndoCommand` calls
+`ModelManager.undoCourseClassBook()`, and `ModelManager` checks the
+`Deque<CourseClassBook>`. If the deque is empty, it returns `Optional.empty()`.
+Otherwise, it calls `removeLast()` to obtain the latest saved snapshot.
+`ModelManager` then calls `resetData(...)` on the current `CourseClassBook` and
+returns the restored state to `UndoCommand`.
 
 #### Persistence
 
