@@ -932,7 +932,7 @@ public class CourseClassUiTest {
             assertEquals("Students: 1", count.getText());
             assertEquals(1, students.getChildren().size());
             assertTrue(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
-            courseClass.getStudents().removePerson(TypicalPersons.ALICE);
+            courseClass.removeStudent(new Telehandle("bethtan"));
             assertEquals("Students: 0", count.getText());
             assertEquals(1, students.getChildren().size());
             assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
