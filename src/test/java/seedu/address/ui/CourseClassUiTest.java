@@ -394,6 +394,8 @@ public class CourseClassUiTest {
                 assertFalse(windowFrame.isMaximized());
                 double restoredWidth = stage.getWidth();
                 double restoredHeight = stage.getHeight();
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100));
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 200, 200, 110, 100));
 
                 stage.setResizable(false);
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));

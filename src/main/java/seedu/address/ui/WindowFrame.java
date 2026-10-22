@@ -25,7 +25,6 @@ final class WindowFrame {
     private boolean bottom;
     private boolean resizing;
     private boolean maximized;
-    private boolean hasRestoreBounds;
     private boolean hasLastRestoredBounds;
     private double pressX;
     private double pressY;
@@ -119,7 +118,7 @@ final class WindowFrame {
 
     /** Returns the bounds that should be saved when the application closes. */
     Rectangle2D getWindowBounds() {
-        if (maximized && hasRestoreBounds) {
+        if (maximized) {
             return new Rectangle2D(restoreX, restoreY, restoreWidth, restoreHeight);
         }
         return new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
@@ -145,9 +144,6 @@ final class WindowFrame {
     }
 
     private void restoreWindow() {
-        if (!hasRestoreBounds) {
-            return;
-        }
         double restoredWidth = constrainSize(restoreWidth * RESTORE_SCALE, stage.getMinWidth(), stage.getMaxWidth());
         double restoredHeight = constrainSize(restoreHeight * RESTORE_SCALE,
                 stage.getMinHeight(), stage.getMaxHeight());
@@ -172,7 +168,6 @@ final class WindowFrame {
         restoreY = stage.getY();
         restoreWidth = stage.getWidth();
         restoreHeight = stage.getHeight();
-        hasRestoreBounds = true;
         hasLastRestoredBounds = false;
     }
 
