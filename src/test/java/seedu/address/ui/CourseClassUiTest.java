@@ -392,6 +392,20 @@ public class CourseClassUiTest {
                 assertEquals(Cursor.DEFAULT, scene.getCursor());
                 title.fireEvent(doubleClick.copyFor(title, title));
                 assertFalse(windowFrame.isMaximized());
+
+                // Exercise every comparison in matchesLastRestoredBounds() before changing the window normally.
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+                stage.setY(stage.getY() + 10);
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+                stage.setWidth(stage.getWidth() + 10);
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+                stage.setHeight(stage.getHeight() + 10);
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+
                 double restoredWidth = stage.getWidth();
                 double restoredHeight = stage.getHeight();
                 title.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100));
