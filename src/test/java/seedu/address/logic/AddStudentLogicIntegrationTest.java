@@ -49,6 +49,30 @@ public class AddStudentLogicIntegrationTest {
     }
 
     @Test
+    public void execute_studentAndNoteCommandsWithLongClassGroup_succeed() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+        Student expectedStudent = new Student(new StudentName("John Doe"), new Telehandle("birdman"));
+
+        logic.execute("aclass n/F111 c/CS2103T");
+        CommandResult result = logic.execute("add n/John Doe t/birdman c/F111 m/CS2103T");
+
+        assertEquals(String.format(AddStudentCommand.MESSAGE_SUCCESS, "John Doe", "F111", "CS2103T"),
+                result.getFeedbackToUser());
+        assertEquals(List.of(expectedStudent), classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().get(0).getStudentList());
+
+        logic.execute("note t/birdman c/F111 m/CS2103T o/Needs follow-up");
+        logic.execute("dnote t/birdman c/F111 m/CS2103T i/1");
+        logic.execute("dstudent t/birdman c/F111 m/CS2103T");
+        logic.execute("yes");
+
+        assertEquals(0, model.findCourseClassByGroup(new ClassGroup("F111"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+    }
+
+    @Test
     public void execute_addStudentToHyphenatedClassGroup_succeeds() throws Exception {
         Model model = new ModelManager();
         JsonCourseClassBookStorage classStorage = createClassStorage();

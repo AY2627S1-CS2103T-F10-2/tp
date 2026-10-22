@@ -53,7 +53,7 @@ public class AddStudentCommandParserTest {
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_MODULE_NAME));
         assertParseFailure(parser, " n/John2 t/birdman c/T05 m/CS2103T", StudentName.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " n/John Doe t/abcd c/T05 m/CS2103T", Telehandle.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " n/John Doe t/birdman c/F10-22 m/CS2103T", ClassGroup.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " n/John Doe t/birdman c/F111! m/CS2103T", ClassGroup.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " n/John Doe t/birdman c/T05 m/", CourseCode.MESSAGE_CONSTRAINTS);
     }
 }

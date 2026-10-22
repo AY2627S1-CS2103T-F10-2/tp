@@ -52,7 +52,7 @@ public class DeleteNoteCommandParserTest {
     @Test
     public void parse_invalidFields_failure() {
         assertParseFailure(parser, " t/abcd c/T05 m/CS2103T i/2", Telehandle.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " t/birdman c/F10-22 m/CS2103T i/2", ClassGroup.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/birdman c/F111! m/CS2103T i/2", ClassGroup.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/ i/2", CourseCode.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T i/0", ParserUtil.MESSAGE_INVALID_INDEX);
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T i/-1", ParserUtil.MESSAGE_INVALID_INDEX);

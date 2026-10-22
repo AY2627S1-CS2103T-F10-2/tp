@@ -9,9 +9,8 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
  */
 public class ClassGroup {
 
-    public static final String MESSAGE_CONSTRAINTS =
-            "Class groups should start with an uppercase letter, followed by two digits, and may end with -<digit>";
-    public static final String VALIDATION_REGEX = "[A-Z]\\d{2}(?:-\\d)?";
+    public static final String MESSAGE_CONSTRAINTS = Name.MESSAGE_CONSTRAINTS;
+    public static final String VALIDATION_REGEX = Name.VALIDATION_REGEX;
 
     public final String value;
 
@@ -33,7 +32,7 @@ public class ClassGroup {
      * @return true if {@code test} is valid
      */
     public static boolean isValidClassGroup(String test) {
-        return test != null && test.matches(VALIDATION_REGEX);
+        return test != null && Name.isValidName(test);
     }
 
     @Override
