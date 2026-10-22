@@ -1,0 +1,80 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+skinparam Participant {
+    Padding 10
+}
+
+title Updating a course class's homework status
+
+actor User as user USER_COLOR
+
+box Logic LOGIC_COLOR_T1
+participant ":LogicManager" as LogicManager LOGIC_COLOR
+participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
+participant "h:SetHomeworkStatusCommand" as SetHomeworkStatusCommand LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant ":Model" as Model MODEL_COLOR
+participant "c:CourseClass" as CourseClass MODEL_COLOR
+end box
+
+box UI UI_COLOR_T1
+participant ":CourseClassCard" as CourseClassCard UI_COLOR
+end box
+
+box Storage STORAGE_COLOR_T1
+participant ":Storage" as Storage STORAGE_COLOR
+end box
+
+user -[USER_COLOR]> LogicManager : execute("hwork 1 s/completed")
+activate LogicManager LOGIC_COLOR
+
+LogicManager -[LOGIC_COLOR]> AddressBookParser : parseCommand(...)
+activate AddressBookParser LOGIC_COLOR
+create SetHomeworkStatusCommand
+AddressBookParser -[LOGIC_COLOR]> SetHomeworkStatusCommand : parse via\nSetHomeworkStatusCommandParser
+SetHomeworkStatusCommand -[LOGIC_COLOR]--> AddressBookParser : command
+deactivate AddressBookParser
+AddressBookParser -[LOGIC_COLOR]--> LogicManager : command
+
+LogicManager -[MODEL_COLOR]> Model : getCourseClassBook()
+Model -[MODEL_COLOR]--> LogicManager : stateBefore
+LogicManager -[MODEL_COLOR]> Model : getUndoHistory()
+Model -[MODEL_COLOR]--> LogicManager : historyBefore
+
+LogicManager -[LOGIC_COLOR]> SetHomeworkStatusCommand : execute(Model)
+activate SetHomeworkStatusCommand LOGIC_COLOR
+
+SetHomeworkStatusCommand -[MODEL_COLOR]> Model : getFilteredCourseClassList()
+Model -[MODEL_COLOR]--> SetHomeworkStatusCommand : filtered classes
+
+SetHomeworkStatusCommand -[MODEL_COLOR]> CourseClass : getHomeworkStatus()
+CourseClass -[MODEL_COLOR]--> SetHomeworkStatusCommand : previous status
+SetHomeworkStatusCommand -[MODEL_COLOR]> CourseClass : setHomeworkStatus(COMPLETED)
+
+CourseClass -[UI_COLOR]> CourseClassCard : homeworkStatusProperty changed
+activate CourseClassCard UI_COLOR
+CourseClassCard -[UI_COLOR]> CourseClassCard : refreshHomeworkStatus()
+CourseClassCard -[MODEL_COLOR]> CourseClass : getHomeworkStatus()
+CourseClass -[MODEL_COLOR]--> CourseClassCard : COMPLETED
+deactivate CourseClassCard
+
+SetHomeworkStatusCommand -[MODEL_COLOR]> Model : updateFilteredCourseClassList(show all)
+SetHomeworkStatusCommand -[LOGIC_COLOR]--> LogicManager : CommandResult
+deactivate SetHomeworkStatusCommand
+
+LogicManager -[MODEL_COLOR]> Model : addUndoSnapshot(stateBefore)
+Model -[MODEL_COLOR]--> LogicManager : snapshot added
+
+LogicManager -[STORAGE_COLOR]> Storage : saveCourseClassBookData(\nmodel.getCourseClassBook(),\nmodel.getUndoHistory())
+activate Storage STORAGE_COLOR
+Storage -[STORAGE_COLOR]> Storage : write courseclasses.json\nand undo history
+Storage -[STORAGE_COLOR]--> LogicManager : saved
+deactivate Storage
+
+LogicManager -[USER_COLOR]--> user : success message
+deactivate LogicManager
+
+@enduml
