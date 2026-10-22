@@ -1,0 +1,84 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Logic LOGIC_COLOR_T1
+participant ":LogicManager" as LogicManager LOGIC_COLOR
+participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
+participant ":AddCourseClassCommandParser" as AddCourseClassCommandParser LOGIC_COLOR
+participant "a:AddCourseClassCommand" as AddCourseClassCommand LOGIC_COLOR
+participant "r:CommandResult" as CommandResult LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant "c:CourseClass" as CourseClass MODEL_COLOR
+participant "m:Model" as Model MODEL_COLOR
+end box
+
+[-> LogicManager : execute("aclass n/F10-2\nc/CS2103T t/tutorial")
+activate LogicManager
+
+LogicManager -> AddressBookParser : parseCommand("aclass n/F10-2\nc/CS2103T t/tutorial")
+activate AddressBookParser
+
+create AddCourseClassCommandParser
+AddressBookParser -> AddCourseClassCommandParser
+activate AddCourseClassCommandParser
+
+AddCourseClassCommandParser --> AddressBookParser
+deactivate AddCourseClassCommandParser
+
+AddressBookParser -> AddCourseClassCommandParser : parse(" n/F10-2 c/CS2103T t/tutorial")
+activate AddCourseClassCommandParser
+
+create CourseClass
+AddCourseClassCommandParser -> CourseClass : CourseClass(name, code, tags)
+activate CourseClass
+
+CourseClass --> AddCourseClassCommandParser : c
+deactivate CourseClass
+
+create AddCourseClassCommand
+AddCourseClassCommandParser -> AddCourseClassCommand : AddCourseClassCommand(c)
+activate AddCourseClassCommand
+
+AddCourseClassCommand --> AddCourseClassCommandParser :
+deactivate AddCourseClassCommand
+
+AddCourseClassCommandParser --> AddressBookParser : a
+deactivate AddCourseClassCommandParser
+'Hidden arrow to position the destroy marker below the end of the activation bar.
+AddCourseClassCommandParser -[hidden]-> AddressBookParser
+destroy AddCourseClassCommandParser
+
+AddressBookParser --> LogicManager : a
+deactivate AddressBookParser
+
+LogicManager -> AddCourseClassCommand : execute(m)
+activate AddCourseClassCommand
+
+AddCourseClassCommand -> Model : hasCourseClass(c)
+activate Model
+
+Model --> AddCourseClassCommand : false
+deactivate Model
+
+AddCourseClassCommand -> Model : addCourseClass(c)
+activate Model
+
+Model --> AddCourseClassCommand
+deactivate Model
+
+create CommandResult
+AddCourseClassCommand -> CommandResult : CommandResult("New class added: " + Messages.format(c))
+activate CommandResult
+
+CommandResult --> AddCourseClassCommand
+deactivate CommandResult
+
+AddCourseClassCommand --> LogicManager : r
+deactivate AddCourseClassCommand
+
+[<--LogicManager : r
+deactivate LogicManager
+@enduml
