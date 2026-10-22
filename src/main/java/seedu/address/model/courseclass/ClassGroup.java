@@ -32,7 +32,7 @@ public class ClassGroup {
      * @return true if {@code test} is valid
      */
     public static boolean isValidClassGroup(String test) {
-        return test != null && Name.isValidName(test);
+        return test != null && Name.isValidName(test) && test.length() <= 50;
     }
 
     @Override

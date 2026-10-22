@@ -28,6 +28,22 @@ public class ClassGroupTest {
     }
 
     @Test
+    public void constructor_classGroupWithinLengthLimit_success() {
+        for (int length : new int[] {49, 50}) {
+            String classGroup = "F".repeat(length);
+            assertTrue(ClassGroup.isValidClassGroup(classGroup));
+            assertEquals(classGroup, new ClassGroup(classGroup).value);
+        }
+    }
+
+    @Test
+    public void constructor_classGroupExceedsLengthLimit_throwsIllegalArgumentException() {
+        String classGroup = "F".repeat(51);
+        assertFalse(ClassGroup.isValidClassGroup(classGroup));
+        assertThrows(IllegalArgumentException.class, () -> new ClassGroup(classGroup));
+    }
+
+    @Test
     public void constructor_nullClassGroup_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new ClassGroup(null));
         assertFalse(ClassGroup.isValidClassGroup(null));
