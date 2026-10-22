@@ -33,10 +33,9 @@ public class CourseClass {
     private final UniqueStudentList students;
     private final ObjectProperty<HomeworkStatus> homeworkStatus = new SimpleObjectProperty<>();
 
-    /** Creates a deep copy of {@code source}, including students and legacy student data. */
+    /** Creates a deep copy of {@code source}, including its students. */
     public CourseClass(CourseClass source) {
-        this(source.name, source.code, source.tags, new AddressBook(source.students),
-                source.getStudentList(), source.getHomeworkStatus());
+        this(source.name, source.code, source.tags, source.getStudentList(), source.getHomeworkStatus());
     }
 
     /**
