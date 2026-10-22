@@ -382,14 +382,18 @@ public class CourseClassUiTest {
                         false, false, false, false, false, false, null);
                 title.fireEvent(doubleClick);
                 assertTrue(windowFrame.isMaximized());
+                double maximizedX = stage.getX();
+                double maximizedY = stage.getY();
                 title.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100));
                 title.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 200, 200, 130, 120));
-                assertEquals(50, stage.getX());
-                assertEquals(60, stage.getY());
+                assertEquals(maximizedX, stage.getX());
+                assertEquals(maximizedY, stage.getY());
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
                 assertEquals(Cursor.DEFAULT, scene.getCursor());
                 title.fireEvent(doubleClick.copyFor(title, title));
                 assertFalse(windowFrame.isMaximized());
+                double restoredWidth = stage.getWidth();
+                double restoredHeight = stage.getHeight();
 
                 stage.setResizable(false);
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
@@ -397,8 +401,8 @@ public class CourseClassUiTest {
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, 1, 1, 130, 120));
-                assertEquals(800, stage.getWidth());
-                assertEquals(600, stage.getHeight());
+                assertEquals(restoredWidth, stage.getWidth());
+                assertEquals(restoredHeight, stage.getHeight());
                 stage.setResizable(true);
                 stage.setFullScreen(true);
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
