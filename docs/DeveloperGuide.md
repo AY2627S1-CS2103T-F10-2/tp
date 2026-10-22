@@ -258,6 +258,10 @@ The model operation is scoped to the selected class: `CourseClass#removeStudent`
 `UniqueStudentList#remove`, which removes the student by telehandle. Because each `CourseClass` owns its own enrolled
 student list, removing an enrolment from one class does not remove the same student from another class.
 
+The interaction between the parser, confirmation flow, model, and storage is shown below.
+
+![Interactions for the `dstudent` command](images/DeleteStudentSequenceDiagram.png)
+
 #### Testing
 
 The feature is covered at parser, command, and logic-integration levels. The tests verify valid and invalid command
