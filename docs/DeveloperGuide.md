@@ -204,6 +204,10 @@ During execution, `SetHomeworkStatusCommand` validates the displayed index, upda
 the filtered course-class list, logs the previous and new statuses, and returns a success message. `LogicManager` then
 saves the updated course-class book.
 
+The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`.
+
+<img src="images/HomeworkStatusSequenceDiagram.png" width="1000" />
+
 #### Persistence and UI display
 
 `JsonAdaptedCourseClass` serializes the status using its value such as `pending` or `completed`. When the field is absent
