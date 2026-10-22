@@ -28,10 +28,12 @@ import seedu.address.model.UserPrefs;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
-import seedu.address.testutil.TypicalPersons;
 
 public class LogicManagerTest {
     private static final IOException DUMMY_IO_EXCEPTION = new IOException("dummy IO exception");
@@ -109,25 +111,26 @@ public class LogicManagerTest {
     }
 
     @Test
-    public void execute_legacyStudentDataChange_createsUndoEntry() throws Exception {
+    public void execute_studentDataChange_createsUndoEntry() throws Exception {
         CourseClassBook initialBook = new CourseClassBook();
         initialBook.addCourseClass(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()));
-        ModelManager legacyMutatingModel = new ModelManager(initialBook, new UserPrefs()) {
+        ModelManager studentMutatingModel = new ModelManager(initialBook, new UserPrefs()) {
             @Override
             public void setCourseClass(CourseClass target, CourseClass editedCourseClass) {
                 super.setCourseClass(target, editedCourseClass);
-                editedCourseClass.getStudents().addPerson(TypicalPersons.ALICE);
+                editedCourseClass.addStudent(new Student(new StudentName("Alice Pauline"),
+                        new Telehandle("alice")));
             }
         };
-        logic = new LogicManager(legacyMutatingModel, new StorageManager(
-                new JsonCourseClassBookStorage(temporaryFolder.resolve("legacyStudents.json")),
-                new JsonUserPrefsStorage(temporaryFolder.resolve("legacyStudentsPrefs.json"))));
+        logic = new LogicManager(studentMutatingModel, new StorageManager(
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("students.json")),
+                new JsonUserPrefsStorage(temporaryFolder.resolve("studentsPrefs.json"))));
 
         logic.execute("eclass 1 n/F10-2");
 
-        assertEquals(1, legacyMutatingModel.getUndoHistory().size());
-        assertTrue(legacyMutatingModel.getUndoHistory().get(0).getCourseClassList().getFirst()
-                .getStudents().getPersonList().isEmpty());
+        assertEquals(1, studentMutatingModel.getUndoHistory().size());
+        assertTrue(studentMutatingModel.getUndoHistory().get(0).getCourseClassList().getFirst()
+                .getStudentList().isEmpty());
     }
 
     @Test

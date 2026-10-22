@@ -64,7 +64,6 @@ import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
 import seedu.address.testutil.GuiTestProcess;
-import seedu.address.testutil.TypicalPersons;
 
 public class CourseClassUiTest {
     @TempDir
@@ -669,18 +668,16 @@ public class CourseClassUiTest {
         }
         FutureTask<Void> task = new FutureTask<>(() -> {
             CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
-            courseClass.getStudents().addPerson(TypicalPersons.ALICE);
-            courseClass.getStudents().addPerson(TypicalPersons.BOB);
+            courseClass.addStudent(new Student(new StudentName("Alice Pauline"), new Telehandle("alice")));
+            courseClass.addStudent(new Student(new StudentName("Benson Meier"), new Telehandle("benson")));
             CourseClassCard card = new CourseClassCard(courseClass, 3);
             VBox students = (VBox) card.getRoot().lookup("#studentsBox");
             assertEquals(2, students.getChildren().size());
             assertEquals("Students: 2", ((Label) card.getRoot().lookup("#studentCount")).getText());
             assertEquals("3. ", ((Label) card.getRoot().lookup("#id")).getText());
-            assertEquals(TypicalPersons.ALICE.getName().fullName, ((Label) students.getChildren().get(0)
-                    .lookup("#name")).getText());
+            assertEquals("Alice Pauline", ((Label) students.getChildren().get(0).lookup("#name")).getText());
             assertEquals("1. ", ((Label) students.getChildren().get(0).lookup("#id")).getText());
-            assertEquals(TypicalPersons.BOB.getName().fullName, ((Label) students.getChildren().get(1)
-                    .lookup("#name")).getText());
+            assertEquals("Benson Meier", ((Label) students.getChildren().get(1).lookup("#name")).getText());
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
             return null;
         });
@@ -922,7 +919,7 @@ public class CourseClassUiTest {
             assertEquals("@aarontan", ((Label) students.getChildren().get(0)
                     .lookup("#telehandle")).getText());
 
-            courseClass.getStudents().addPerson(TypicalPersons.ALICE);
+            courseClass.addStudent(new Student(new StudentName("Beth Tan"), new Telehandle("bethtan")));
             assertEquals("Students: 2", count.getText());
             assertEquals(2, students.getChildren().size());
             assertEquals("1. ", ((Label) students.getChildren().get(0).lookup("#id")).getText());

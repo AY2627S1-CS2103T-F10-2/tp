@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.HomeworkStatus;
-import seedu.address.model.person.Person;
 import seedu.address.model.student.Student;
 
 /**
@@ -68,8 +67,6 @@ public class CourseClassCard extends UiPart<Region> {
         studentsBox.setClip(studentListClip);
         refreshStudents();
 
-        courseClass.getStudents().getPersonList().addListener(
-                (ListChangeListener<Person>) change -> refreshStudents());
         courseClass.getStudentList().addListener(
                 (ListChangeListener<Student>) change -> refreshStudents());
         courseClass.homeworkStatusProperty().addListener((observable, oldStatus, newStatus)
@@ -91,24 +88,16 @@ public class CourseClassCard extends UiPart<Region> {
     /**
      * Refreshes the student count and the student cards shown inside this class card.
      *
-     * <p>The legacy person list is retained for brownfield compatibility, while students added through the
-     * current enrolment model are displayed using {@link StudentCard}.</p>
+     * <p>The class's student list is the single source of truth for the count and displayed cards.</p>
      */
     private void refreshStudents() {
-        ObservableList<Person> legacyStudents = courseClass.getStudents().getPersonList();
         ObservableList<Student> enrolledStudents = courseClass.getStudentList();
-        int legacyStudentCount = courseClass.getStudents().getPersonList().size();
-        int enrolledStudentCount = courseClass.getStudentList().size();
-        studentCount.setText("Students: " + (legacyStudentCount + enrolledStudentCount));
+        studentCount.setText("Students: " + enrolledStudents.size());
 
         studentsBox.getChildren().clear();
-        for (int i = 0; i < legacyStudents.size(); i++) {
-            studentsBox.getChildren().add(
-                    new PersonCard(legacyStudents.get(i), i + 1).getRoot());
-        }
         for (int i = 0; i < enrolledStudents.size(); i++) {
             studentsBox.getChildren().add(
-                    new StudentCard(enrolledStudents.get(i), legacyStudents.size() + i + 1).getRoot());
+                    new StudentCard(enrolledStudents.get(i), i + 1).getRoot());
         }
         if (!studentsBox.getChildren().isEmpty()) {
             studentsBox.getChildren().get(studentsBox.getChildren().size() - 1)

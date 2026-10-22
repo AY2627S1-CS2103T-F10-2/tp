@@ -122,7 +122,6 @@ public class LogicManager implements Logic {
             CourseClass firstClass = first.getCourseClassList().get(i);
             CourseClass secondClass = second.getCourseClassList().get(i);
             if (!firstClass.equals(secondClass)
-                    || !firstClass.getStudents().equals(secondClass.getStudents())
                     || !firstClass.getStudentList().equals(secondClass.getStudentList())) {
                 return false;
             }
