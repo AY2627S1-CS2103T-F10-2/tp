@@ -183,8 +183,14 @@ already exists, the command throws `This class already exists in the system.` Ot
 `Model#addCourseClass` and returns a formatted success message containing the class name, course code, and tags.
 
 `ModelManager#addCourseClass` delegates to `CourseClassBook`, then resets the filtered course-class list so the new
-class is immediately visible in the UI. After a successful command, `LogicManager` saves the complete
-`CourseClassBook` through `Storage#saveCourseClassBook`, so the new class is persisted automatically.
+class is immediately visible in the UI. After a successful command, `LogicManager` records an undo snapshot and saves
+the complete course-class book and undo history through `Storage#saveCourseClassBookData`, so the new class is
+persisted automatically.
+
+The sequence diagram below shows the successful execution flow for
+`aclass n/F10-2 c/CS2103T t/tutorial`.
+
+![Interactions for the `aclass` command](images/AddClassSequenceDiagram.png)
 
 #### Testing
 
@@ -208,9 +214,10 @@ the filtered course-class list, logs the previous and new statuses, and returns 
 stores an undo snapshot and saves the updated course-class book together with the undo history through
 `Storage#saveCourseClassBookData`.
 
-The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`.
+The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`. Parser interactions are
+summarised at command creation so that the model, UI refresh, undo, and storage interactions remain readable.
 
-<img src="images/HomeworkStatusSequenceDiagram.png" width="1200" />
+![Interactions for the `hwork` command](images/HomeworkStatusSequenceDiagram.png)
 
 #### Persistence and UI display
 

@@ -11,7 +11,6 @@ actor User as user USER_COLOR
 
 box Logic LOGIC_COLOR_T1
 participant ":LogicManager" as LogicManager LOGIC_COLOR
-participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
 participant "h:SetHomeworkStatusCommand" as SetHomeworkStatusCommand LOGIC_COLOR
 end box
 
@@ -31,13 +30,13 @@ end box
 user -[USER_COLOR]> LogicManager : execute("hwork 1 s/completed")
 activate LogicManager LOGIC_COLOR
 
-LogicManager -[LOGIC_COLOR]> AddressBookParser : parseCommand(...)
-activate AddressBookParser LOGIC_COLOR
+LogicManager -[LOGIC_COLOR]> LogicManager : parseCommand(...)
 create SetHomeworkStatusCommand
-AddressBookParser -[LOGIC_COLOR]> SetHomeworkStatusCommand : parse via\nSetHomeworkStatusCommandParser
-SetHomeworkStatusCommand -[LOGIC_COLOR]--> AddressBookParser : command
-deactivate AddressBookParser
-AddressBookParser -[LOGIC_COLOR]--> LogicManager : command
+LogicManager -[LOGIC_COLOR]> SetHomeworkStatusCommand : create(index, COMPLETED)
+note over LogicManager, SetHomeworkStatusCommand
+  Parser interactions are omitted
+  to keep the diagram readable.
+end note
 
 LogicManager -[MODEL_COLOR]> Model : getCourseClassBook()
 Model -[MODEL_COLOR]--> LogicManager : stateBefore
