@@ -202,11 +202,12 @@ students in that class; it is not stored on individual `Student` objects.
 index and an `s/` status prefix. `ParserUtil` converts the status to one of `PENDING`, `COMPLETED`, or `NOT_SET`.
 During execution, `SetHomeworkStatusCommand` validates the displayed index, updates only the selected class, refreshes
 the filtered course-class list, logs the previous and new statuses, and returns a success message. `LogicManager` then
-saves the updated course-class book.
+stores an undo snapshot and saves the updated course-class book together with the undo history through
+`Storage#saveCourseClassBookData`.
 
 The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`.
 
-<img src="images/HomeworkStatusSequenceDiagram.png" width="1000" />
+<img src="images/HomeworkStatusSequenceDiagram.png" width="1200" />
 
 #### Persistence and UI display
 
