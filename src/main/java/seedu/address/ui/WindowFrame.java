@@ -1,34 +1,56 @@
 package seedu.address.ui;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /** Provides dragging and edge resizing for a window with a custom title bar. */
 final class WindowFrame {
     private static final double RESIZE_MARGIN = 5;
+    private static final double RESTORE_SCALE = 0.9;
 
     private final Stage stage;
+    private final Consumer<Boolean> maximizeStateListener;
     private boolean left;
     private boolean right;
     private boolean top;
     private boolean bottom;
     private boolean resizing;
+    private boolean maximized;
+    private boolean hasRestoreBounds;
+    private boolean hasLastRestoredBounds;
     private double pressX;
     private double pressY;
     private double windowX;
     private double windowY;
     private double windowWidth;
     private double windowHeight;
+    private double restoreX;
+    private double restoreY;
+    private double restoreWidth;
+    private double restoreHeight;
+    private double lastRestoredX;
+    private double lastRestoredY;
+    private double lastRestoredWidth;
+    private double lastRestoredHeight;
 
     WindowFrame(Stage stage, Region dragArea) {
+        this(stage, dragArea, maximized -> { });
+    }
+
+    WindowFrame(Stage stage, Region dragArea, Consumer<Boolean> maximizeStateListener) {
         this.stage = stage;
+        this.maximizeStateListener = Objects.requireNonNull(maximizeStateListener);
         configureDragArea(dragArea);
         configureResizeHandlers();
-        configureMaximizeHandler();
     }
 
     /**
@@ -36,19 +58,19 @@ final class WindowFrame {
      */
     private void configureDragArea(Region dragArea) {
         dragArea.setOnMousePressed(event -> {
-            if (event.getButton() == MouseButton.PRIMARY && !stage.isMaximized()) {
+            if (event.getButton() == MouseButton.PRIMARY && !maximized) {
                 rememberBounds(event);
             }
         });
         dragArea.setOnMouseDragged(event -> {
-            if (event.isPrimaryButtonDown() && !stage.isMaximized()) {
+            if (event.isPrimaryButtonDown() && !maximized) {
                 stage.setX(windowX + event.getScreenX() - pressX);
                 stage.setY(windowY + event.getScreenY() - pressY);
             }
         });
         dragArea.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                stage.setMaximized(!stage.isMaximized());
+                toggleMaximize();
             }
         });
     }
@@ -82,15 +104,92 @@ final class WindowFrame {
         });
     }
 
-    /**
-     * Resets resize state when the window is maximized or restored.
-     */
-    private void configureMaximizeHandler() {
-        Scene scene = stage.getScene();
-        stage.maximizedProperty().addListener((observable, previous, maximized) -> {
-            resizing = false;
-            scene.setCursor(Cursor.DEFAULT);
-        });
+    /** Toggles between the saved window size and the current screen's usable bounds. */
+    void toggleMaximize() {
+        if (maximized) {
+            restoreWindow();
+        } else {
+            maximizeWindow();
+        }
+    }
+
+    boolean isMaximized() {
+        return maximized;
+    }
+
+    /** Returns the bounds that should be saved when the application closes. */
+    Rectangle2D getWindowBounds() {
+        if (maximized && hasRestoreBounds) {
+            return new Rectangle2D(restoreX, restoreY, restoreWidth, restoreHeight);
+        }
+        return new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+    }
+
+    private void maximizeWindow() {
+        if (!hasLastRestoredBounds || !matchesLastRestoredBounds()) {
+            rememberRestoreBounds();
+        }
+        Rectangle2D screenBounds = Screen.getScreensForRectangle(
+                stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight())
+                .stream()
+                .findFirst()
+                .orElse(Screen.getPrimary())
+                .getVisualBounds();
+        stage.setX(screenBounds.getMinX());
+        stage.setY(screenBounds.getMinY());
+        stage.setWidth(screenBounds.getWidth());
+        stage.setHeight(screenBounds.getHeight());
+        maximized = true;
+        resetResizeState();
+        maximizeStateListener.accept(true);
+    }
+
+    private void restoreWindow() {
+        if (!hasRestoreBounds) {
+            return;
+        }
+        double restoredWidth = constrainSize(restoreWidth * RESTORE_SCALE, stage.getMinWidth(), stage.getMaxWidth());
+        double restoredHeight = constrainSize(restoreHeight * RESTORE_SCALE,
+                stage.getMinHeight(), stage.getMaxHeight());
+        double restoredX = restoreX + (restoreWidth - restoredWidth) / 2;
+        double restoredY = restoreY + (restoreHeight - restoredHeight) / 2;
+        stage.setX(restoredX);
+        stage.setY(restoredY);
+        stage.setWidth(restoredWidth);
+        stage.setHeight(restoredHeight);
+        lastRestoredX = restoredX;
+        lastRestoredY = restoredY;
+        lastRestoredWidth = restoredWidth;
+        lastRestoredHeight = restoredHeight;
+        hasLastRestoredBounds = true;
+        maximized = false;
+        resetResizeState();
+        maximizeStateListener.accept(false);
+    }
+
+    private void rememberRestoreBounds() {
+        restoreX = stage.getX();
+        restoreY = stage.getY();
+        restoreWidth = stage.getWidth();
+        restoreHeight = stage.getHeight();
+        hasRestoreBounds = true;
+        hasLastRestoredBounds = false;
+    }
+
+    private boolean matchesLastRestoredBounds() {
+        return Math.abs(stage.getX() - lastRestoredX) < 0.01
+                && Math.abs(stage.getY() - lastRestoredY) < 0.01
+                && Math.abs(stage.getWidth() - lastRestoredWidth) < 0.01
+                && Math.abs(stage.getHeight() - lastRestoredHeight) < 0.01;
+    }
+
+    private double constrainSize(double size, double minimum, double maximum) {
+        return Math.min(maximum, Math.max(minimum, size));
+    }
+
+    private void resetResizeState() {
+        resizing = false;
+        stage.getScene().setCursor(Cursor.DEFAULT);
     }
 
     private void rememberBounds(MouseEvent event) {
@@ -104,7 +203,7 @@ final class WindowFrame {
 
     private void updateResizeEdges(MouseEvent event) {
         Scene scene = stage.getScene();
-        boolean enabled = stage.isResizable() && !stage.isMaximized() && !stage.isFullScreen();
+        boolean enabled = stage.isResizable() && !maximized && !stage.isFullScreen();
         left = enabled && event.getSceneX() < RESIZE_MARGIN;
         right = enabled && event.getSceneX() > scene.getWidth() - RESIZE_MARGIN;
         top = enabled && event.getSceneY() < RESIZE_MARGIN;
