@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 /** Provides dragging and edge resizing for a window with a custom title bar. */
 final class WindowFrame {
     private static final double RESIZE_MARGIN = 5;
-    private static final double RESTORE_SCALE = 0.9;
 
     private final Stage stage;
     private final Consumer<Boolean> maximizeStateListener;
@@ -144,19 +143,14 @@ final class WindowFrame {
     }
 
     private void restoreWindow() {
-        double restoredWidth = constrainSize(restoreWidth * RESTORE_SCALE, stage.getMinWidth(), stage.getMaxWidth());
-        double restoredHeight = constrainSize(restoreHeight * RESTORE_SCALE,
-                stage.getMinHeight(), stage.getMaxHeight());
-        double restoredX = restoreX + (restoreWidth - restoredWidth) / 2;
-        double restoredY = restoreY + (restoreHeight - restoredHeight) / 2;
-        stage.setX(restoredX);
-        stage.setY(restoredY);
-        stage.setWidth(restoredWidth);
-        stage.setHeight(restoredHeight);
-        lastRestoredX = restoredX;
-        lastRestoredY = restoredY;
-        lastRestoredWidth = restoredWidth;
-        lastRestoredHeight = restoredHeight;
+        stage.setX(restoreX);
+        stage.setY(restoreY);
+        stage.setWidth(restoreWidth);
+        stage.setHeight(restoreHeight);
+        lastRestoredX = restoreX;
+        lastRestoredY = restoreY;
+        lastRestoredWidth = restoreWidth;
+        lastRestoredHeight = restoreHeight;
         hasLastRestoredBounds = true;
         maximized = false;
         resetResizeState();
@@ -176,10 +170,6 @@ final class WindowFrame {
                 && Math.abs(stage.getY() - lastRestoredY) < 0.01
                 && Math.abs(stage.getWidth() - lastRestoredWidth) < 0.01
                 && Math.abs(stage.getHeight() - lastRestoredHeight) < 0.01;
-    }
-
-    private double constrainSize(double size, double minimum, double maximum) {
-        return Math.min(maximum, Math.max(minimum, size));
     }
 
     private void resetResizeState() {

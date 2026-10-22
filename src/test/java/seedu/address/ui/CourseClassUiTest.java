@@ -232,10 +232,10 @@ public class CourseClassUiTest {
                 maximize.fire();
                 assertEquals("Maximize window", maximize.getAccessibleText());
                 assertEquals("\u25a1", maximize.getText());
-                assertTrue(stage.getWidth() < restoredWidth);
-                assertTrue(stage.getHeight() < restoredHeight);
-                assertEquals(restoredX + (restoredWidth - stage.getWidth()) / 2, stage.getX(), 0.01);
-                assertEquals(restoredY + (restoredHeight - stage.getHeight()) / 2, stage.getY(), 0.01);
+                assertEquals(restoredX, stage.getX(), 0.01);
+                assertEquals(restoredY, stage.getY(), 0.01);
+                assertEquals(restoredWidth, stage.getWidth(), 0.01);
+                assertEquals(restoredHeight, stage.getHeight(), 0.01);
                 double firstRestoredWidth = stage.getWidth();
                 double firstRestoredHeight = stage.getHeight();
                 maximize.fire();
@@ -243,14 +243,20 @@ public class CourseClassUiTest {
                 assertEquals(firstRestoredWidth, stage.getWidth(), 0.01);
                 assertEquals(firstRestoredHeight, stage.getHeight(), 0.01);
                 Button minimize = (Button) stage.getScene().lookup("#minimizeButton");
+                maximize.fire();
+                assertEquals("Restore window", maximize.getAccessibleText());
                 minimize.fire();
                 assertTrue(stage.isIconified());
                 stage.setIconified(false);
                 window.show();
                 assertTrue(stage.isShowing());
+                assertEquals("Restore window", maximize.getAccessibleText());
                 close.fire();
                 assertFalse(stage.isShowing());
-                assertEquals((int) stage.getX(), model.getGuiSettings().getWindowCoordinates().x);
+                assertEquals(restoredWidth, model.getGuiSettings().getWindowWidth(), 0.01);
+                assertEquals(restoredHeight, model.getGuiSettings().getWindowHeight(), 0.01);
+                assertEquals((int) restoredX, model.getGuiSettings().getWindowCoordinates().x);
+                assertEquals((int) restoredY, model.getGuiSettings().getWindowCoordinates().y);
             } finally {
                 stage.close();
             }
