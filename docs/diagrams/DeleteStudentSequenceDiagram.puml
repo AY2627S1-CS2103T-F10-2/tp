@@ -1,79 +1,92 @@
 @startuml
 !include style.puml
+skinparam ArrowFontStyle plain
 
-actor User
+actor User as user USER_COLOR
 
 box Logic LOGIC_COLOR_T1
 participant ":LogicManager" as LogicManager LOGIC_COLOR
-participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
-participant ":DeleteStudentCommandParser" as DeleteStudentCommandParser LOGIC_COLOR
 participant "d:DeleteStudentCommand" as DeleteStudentCommand LOGIC_COLOR
 end box
 
 box Model MODEL_COLOR_T1
 participant ":Model" as Model MODEL_COLOR
 participant "c:CourseClass" as CourseClass MODEL_COLOR
-participant ":UniqueStudentList" as UniqueStudentList MODEL_COLOR
 end box
 
 box Storage STORAGE_COLOR_T1
 participant ":Storage" as Storage STORAGE_COLOR
 end box
 
-User -> LogicManager : execute("dstudent t/birdman c/T05 m/CS2103T")
-activate LogicManager
-
-LogicManager -> AddressBookParser : parseCommand(...)
-activate AddressBookParser
-AddressBookParser -> DeleteStudentCommandParser : parse(...)
-activate DeleteStudentCommandParser
+user -[USER_COLOR]> LogicManager : execute("dstudent t/birdman c/T05 m/CS2103T")
+activate LogicManager LOGIC_COLOR
+LogicManager -[LOGIC_COLOR]> LogicManager : parseCommand(...)
 create DeleteStudentCommand
-DeleteStudentCommandParser -> DeleteStudentCommand : create command
-DeleteStudentCommand --> DeleteStudentCommandParser
-deactivate DeleteStudentCommandParser
-AddressBookParser --> LogicManager : d
-deactivate AddressBookParser
+LogicManager -[LOGIC_COLOR]> DeleteStudentCommand : create unconfirmed command
+note over LogicManager, DeleteStudentCommand
+  Parser interactions are omitted
+  to keep the diagram readable.
+end note
 
-LogicManager -> DeleteStudentCommand : execute(Model)
-activate DeleteStudentCommand
-DeleteStudentCommand -> Model : findCourseClassByGroup(T05, CS2103T)
-Model --> DeleteStudentCommand : c
-DeleteStudentCommand -> CourseClass : hasStudent(birdman)
-CourseClass -> UniqueStudentList : containsTelehandle(birdman)
-UniqueStudentList --> CourseClass : true
-CourseClass --> DeleteStudentCommand : true
-DeleteStudentCommand --> LogicManager : confirmation preview
+LogicManager -[MODEL_COLOR]> Model : getCourseClassBook()
+Model -[MODEL_COLOR]--> LogicManager : stateBefore
+LogicManager -[MODEL_COLOR]> Model : getUndoHistory()
+Model -[MODEL_COLOR]--> LogicManager : historyBefore
+
+LogicManager -[LOGIC_COLOR]> DeleteStudentCommand : execute(Model)
+activate DeleteStudentCommand LOGIC_COLOR
+DeleteStudentCommand -[MODEL_COLOR]> Model : findCourseClassByGroup(T05, CS2103T)
+Model -[MODEL_COLOR]--> DeleteStudentCommand : c
+DeleteStudentCommand -[MODEL_COLOR]> CourseClass : hasStudent(birdman)
+CourseClass -[MODEL_COLOR]--> DeleteStudentCommand : true
+DeleteStudentCommand -[MODEL_COLOR]> CourseClass : getStudentList()
+CourseClass -[MODEL_COLOR]--> DeleteStudentCommand : students
+DeleteStudentCommand -[LOGIC_COLOR]> DeleteStudentCommand : stream, filter by telehandle, findFirst
+DeleteStudentCommand -[LOGIC_COLOR]--> LogicManager : confirmation preview
 deactivate DeleteStudentCommand
-LogicManager -> LogicManager : store pending command
-LogicManager --> User : ask for yes/no confirmation
+LogicManager -[LOGIC_COLOR]> LogicManager : store pending command
+LogicManager -[USER_COLOR]--> user : ask for yes/no confirmation
+deactivate LogicManager
 
 alt User enters yes
-    User -> LogicManager : execute("yes")
-    activate LogicManager
-    LogicManager -> DeleteStudentCommand : confirm()
-    DeleteStudentCommand --> LogicManager : confirmed command
-    LogicManager -> DeleteStudentCommand : execute(Model)
-    activate DeleteStudentCommand
-    DeleteStudentCommand -> Model : findCourseClassByGroup(T05, CS2103T)
-    Model --> DeleteStudentCommand : c
-    DeleteStudentCommand -> CourseClass : removeStudent(birdman)
-    CourseClass -> UniqueStudentList : remove(birdman)
-    UniqueStudentList --> CourseClass : student removed
-    CourseClass --> DeleteStudentCommand
-    DeleteStudentCommand --> LogicManager : success result
+    user -[USER_COLOR]> LogicManager : execute("yes")
+    activate LogicManager LOGIC_COLOR
+    LogicManager -[LOGIC_COLOR]> DeleteStudentCommand : confirm()
+    DeleteStudentCommand -[LOGIC_COLOR]--> LogicManager : confirmed command
+    LogicManager -[MODEL_COLOR]> Model : getCourseClassBook()
+    Model -[MODEL_COLOR]--> LogicManager : stateBefore
+    LogicManager -[MODEL_COLOR]> Model : getUndoHistory()
+    Model -[MODEL_COLOR]--> LogicManager : historyBefore
+    LogicManager -[LOGIC_COLOR]> DeleteStudentCommand : execute(Model)
+    activate DeleteStudentCommand LOGIC_COLOR
+    DeleteStudentCommand -[MODEL_COLOR]> Model : findCourseClassByGroup(T05, CS2103T)
+    Model -[MODEL_COLOR]--> DeleteStudentCommand : c
+    DeleteStudentCommand -[MODEL_COLOR]> CourseClass : getStudentList()
+    CourseClass -[MODEL_COLOR]--> DeleteStudentCommand : students
+    DeleteStudentCommand -[LOGIC_COLOR]> DeleteStudentCommand : stream, filter by telehandle, findFirst
+    DeleteStudentCommand -[MODEL_COLOR]> CourseClass : removeStudent(birdman)
+    CourseClass -[MODEL_COLOR]--> DeleteStudentCommand : student removed
+    DeleteStudentCommand -[LOGIC_COLOR]--> LogicManager : success result
     deactivate DeleteStudentCommand
-    LogicManager -> Storage : saveCourseClassBookData(...)
-    Storage --> LogicManager : saved
-    LogicManager --> User : deletion successful
+    LogicManager -[MODEL_COLOR]> Model : addUndoSnapshot(stateBefore)
+    Model -[MODEL_COLOR]--> LogicManager : snapshot added
+    LogicManager -[STORAGE_COLOR]> Storage : saveCourseClassBookData(\nmodel.getCourseClassBook(),\nmodel.getUndoHistory())
+    activate Storage STORAGE_COLOR
+    Storage -[STORAGE_COLOR]--> LogicManager : saved
+    deactivate Storage
+    LogicManager -[USER_COLOR]--> user : deletion successful
     deactivate LogicManager
 else User enters no
-    User -> LogicManager : execute("no")
-    LogicManager -> LogicManager : clear pending command
-    LogicManager --> User : cancellation message
+    user -[USER_COLOR]> LogicManager : execute("no")
+    activate LogicManager LOGIC_COLOR
+    LogicManager -[LOGIC_COLOR]> LogicManager : clear pending command
+    LogicManager -[USER_COLOR]--> user : cancellation message
+    deactivate LogicManager
 else User enters another input
-    User -> LogicManager : execute("maybe")
-    LogicManager --> User : confirmation error
+    user -[USER_COLOR]> LogicManager : execute("maybe")
+    activate LogicManager LOGIC_COLOR
+    LogicManager -[USER_COLOR]--> user : confirmation error
+    deactivate LogicManager
 end
 
-deactivate LogicManager
 @enduml
