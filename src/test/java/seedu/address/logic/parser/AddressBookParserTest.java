@@ -28,6 +28,7 @@ import seedu.address.logic.commands.FindStudentCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.commands.SetHomeworkStatusCommand;
+import seedu.address.logic.commands.UndoCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
@@ -75,6 +76,13 @@ public class AddressBookParserTest {
     public void parseCommand_setHomeworkStatus() throws Exception {
         assertEquals(new SetHomeworkStatusCommand(INDEX_FIRST_PERSON, HomeworkStatus.COMPLETED),
                 parser.parseCommand("hwork 1 s/completed"));
+    }
+
+    @Test
+    public void parseCommand_undo() throws Exception {
+        assertTrue(parser.parseCommand(UndoCommand.COMMAND_WORD) instanceof UndoCommand);
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_COMMAND_FORMAT, UndoCommand.MESSAGE_USAGE), ()
+                -> parser.parseCommand(UndoCommand.COMMAND_WORD + " 1"));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package seedu.address.model;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -80,6 +81,18 @@ public interface Model {
      * Replaces course class book data with the data in {@code courseClassBook}.
      */
     void setCourseClassBook(ReadOnlyCourseClassBook courseClassBook);
+
+    /** Returns defensive copies of the course-class states available for undo. */
+    List<? extends ReadOnlyCourseClassBook> getUndoHistory();
+
+    /** Adds a defensive copy of a course-class state to the undo stack. */
+    void addUndoSnapshot(ReadOnlyCourseClassBook courseClassBook);
+
+    /** Replaces the undo stack with defensive copies of the given states. */
+    void setUndoHistory(List<? extends ReadOnlyCourseClassBook> undoHistory);
+
+    /** Restores the most recent course-class state, if one is available. */
+    Optional<ReadOnlyCourseClassBook> undoCourseClassBook();
 
     /** Returns the CourseClassBook */
     ReadOnlyCourseClassBook getCourseClassBook();

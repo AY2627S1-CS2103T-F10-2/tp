@@ -134,6 +134,8 @@ Example:
 
 * `dclass 1` deletes the first displayed course class.
 
+If the deletion was accidental, enter `undo` immediately afterwards to restore the deleted course class.
+
 ### Adding a class: `aclass`
 
 Adds a class group to the system.
@@ -178,6 +180,8 @@ Example:
 1. Enter `yes` to remove `@birdman` from `T05` in `CS2103T`.<br>
    The application displays `Student @birdman has been removed from T05 in CS2103T`.
 
+If the removal was accidental, enter `undo` immediately afterwards to restore the student to the class.
+
 To cancel the operation, enter `no` after the confirmation prompt. The application displays
 `Student deletion cancelled. No records were changed.`
 
@@ -216,7 +220,8 @@ Format: `dnote t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME i/NOTE_INDEX`
 * `MODULE_NAME` identifies the module containing the class group.
 * `NOTE_INDEX` is the positive number displayed beside the note.
 * All four prefixes are required. They can be entered in any order, but each prefix can only be used once.
-* The note is deleted immediately and cannot be recovered through the application.
+* The note is deleted immediately. If the deletion was accidental, it can be restored with `undo` provided no newer
+  data change has been made.
 * The command changes only the specified enrolment. Notes belonging to the same student in another class are not
   affected.
 * If the class, student, or note index cannot be found, an error is shown and no data is changed.
@@ -224,6 +229,8 @@ Format: `dnote t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME i/NOTE_INDEX`
 Example:
 
 * `dnote t/birdman c/T05 m/CS2103T i/2` deletes note 2 from `@birdman` in `T05` of `CS2103T`.
+
+If the deletion was accidental and no newer data change has been made, enter `undo` to restore the note.
 
 ### Finding enrolled students by name: `fstudent`
 
@@ -275,6 +282,27 @@ Removes all course classes from the course-class book, including their enrolled 
 
 Format: `cclass`
 
+If the clearing was accidental, enter `undo` immediately afterwards to restore the course classes.
+
+### Undoing the most recent change: `undo`
+
+Restores the course-class data to the state before the most recent successful data-changing command.
+
+Format: `undo`
+
+Undo supports changes to course classes, student enrolments, notes, homework statuses, and clearing the course-class
+book. For example, enter `undo` after `dclass 1` to restore the deleted class, or after confirming a `dstudent`
+command to restore the removed student.
+
+* Undo changes are applied one at a time, starting with the most recent change.
+* You can enter `undo` repeatedly to reverse earlier successful changes.
+* Failed commands and cancelled student-deletion confirmations do not create undo entries.
+* Search, list, help, and exit commands do not create undo entries.
+* Undo history is saved in `data/courseclasses.json` and remains available after restarting the application.
+* The application does not currently provide a `redo` command.
+
+If there is no saved change to undo, the application displays `There is no change to undo.`
+
 ### Exiting the program: `exit`
 
 Exits the program.
@@ -283,13 +311,14 @@ Format: `exit`
 
 ### Saving the data
 
-The application automatically saves the course-class data after every command that completes successfully. You do not
-need to save manually.
+The application automatically saves the course-class data and undo history after every command that completes
+successfully. You do not need to save manually.
 
 ### Editing the data file
 
-Course-class data is saved automatically as a JSON file `[JAR file location]/data/courseclasses.json`. Advanced users are
-welcome to update data directly by editing that data file.
+Course-class data and undo history are saved automatically as a JSON file
+`[JAR file location]/data/courseclasses.json`. Advanced users are welcome to update data directly by editing that data
+file.
 
 <div markdown="span" class="alert alert-warning">:exclamation: **Caution:**
 If your changes make the data file invalid, the application starts with an empty course-class book at the next run. The
@@ -336,5 +365,6 @@ Action | Format, Examples
 **Find class** | `fclass KEYWORD [MORE_KEYWORDS]`<br> e.g., `fclass T05 L01`
 **List course classes** | `lclass`
 **Clear course classes** | `cclass`
+**Undo most recent change** | `undo`<br> e.g., `undo`
 **Help** | `help`
 **Exit** | `exit`

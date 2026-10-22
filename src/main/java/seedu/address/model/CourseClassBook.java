@@ -27,7 +27,10 @@ public class CourseClassBook implements ReadOnlyCourseClassBook {
      */
     public CourseClassBook(ReadOnlyCourseClassBook toBeCopied) {
         this();
-        resetData(toBeCopied);
+        requireNonNull(toBeCopied);
+        setCourseClasses(toBeCopied.getCourseClassList().stream()
+                .map(CourseClass::new)
+                .toList());
     }
 
     //// list overwrite operations
