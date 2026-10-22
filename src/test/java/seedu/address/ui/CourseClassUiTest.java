@@ -909,11 +909,13 @@ public class CourseClassUiTest {
             Label count = (Label) card.getRoot().lookup("#studentCount");
 
             assertEquals("Students: 0", count.getText());
+            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
+            assertEquals(1, students.getChildren().size());
+            assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
 
             courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
 
             assertEquals("Students: 1", count.getText());
-            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
             assertEquals(1, students.getChildren().size());
             assertEquals("Aaron Tan", ((Label) students.getChildren().get(0).lookup("#name")).getText());
             assertEquals("@aarontan", ((Label) students.getChildren().get(0)
@@ -930,6 +932,55 @@ public class CourseClassUiTest {
             assertEquals("Students: 1", count.getText());
             assertEquals(1, students.getChildren().size());
             assertTrue(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
+            courseClass.getStudents().removePerson(TypicalPersons.ALICE);
+            assertEquals("Students: 0", count.getText());
+            assertEquals(1, students.getChildren().size());
+            assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void listPanel_clickingClassOrStudent_doesNotSelectOrReplaceCard() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "listPanel_clickingClassOrStudent_doesNotSelectOrReplaceCard",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Model model = new ModelManager();
+            CourseClass courseClass = new CourseClass(new Name("F111"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
+            model.addCourseClass(courseClass);
+            CourseClassListPanel panel = new CourseClassListPanel(model.getFilteredCourseClassList());
+            Scene scene = new Scene(panel.getRoot(), 700, 400);
+            scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
+            panel.getRoot().applyCss();
+            panel.getRoot().layout();
+            ListView<?> listView = (ListView<?>) panel.getRoot().lookup("#courseClassListView");
+            CourseClassListPanel.CourseClassListViewCell cell = listView.lookupAll(".list-cell").stream()
+                    .filter(node -> node instanceof CourseClassListPanel.CourseClassListViewCell listCell
+                            && !listCell.isEmpty())
+                    .map(node -> (CourseClassListPanel.CourseClassListViewCell) node)
+                    .findFirst().orElseThrow();
+            Region graphic = (Region) cell.getGraphic();
+            VBox students = (VBox) graphic.lookup("#studentsBox");
+            Region student = (Region) students.getChildren().getFirst();
+
+            for (Region target : List.of(graphic, student)) {
+                target.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 10, 10, 10, 10));
+                target.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, 10, 10, 10, 10));
+                target.fireEvent(mouseEvent(MouseEvent.MOUSE_CLICKED, 10, 10, 10, 10));
+                panel.getRoot().applyCss();
+                panel.getRoot().layout();
+
+                assertTrue(listView.getSelectionModel().isEmpty());
+                assertFalse(listView.isFocusTraversable());
+                assertSame(graphic, cell.getGraphic());
+                assertSame(student, students.getChildren().getFirst());
+            }
             return null;
         });
         Platform.runLater(task);
