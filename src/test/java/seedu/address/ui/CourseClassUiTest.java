@@ -279,7 +279,7 @@ public class CourseClassUiTest {
             VBox root = new VBox(title);
             Scene scene = new Scene(root, 800, 600);
             stage.setScene(scene);
-            WindowFrame windowFrame = new WindowFrame(stage, title);
+            new WindowFrame(stage, title);
             stage.setMinWidth(400);
             stage.setMinHeight(300);
             stage.setMaxWidth(1000);
@@ -356,7 +356,7 @@ public class CourseClassUiTest {
             VBox root = new VBox(title);
             Scene scene = new Scene(root, 800, 600);
             stage.setScene(scene);
-            new WindowFrame(stage, title);
+            WindowFrame windowFrame = new WindowFrame(stage, title);
             stage.setX(50);
             stage.setY(60);
             stage.setWidth(800);
@@ -409,6 +409,8 @@ public class CourseClassUiTest {
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
                 windowFrame.toggleMaximize();
                 assertEquals(Cursor.DEFAULT, scene.getCursor());
+                assertEquals(800, windowFrame.getWindowBounds().getWidth(), 0.01);
+                assertEquals(600, windowFrame.getWindowBounds().getHeight(), 0.01);
                 double maximizedWidth = stage.getWidth();
                 double maximizedHeight = stage.getHeight();
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
