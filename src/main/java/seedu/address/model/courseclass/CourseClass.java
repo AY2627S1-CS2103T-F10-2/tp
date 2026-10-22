@@ -13,7 +13,6 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
-import seedu.address.model.AddressBook;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.Telehandle;
 import seedu.address.model.student.UniqueStudentList;
@@ -31,36 +30,21 @@ public class CourseClass {
 
     // Data fields
     private final Set<Tag> tags = new HashSet<>();
-    private final AddressBook students;
-    private final UniqueStudentList enrolledStudents;
+    private final UniqueStudentList students;
     private final ObjectProperty<HomeworkStatus> homeworkStatus = new SimpleObjectProperty<>();
 
     /**
      * Every field must be present and not null.
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags) {
-        this(name, code, tags, new AddressBook(), new UniqueStudentList(), HomeworkStatus.NOT_SET);
+        this(name, code, tags, List.of(), HomeworkStatus.NOT_SET);
     }
 
     /**
      * Every field must be present and not null.
      */
-    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students) {
-        this(name, code, tags, students, new UniqueStudentList(), HomeworkStatus.NOT_SET);
-    }
-
-    /**
-     * Every field must be present and not null.
-     *
-     * @param name class name
-     * @param code course code
-     * @param tags class tags
-     * @param students legacy student data
-     * @param enrolledStudents students using the current student model
-     */
-    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
-            UniqueStudentList enrolledStudents) {
-        this(name, code, tags, students, enrolledStudents, HomeworkStatus.NOT_SET);
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, List<Student> students) {
+        this(name, code, tags, students, HomeworkStatus.NOT_SET);
     }
 
     /**
@@ -69,45 +53,17 @@ public class CourseClass {
      * @param name class group name
      * @param code module code
      * @param tags class tags
-     * @param students legacy student data
-     * @param enrolledStudents students using the current student model
+     * @param students students enrolled in the class
      * @param homeworkStatus status of the homework assigned to the class
      */
-    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
-            UniqueStudentList enrolledStudents, HomeworkStatus homeworkStatus) {
-        requireAllNonNull(name, code, tags, students, enrolledStudents, homeworkStatus);
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, List<Student> students,
+            HomeworkStatus homeworkStatus) {
+        requireAllNonNull(name, code, tags, students, homeworkStatus);
         this.name = name;
         this.code = code;
         this.tags.addAll(tags);
-        this.students = students;
-        this.enrolledStudents = new UniqueStudentList(enrolledStudents);
-        this.homeworkStatus.set(homeworkStatus);
-    }
-
-    /**
-     * Every field must be present and not null.
-     *
-     * @param name class group name
-     * @param code module code
-     * @param tags class tags
-     * @param students legacy student data
-     * @param enrolledStudents students using the current student model
-     */
-    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
-            List<Student> enrolledStudents) {
-        this(name, code, tags, students, enrolledStudents, HomeworkStatus.NOT_SET);
-    }
-
-    /** Creates a course class with current-model students and a homework status. */
-    public CourseClass(Name name, CourseCode code, Set<Tag> tags, AddressBook students,
-            List<Student> enrolledStudents, HomeworkStatus homeworkStatus) {
-        requireAllNonNull(name, code, tags, students, enrolledStudents, homeworkStatus);
-        this.name = name;
-        this.code = code;
-        this.tags.addAll(tags);
-        this.students = students;
-        this.enrolledStudents = new UniqueStudentList();
-        this.enrolledStudents.setStudents(enrolledStudents);
+        this.students = new UniqueStudentList();
+        this.students.setStudents(students);
         this.homeworkStatus.set(homeworkStatus);
     }
 
@@ -135,10 +91,6 @@ public class CourseClass {
         this.homeworkStatus.set(homeworkStatus);
     }
 
-    public AddressBook getStudents() {
-        return students;
-    }
-
     /**
      * Returns true if a student with the same telehandle is enrolled in this class.
      *
@@ -146,12 +98,12 @@ public class CourseClass {
      * @return true if the student is enrolled in this class
      */
     public boolean hasStudent(Student student) {
-        return enrolledStudents.contains(student);
+        return students.contains(student);
     }
 
     /** Returns true if a student with the given telehandle is enrolled in this class. */
     public boolean hasStudent(Telehandle telehandle) {
-        return enrolledStudents.containsTelehandle(telehandle);
+        return students.containsTelehandle(telehandle);
     }
 
     /**
@@ -161,17 +113,17 @@ public class CourseClass {
      * @param student student to enrol
      */
     public void addStudent(Student student) {
-        enrolledStudents.add(student);
+        students.add(student);
     }
 
     /** Replaces {@code target} with {@code editedStudent} in this class. */
     public void setStudent(Student target, Student editedStudent) {
-        enrolledStudents.setStudent(target, editedStudent);
+        students.setStudent(target, editedStudent);
     }
 
     /** Removes the student with the given telehandle from this class. */
     public void removeStudent(Telehandle telehandle) {
-        enrolledStudents.remove(telehandle);
+        students.remove(telehandle);
     }
 
     /**
@@ -180,7 +132,7 @@ public class CourseClass {
      * @return an unmodifiable student list
      */
     public ObservableList<Student> getStudentList() {
-        return enrolledStudents.asUnmodifiableObservableList();
+        return students.asUnmodifiableObservableList();
     }
 
     /**

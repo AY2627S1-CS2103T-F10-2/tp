@@ -25,7 +25,6 @@ import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
 import seedu.address.model.tag.Tag;
-import seedu.address.testutil.TypicalPersons;
 
 public class JsonCourseClassBookStorageTest {
     @TempDir
@@ -58,7 +57,6 @@ public class JsonCourseClassBookStorageTest {
         CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"),
                 Set.of(new Tag("tutorial")));
         courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
-        courseClass.getStudents().addPerson(TypicalPersons.ALICE);
         Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
         Student student = new Student(new StudentName("John Doe"), new Telehandle("birdman"), List.of(note));
         courseClass.addStudent(student);
@@ -66,7 +64,6 @@ public class JsonCourseClassBookStorageTest {
         storage.saveCourseClassBook(book);
         var restored = storage.readCourseClassBook().orElseThrow();
         assertEquals(book, restored);
-        assertEquals(courseClass.getStudents(), restored.getCourseClassList().get(0).getStudents());
         assertEquals(List.of(student), restored.getCourseClassList().get(0).getStudentList());
         assertEquals(HomeworkStatus.PENDING, restored.getCourseClassList().get(0).getHomeworkStatus());
     }

@@ -20,7 +20,7 @@ public class SampleDataUtilTest {
         assertEquals("F10-2", courseClass.getName().fullName);
         assertEquals("CS2103T", courseClass.getCourseCode().value);
         assertEquals(Set.of(new Tag("tutorial")), courseClass.getTags());
-        assertTrue(courseClass.getStudents().getPersonList().isEmpty());
+        assertTrue(courseClass.getStudentList().isEmpty());
         assertNotSame(book, SampleDataUtil.getSampleCourseClassBook());
     }
 

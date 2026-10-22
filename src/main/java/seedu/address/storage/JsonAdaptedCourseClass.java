@@ -10,13 +10,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.model.AddressBook;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Student;
-import seedu.address.model.student.UniqueStudentList;
 import seedu.address.model.tag.Tag;
 
 /** Jackson-friendly version of a course class, including its student book. */
@@ -24,7 +22,6 @@ class JsonAdaptedCourseClass {
     private final String name;
     private final String courseCode;
     private final List<JsonAdaptedTag> tags = new ArrayList<>();
-    private final JsonSerializableAddressBook students;
     private final List<JsonAdaptedStudent> enrolledStudents = new ArrayList<>();
     private final String homeworkStatus;
 
@@ -32,7 +29,6 @@ class JsonAdaptedCourseClass {
     @JsonCreator
     public JsonAdaptedCourseClass(@JsonProperty("name") String name,
             @JsonProperty("courseCode") String courseCode, @JsonProperty("tags") List<JsonAdaptedTag> tags,
-            @JsonProperty("students") JsonSerializableAddressBook students,
             @JsonProperty("enrolledStudents") List<JsonAdaptedStudent> enrolledStudents,
             @JsonProperty("homeworkStatus") String homeworkStatus) {
         this.name = name;
@@ -40,7 +36,6 @@ class JsonAdaptedCourseClass {
         if (tags != null) {
             this.tags.addAll(tags);
         }
-        this.students = students;
         if (enrolledStudents != null) {
             this.enrolledStudents.addAll(enrolledStudents);
         }
@@ -49,22 +44,16 @@ class JsonAdaptedCourseClass {
     }
 
     /**
-     * Creates an adapted class without current-model student data.
+     * Creates an adapted class without homework status data.
      *
      * @param name class name
      * @param courseCode course code
      * @param tags class tags
-     * @param students legacy student data
+     * @param enrolledStudents enrolled student data
      */
     public JsonAdaptedCourseClass(String name, String courseCode, List<JsonAdaptedTag> tags,
-            JsonSerializableAddressBook students) {
-        this(name, courseCode, tags, students, null, null);
-    }
-
-    /** Creates an adapted class without current-model student data and with a status. */
-    public JsonAdaptedCourseClass(String name, String courseCode, List<JsonAdaptedTag> tags,
-            JsonSerializableAddressBook students, List<JsonAdaptedStudent> enrolledStudents) {
-        this(name, courseCode, tags, students, enrolledStudents, null);
+            List<JsonAdaptedStudent> enrolledStudents) {
+        this(name, courseCode, tags, enrolledStudents, null);
     }
 
     /** Copies a course class for serialization. */
@@ -72,7 +61,6 @@ class JsonAdaptedCourseClass {
         name = source.getName().fullName;
         courseCode = source.getCourseCode().value;
         tags.addAll(source.getTags().stream().map(JsonAdaptedTag::new).collect(Collectors.toList()));
-        students = new JsonSerializableAddressBook(source.getStudents());
         enrolledStudents.addAll(source.getStudentList().stream()
                 .map(JsonAdaptedStudent::new).collect(Collectors.toList()));
         homeworkStatus = source.getHomeworkStatus().getSerializedValue();
@@ -96,21 +84,20 @@ class JsonAdaptedCourseClass {
             }
             modelTags.add(tag.toModelType());
         }
-        AddressBook studentBook = students == null ? new AddressBook() : students.toModelType();
-        UniqueStudentList enrolledStudentList = new UniqueStudentList();
+        List<Student> modelStudents = new ArrayList<>();
         for (JsonAdaptedStudent jsonAdaptedStudent : enrolledStudents) {
             if (jsonAdaptedStudent == null) {
                 throw new IllegalValueException("Enrolled students list must not contain null entries.");
             }
             Student student = jsonAdaptedStudent.toModelType();
-            if (enrolledStudentList.contains(student)) {
+            if (modelStudents.stream().anyMatch(student::isSameStudent)) {
                 throw new IllegalValueException("Enrolled students list contains duplicate student(s).");
             }
-            enrolledStudentList.add(student);
+            modelStudents.add(student);
         }
         HomeworkStatus modelHomeworkStatus = HomeworkStatus.fromSerializedValue(homeworkStatus)
                 .orElseThrow(() -> new IllegalValueException("Invalid homework status: " + homeworkStatus));
         return new CourseClass(new Name(name), new CourseCode(courseCode), modelTags,
-                studentBook, enrolledStudentList, modelHomeworkStatus);
+                modelStudents, modelHomeworkStatus);
     }
 }

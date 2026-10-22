@@ -12,11 +12,9 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import seedu.address.model.AddressBook;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.StudentName;
 import seedu.address.model.student.Telehandle;
-import seedu.address.model.student.UniqueStudentList;
 import seedu.address.model.student.exceptions.DuplicateStudentException;
 import seedu.address.model.student.exceptions.StudentNotFoundException;
 import seedu.address.model.tag.Tag;
@@ -31,18 +29,13 @@ public class CourseClassTest {
         assertThrows(NullPointerException.class, () -> new CourseClass(name, null, Set.of()));
         assertThrows(NullPointerException.class, () -> new CourseClass(name, code, null));
         assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(), null));
-        assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(),
-                new AddressBook(), new UniqueStudentList(), null));
+        assertThrows(NullPointerException.class, () -> new CourseClass(name, code, Set.of(), List.of(), null));
     }
 
     @Test
-    public void legacyConstructors_defaultHomeworkStatusToNotSet() {
-        CourseClass withUniqueStudentList = new CourseClass(name, code, Set.of(),
-                new AddressBook(), new UniqueStudentList());
-        CourseClass withStudentList = new CourseClass(name, code, Set.of(),
-                new AddressBook(), List.of());
+    public void constructorWithStudentList_defaultsHomeworkStatusToNotSet() {
+        CourseClass withStudentList = new CourseClass(name, code, Set.of(), List.of());
 
-        assertEquals(HomeworkStatus.NOT_SET, withUniqueStudentList.getHomeworkStatus());
         assertEquals(HomeworkStatus.NOT_SET, withStudentList.getHomeworkStatus());
     }
 
@@ -53,7 +46,7 @@ public class CourseClassTest {
         tags.clear();
         assertEquals(Set.of(new Tag("tutorial")), courseClass.getTags());
         assertThrows(UnsupportedOperationException.class, () -> courseClass.getTags().clear());
-        assertTrue(courseClass.getStudents().getPersonList().isEmpty());
+        assertTrue(courseClass.getStudentList().isEmpty());
     }
 
     @Test
@@ -98,7 +91,7 @@ public class CourseClassTest {
     @Test
     public void equals_comparesNameCodeAndTags() {
         CourseClass courseClass = new CourseClass(name, code, Set.of());
-        CourseClass copy = new CourseClass(name, code, Set.of(), new AddressBook());
+        CourseClass copy = new CourseClass(name, code, Set.of(), List.of());
         assertEquals(courseClass, copy);
         assertEquals(courseClass.hashCode(), copy.hashCode());
         assertNotEquals(courseClass, null);

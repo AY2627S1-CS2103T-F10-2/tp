@@ -278,6 +278,13 @@ The command returns every matching enrolment with the student's Telegram
 handle, class group, and module code, allowing similarly named students and
 multiple enrolments to be distinguished.
 
+The sequence diagram below shows the successful search path. It focuses on
+command parsing and the read-only traversal of the model. Formatting of each
+matching result and persistence are omitted: formatting is internal to
+`FindStudentCommand`, while a search does not modify stored data.
+
+<img src="images/FindStudentSequenceDiagram.png" width="900" />
+
 This approach searches the existing per-class student lists instead of
 introducing a separate global student index. It keeps the first feature
 increment small and avoids duplicating enrolment data, while still satisfying
