@@ -21,7 +21,7 @@ note over Command, CourseClass
   note construction are omitted.
 end note
 
-Command -> Student : withNote(note) or\nwithoutNoteAt(index)
+Command -> Student : withNote(note) for note, or\nwithoutNoteAt(index) for dnote
 activate Student
 
 Student -> Student : copy notes and apply update
