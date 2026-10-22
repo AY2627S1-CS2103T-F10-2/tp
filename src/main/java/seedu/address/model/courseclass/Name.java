@@ -11,7 +11,8 @@ public class Name {
 
     public static final String MESSAGE_CONSTRAINTS =
             "Names should only contain alphanumeric characters and spaces,"
-                + " accents, apostrophes, slashes, hyphens, and should not be blank";
+                + " accents, apostrophes, slashes, hyphens"
+                + ", should not be blank and be at most 50 characters!";
 
     /*
      * The first character of the name must not be a whitespace,
@@ -36,7 +37,7 @@ public class Name {
      * Returns true if a given string is a valid name.
      */
     public static boolean isValidName(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return test.length() <= 50 && test.matches(VALIDATION_REGEX);
     }
 
 

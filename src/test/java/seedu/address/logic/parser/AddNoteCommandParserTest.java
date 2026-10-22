@@ -63,7 +63,7 @@ public class AddNoteCommandParserTest {
     @Test
     public void parse_invalidFields_failure() {
         assertParseFailure(parser, " t/abcd c/T05 m/CS2103T o/Needs follow-up", Telehandle.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " t/birdman c/F10-22 m/CS2103T o/Needs follow-up",
+        assertParseFailure(parser, " t/birdman c/F111! m/CS2103T o/Needs follow-up",
                 ClassGroup.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/ o/Needs follow-up", CourseCode.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T o/   ", Note.MESSAGE_CONSTRAINTS);

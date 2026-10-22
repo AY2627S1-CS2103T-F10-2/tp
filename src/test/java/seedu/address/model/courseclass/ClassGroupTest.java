@@ -12,7 +12,8 @@ public class ClassGroupTest {
 
     @Test
     public void constructor_validClassGroups_success() {
-        for (String classGroup : new String[] {"T05", "L14", "R40", "B32", "F10-2"}) {
+        for (String classGroup : new String[] {"T05", "L14", "R40", "B32", "F10-2", "F111", "t05", "F1",
+            "F100", "F10-", "F10-22", "F10-2-3", "T0A", "Tutorial 1", "L01/L02", "École", "Tutor's group"}) {
             assertTrue(ClassGroup.isValidClassGroup(classGroup));
             assertEquals(classGroup, new ClassGroup(classGroup).toString());
         }
@@ -20,10 +21,26 @@ public class ClassGroupTest {
 
     @Test
     public void constructor_invalidClassGroups_throwsIllegalArgumentException() {
-        for (String classGroup : new String[] {"t05", "F1", "F100", "F10-", "F10-22", "F10-2-3", "T0A", ""}) {
+        for (String classGroup : new String[] {"", " ", " T05", "F111!", "T_05", "-T05"}) {
             assertFalse(ClassGroup.isValidClassGroup(classGroup));
             assertThrows(IllegalArgumentException.class, () -> new ClassGroup(classGroup));
         }
+    }
+
+    @Test
+    public void constructor_classGroupWithinLengthLimit_success() {
+        for (int length : new int[] {49, 50}) {
+            String classGroup = "F".repeat(length);
+            assertTrue(ClassGroup.isValidClassGroup(classGroup));
+            assertEquals(classGroup, new ClassGroup(classGroup).value);
+        }
+    }
+
+    @Test
+    public void constructor_classGroupExceedsLengthLimit_throwsIllegalArgumentException() {
+        String classGroup = "F".repeat(51);
+        assertFalse(ClassGroup.isValidClassGroup(classGroup));
+        assertThrows(IllegalArgumentException.class, () -> new ClassGroup(classGroup));
     }
 
     @Test
