@@ -912,11 +912,13 @@ public class CourseClassUiTest {
             Label count = (Label) card.getRoot().lookup("#studentCount");
 
             assertEquals("Students: 0", count.getText());
+            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
+            assertEquals(1, students.getChildren().size());
+            assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
 
             courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
 
             assertEquals("Students: 1", count.getText());
-            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
             assertEquals(1, students.getChildren().size());
             assertEquals("Aaron Tan", ((Label) students.getChildren().get(0).lookup("#name")).getText());
             assertEquals("@aarontan", ((Label) students.getChildren().get(0)
@@ -933,6 +935,10 @@ public class CourseClassUiTest {
             assertEquals("Students: 1", count.getText());
             assertEquals(1, students.getChildren().size());
             assertTrue(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
+            courseClass.getStudents().removePerson(TypicalPersons.ALICE);
+            assertEquals("Students: 0", count.getText());
+            assertEquals(1, students.getChildren().size());
+            assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
             return null;
         });
         Platform.runLater(task);

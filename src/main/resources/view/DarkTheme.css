@@ -257,6 +257,10 @@
     -fx-border-radius: 5;
 }
 
+.empty-student-list {
+    -fx-padding: 12 15;
+}
+
 #studentsBox {
     -fx-background-color: transparent;
     -fx-background-radius: 4;

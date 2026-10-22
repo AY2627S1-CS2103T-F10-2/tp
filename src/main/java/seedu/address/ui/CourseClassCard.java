@@ -110,7 +110,11 @@ public class CourseClassCard extends UiPart<Region> {
             studentsBox.getChildren().add(
                     new StudentCard(enrolledStudents.get(i), legacyStudents.size() + i + 1).getRoot());
         }
-        if (!studentsBox.getChildren().isEmpty()) {
+        if (studentsBox.getChildren().isEmpty()) {
+            Label placeholder = new Label("No students added yet");
+            placeholder.getStyleClass().addAll("cell_small_label", "empty-student-list");
+            studentsBox.getChildren().add(placeholder);
+        } else {
             studentsBox.getChildren().get(studentsBox.getChildren().size() - 1)
                     .getStyleClass().add("student-row-last");
         }
