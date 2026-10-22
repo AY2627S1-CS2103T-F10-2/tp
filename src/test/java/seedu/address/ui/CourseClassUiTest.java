@@ -415,8 +415,8 @@ public class CourseClassUiTest {
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
                 windowFrame.toggleMaximize();
                 assertEquals(Cursor.DEFAULT, scene.getCursor());
-                assertEquals(800, windowFrame.getWindowBounds().getWidth(), 0.01);
-                assertEquals(600, windowFrame.getWindowBounds().getHeight(), 0.01);
+                assertEquals(restoredWidth, windowFrame.getWindowBounds().getWidth(), 0.01);
+                assertEquals(restoredHeight, windowFrame.getWindowBounds().getHeight(), 0.01);
                 double maximizedWidth = stage.getWidth();
                 double maximizedHeight = stage.getHeight();
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
