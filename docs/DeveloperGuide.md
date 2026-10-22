@@ -208,9 +208,10 @@ the filtered course-class list, logs the previous and new statuses, and returns 
 stores an undo snapshot and saves the updated course-class book together with the undo history through
 `Storage#saveCourseClassBookData`.
 
-The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`.
+The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`. Parser interactions are
+summarised at command creation so that the model, UI refresh, undo, and storage interactions remain readable.
 
-<img src="images/HomeworkStatusSequenceDiagram.png" width="1200" />
+![Interactions for the `hwork` command](images/HomeworkStatusSequenceDiagram.png)
 
 #### Persistence and UI display
 
