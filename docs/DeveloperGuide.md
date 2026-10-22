@@ -310,10 +310,17 @@ the note-related behaviour in `Student` and `StudentCard`.
 
 `Note` is an immutable value object containing non-blank text and a
 `LocalDateTime` timestamp. Each `Student` stores an unmodifiable list of notes.
-`Student#withNote` creates a new `Student` with the new note appended, while
-`Student#withoutNoteAt` creates a new `Student` without the note at a validated
-zero-based index. Both operations preserve the original `Student` and the order
-of all retained notes.
+Note addition and deletion therefore use an immutable copy-and-replace
+approach: `Student#withNote` and `Student#withoutNoteAt` return an updated
+`Student`, which replaces the original enrolment in the relevant `CourseClass`.
+The original `Student` and the order of all retained notes remain unchanged.
+
+![Updating a student's notes using immutable replacement](images/StudentNoteUpdateSequenceDiagram.png)
+
+The diagram focuses on a successful update within the Model domain. Class and
+student lookup, validation failures, note construction, logging, UI refresh,
+and persistence are omitted because they are covered elsewhere in this guide.
+If validation fails, the student replacement does not occur.
 
 The command execution flow is as follows:
 
