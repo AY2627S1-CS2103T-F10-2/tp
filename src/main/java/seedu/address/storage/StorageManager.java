@@ -2,6 +2,7 @@ package seedu.address.storage;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -49,6 +50,17 @@ public class StorageManager implements Storage {
     @Override
     public void saveCourseClassBook(ReadOnlyCourseClassBook courseClassBook) throws IOException {
         courseClassBookStorage.saveCourseClassBook(courseClassBook);
+    }
+
+    @Override
+    public Optional<CourseClassBookStorageData> readCourseClassBookData() throws DataLoadingException {
+        return courseClassBookStorage.readCourseClassBookData();
+    }
+
+    @Override
+    public void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+            List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
+        courseClassBookStorage.saveCourseClassBookData(courseClassBook, undoHistory);
     }
 
     // ================ UserPrefs methods ==============================

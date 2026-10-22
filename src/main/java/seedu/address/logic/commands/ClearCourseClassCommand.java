@@ -14,6 +14,11 @@ public class ClearCourseClassCommand extends Command {
     public static final String MESSAGE_SUCCESS = "Course class book has been cleared!";
 
     @Override
+    public boolean isMutating() {
+        return true;
+    }
+
+    @Override
     public CommandResult execute(Model model) {
         requireNonNull(model);
         model.setCourseClassBook(new CourseClassBook());

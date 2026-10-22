@@ -70,6 +70,11 @@ public class DeleteStudentCommand extends Command {
     }
 
     @Override
+    public boolean isMutating() {
+        return confirmed;
+    }
+
+    @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 

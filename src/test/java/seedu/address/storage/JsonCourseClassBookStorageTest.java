@@ -4,9 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.exceptions.DataLoadingException;
+import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.model.CourseClassBook;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.courseclass.CourseClass;
@@ -50,6 +56,57 @@ public class JsonCourseClassBookStorageTest {
     }
 
     @Test
+    public void pathOverloads_saveAndReadCourseClassBook() throws Exception {
+        Path defaultFile = temporaryFolder.resolve("default/classes.json");
+        Path alternateFile = temporaryFolder.resolve("alternate/classes.json");
+        JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(defaultFile);
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()));
+
+        storage.saveCourseClassBook(book, alternateFile);
+
+        assertEquals(book, storage.readCourseClassBook(alternateFile).orElseThrow());
+    }
+
+    @Test
+    public void saveCourseClassBook_atomicMoveUnsupported_usesRegularMove() throws Exception {
+        Path file = temporaryFolder.resolve("classes.json");
+        JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file) {
+            @Override
+            Path moveFile(Path source, Path target, CopyOption... options) throws IOException {
+                if (List.of(options).contains(StandardCopyOption.ATOMIC_MOVE)) {
+                    throw new AtomicMoveNotSupportedException(source.toString(), target.toString(), "test");
+                }
+                return super.moveFile(source, target, options);
+            }
+        };
+        CourseClassBook book = new CourseClassBook();
+        book.addCourseClass(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()));
+
+        storage.saveCourseClassBook(book);
+
+        assertEquals(book, storage.readCourseClassBook().orElseThrow());
+    }
+
+    @Test
+    public void serializableBook_legacyConstructor_convertsCourseClasses() throws Exception {
+        CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+        JsonSerializableCourseClassBook serializable = new JsonSerializableCourseClassBook(
+                List.of(new JsonAdaptedCourseClass(courseClass)));
+
+        assertEquals(List.of(courseClass), serializable.toModelType().getCourseClassList());
+        assertTrue(serializable.toUndoHistory().isEmpty());
+    }
+
+    @Test
+    public void toUndoHistory_nullEntry_throwsIllegalValueException() {
+        JsonSerializableCourseClassBook serializable = new JsonSerializableCourseClassBook(
+                List.of(), Collections.singletonList((JsonSerializableCourseClassBook) null));
+
+        assertThrows(IllegalValueException.class, serializable::toUndoHistory);
+    }
+
+    @Test
     public void saveAndRead_roundTrip_preservesClassFieldsAndStudents() throws Exception {
         Path file = temporaryFolder.resolve("nested/classes.json");
         JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
@@ -69,6 +126,32 @@ public class JsonCourseClassBookStorageTest {
         assertEquals(courseClass.getStudents(), restored.getCourseClassList().get(0).getStudents());
         assertEquals(List.of(student), restored.getCourseClassList().get(0).getStudentList());
         assertEquals(HomeworkStatus.PENDING, restored.getCourseClassList().get(0).getHomeworkStatus());
+    }
+
+    @Test
+    public void saveAndRead_roundTrip_preservesUndoHistory() throws Exception {
+        Path file = temporaryFolder.resolve("history/classes.json");
+        JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
+        CourseClassBook currentBook = new CourseClassBook();
+        currentBook.addCourseClass(new CourseClass(new Name("F10-3"), new CourseCode("CS2103T"), Set.of()));
+
+        CourseClass previousClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+        previousClass.setHomeworkStatus(HomeworkStatus.COMPLETED);
+        Student previousStudent = new Student(new StudentName("John Doe"), new Telehandle("birdman"),
+                List.of(new Note("Follow up", LocalDateTime.of(2026, 10, 8, 14, 30))));
+        previousClass.addStudent(previousStudent);
+        CourseClassBook previousBook = new CourseClassBook();
+        previousBook.addCourseClass(previousClass);
+
+        storage.saveCourseClassBookData(currentBook, List.of(previousBook));
+
+        CourseClassBookStorageData restored = storage.readCourseClassBookData().orElseThrow();
+        assertEquals(currentBook, restored.getCourseClassBook());
+        CourseClass restoredHistoryClass = restored.getUndoHistory().getFirst().getCourseClassList().getFirst();
+        assertEquals(previousClass.getName(), restoredHistoryClass.getName());
+        assertEquals(previousClass.getCourseCode(), restoredHistoryClass.getCourseCode());
+        assertEquals(HomeworkStatus.COMPLETED, restoredHistoryClass.getHomeworkStatus());
+        assertEquals(List.of(previousStudent), restoredHistoryClass.getStudentList());
     }
 
     @Test
@@ -98,6 +181,7 @@ public class JsonCourseClassBookStorageTest {
                 .getCourseClassList().getFirst();
 
         assertEquals(HomeworkStatus.NOT_SET, restored.getHomeworkStatus());
+        assertTrue(storage.readCourseClassBookData().orElseThrow().getUndoHistory().isEmpty());
     }
 
     @Test

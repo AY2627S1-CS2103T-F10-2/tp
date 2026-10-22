@@ -2,6 +2,7 @@ package seedu.address.storage;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import seedu.address.commons.exceptions.DataLoadingException;
@@ -23,6 +24,13 @@ public interface Storage {
 
     /** Saves the course class book. */
     void saveCourseClassBook(ReadOnlyCourseClassBook courseClassBook) throws IOException;
+
+    /** Reads the course-class book together with its persisted undo history. */
+    Optional<CourseClassBookStorageData> readCourseClassBookData() throws DataLoadingException;
+
+    /** Saves the course-class book together with its persisted undo history. */
+    void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+            List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException;
 
     /**
      * Returns the file path of the UserPrefs data file.
