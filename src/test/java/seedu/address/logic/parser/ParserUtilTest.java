@@ -24,8 +24,15 @@ public class ParserUtilTest {
     private static final String WHITESPACE = " \t\r\n";
 
     @Test
-    public void parseIndex_invalidInput_throwsParseException() {
+    public void parseIndex_malformedInput_throwsParseException() {
         assertThrows(ParseException.class, () -> ParserUtil.parseIndex("10 a"));
+    }
+
+    @Test
+    public void parseIndex_nonPositiveInput_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseIndex(""));
+        assertThrows(ParseException.class, () -> ParserUtil.parseIndex("0"));
+        assertThrows(ParseException.class, () -> ParserUtil.parseIndex("-1"));
     }
 
     @Test
@@ -38,6 +45,9 @@ public class ParserUtilTest {
     public void parseIndex_validInput_success() throws Exception {
         // No whitespaces
         assertEquals(INDEX_FIRST_PERSON, ParserUtil.parseIndex("1"));
+
+        // Largest representable positive integer
+        assertEquals(Integer.MAX_VALUE, ParserUtil.parseIndex(Integer.toString(Integer.MAX_VALUE)).getOneBased());
 
         // Leading and trailing whitespaces
         assertEquals(INDEX_FIRST_PERSON, ParserUtil.parseIndex("  1  "));
@@ -90,8 +100,21 @@ public class ParserUtilTest {
     }
 
     @Test
-    public void parseHomeworkStatus_validAndInvalidValues() throws Exception {
+    public void parseHomeworkStatus_eachValidPartition_returnsStatus() throws Exception {
+        assertEquals(HomeworkStatus.NOT_SET, ParserUtil.parseHomeworkStatus("not-set"));
         assertEquals(HomeworkStatus.PENDING, ParserUtil.parseHomeworkStatus(" pending "));
+        assertEquals(HomeworkStatus.COMPLETED, ParserUtil.parseHomeworkStatus("COMPLETED"));
+        assertEquals(HomeworkStatus.NOT_SET, ParserUtil.parseHomeworkStatus("not_set"));
+    }
+
+    @Test
+    public void parseHomeworkStatus_invalidValues_throwParseException() {
         assertThrows(ParseException.class, () -> ParserUtil.parseHomeworkStatus("unknown"));
+        assertThrows(ParseException.class, () -> ParserUtil.parseHomeworkStatus("notset"));
+    }
+
+    @Test
+    public void parseHomeworkStatus_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseHomeworkStatus(null));
     }
 }
