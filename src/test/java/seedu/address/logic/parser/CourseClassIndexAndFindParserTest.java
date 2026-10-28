@@ -16,6 +16,8 @@ import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
 public class CourseClassIndexAndFindParserTest {
     @Test
     public void delete_validIndex_success() {
+        assertParseSuccess(new DeleteCourseClassCommandParser(), "1",
+                new DeleteCourseClassCommand(Index.fromOneBased(1)));
         assertParseSuccess(new DeleteCourseClassCommandParser(), " 2 ",
                 new DeleteCourseClassCommand(Index.fromOneBased(2)));
     }

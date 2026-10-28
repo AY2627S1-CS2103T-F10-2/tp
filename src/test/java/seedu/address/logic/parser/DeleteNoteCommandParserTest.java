@@ -21,9 +21,12 @@ public class DeleteNoteCommandParserTest {
     public void parse_validFields_success() {
         DeleteNoteCommand expected = new DeleteNoteCommand(new Telehandle("birdman"),
                 new ClassGroup("T05"), new CourseCode("CS2103T"), Index.fromOneBased(2));
+        DeleteNoteCommand firstNote = new DeleteNoteCommand(new Telehandle("birdman"),
+                new ClassGroup("T05"), new CourseCode("CS2103T"), Index.fromOneBased(1));
 
         assertParseSuccess(parser, " t/birdman c/T05 m/CS2103T i/2", expected);
         assertParseSuccess(parser, " i/2 m/CS2103T c/T05 t/birdman", expected);
+        assertParseSuccess(parser, " t/birdman c/T05 m/CS2103T i/1", firstNote);
     }
 
     @Test
