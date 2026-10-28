@@ -123,6 +123,23 @@ public class AddStudentLogicIntegrationTest {
     }
 
     @Test
+    public void execute_invalidTelehandle_failsWithoutChangingData() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+
+        ParseException exception = assertThrows(ParseException.class, () ->
+                logic.execute("add n/Carol Lee t/abc/123 c/T05 m/CS2103T"));
+
+        assertEquals(Telehandle.MESSAGE_CONSTRAINTS, exception.getMessage());
+        assertEquals(0, model.getCourseClassBook().getCourseClassList().getFirst().getStudentList().size());
+        assertEquals(0, classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().getFirst().getStudentList().size());
+    }
+
+    @Test
     public void execute_invalidStudentInput_failsBeforeChangingData() throws Exception {
         Model model = new ModelManager();
         JsonCourseClassBookStorage classStorage = createClassStorage();

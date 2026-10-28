@@ -33,6 +33,14 @@ public class AddStudentCommandParserTest {
     }
 
     @Test
+    public void parse_invalidTelehandleCharacters_failure() {
+        for (String telehandle : new String[] {"abc/123", "abc!123", "abc.def", "bird@man", "abc-123"}) {
+            assertParseFailure(parser, " n/Carol Lee t/" + telehandle + " c/T05 m/CS2103T",
+                    Telehandle.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    @Test
     public void parse_missingFieldsOrPreamble_failure() {
         String expected = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddStudentCommand.MESSAGE_USAGE);
         assertParseFailure(parser, " n/John Doe t/birdman c/T05", expected);

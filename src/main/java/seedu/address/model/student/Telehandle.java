@@ -5,13 +5,13 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
  * Represents a student's telehandle.
- * Guarantees: immutable; contains 5 to 32 non-whitespace characters and does not start with {@code @}.
+ * Guarantees: immutable; contains 5 to 32 ASCII letters, digits, or underscores.
  */
 public class Telehandle {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Telehandles should contain 5 to 32 characters, contain no spaces, and should not start with @";
-    public static final String VALIDATION_REGEX = "(?!@)[^\\s]{5,32}";
+            "Telehandles should contain 5 to 32 characters, using only letters (A-Z, a-z), digits, and underscores";
+    public static final String VALIDATION_REGEX = "[A-Za-z0-9_]{5,32}";
 
     public final String value;
 
