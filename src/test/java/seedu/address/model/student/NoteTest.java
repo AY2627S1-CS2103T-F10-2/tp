@@ -21,18 +21,27 @@ public class NoteTest {
     }
 
     @Test
-    public void constructor_blankText_throwsIllegalArgumentException() {
+    public void constructor_textWithoutVisibleCharacters_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> new Note("", TIMESTAMP));
         assertThrows(IllegalArgumentException.class, () -> new Note("   ", TIMESTAMP));
         assertThrows(IllegalArgumentException.class, () -> new Note("\t\n", TIMESTAMP));
+        assertThrows(IllegalArgumentException.class, () -> new Note("\u200B", TIMESTAMP));
+        assertThrows(IllegalArgumentException.class, () -> new Note("\u200E\u2060", TIMESTAMP));
+        assertThrows(IllegalArgumentException.class, () -> new Note("\u0000", TIMESTAMP));
     }
 
     @Test
-    public void isValidText_rejectsNullOrBlankText() {
+    public void isValidText_acceptsOnlyTextWithVisibleCharacters() {
         assertFalse(Note.isValidText(null));
         assertFalse(Note.isValidText(""));
         assertFalse(Note.isValidText("   "));
+        assertFalse(Note.isValidText("\u00A0"));
+        assertFalse(Note.isValidText("\u200B"));
+        assertFalse(Note.isValidText("\u200E\u2060"));
+        assertFalse(Note.isValidText("\u0000"));
         assertTrue(Note.isValidText("Needs follow-up"));
+        assertTrue(Note.isValidText("👩‍💻"));
+        assertTrue(Note.isValidText("Needs\u200B follow-up"));
     }
 
     @Test

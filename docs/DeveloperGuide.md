@@ -911,6 +911,10 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `note t/birdman c/T05 m/CS2103T o/   `<br>
       Expected: The command is rejected for blank note text and no note is added.
 
+   1. Test case: `note t/birdman c/T05 m/CS2103T o/[U+200B]`, where `[U+200B]` is replaced with a zero-width
+      space character.<br>
+      Expected: The command is rejected because the observation contains no visible characters and no note is added.
+
    1. Test case: `note t/abcd c/T05 m/CS2103T o/Needs follow-up`<br>
       Expected: The command is rejected for an invalid telehandle and no note is added.
 

@@ -67,5 +67,6 @@ public class AddNoteCommandParserTest {
                 ClassGroup.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/ o/Needs follow-up", CourseCode.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T o/   ", Note.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/birdman c/T05 m/CS2103T o/\u200B", Note.MESSAGE_CONSTRAINTS);
     }
 }
