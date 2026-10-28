@@ -72,11 +72,17 @@ public class JsonAdaptedCourseClassTest {
     }
 
     @Test
-    public void toModelType_homeworkStatus_restoresStatus() throws Exception {
-        CourseClass restored = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+    public void toModelType_homeworkStatus_restoresEachValidStatus() throws Exception {
+        CourseClass notSet = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, "not-set").toModelType();
+        CourseClass pending = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, "pending").toModelType();
+        CourseClass completed = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
                 null, "completed").toModelType();
 
-        assertEquals(HomeworkStatus.COMPLETED, restored.getHomeworkStatus());
+        assertEquals(HomeworkStatus.NOT_SET, notSet.getHomeworkStatus());
+        assertEquals(HomeworkStatus.PENDING, pending.getHomeworkStatus());
+        assertEquals(HomeworkStatus.COMPLETED, completed.getHomeworkStatus());
     }
 
     @Test
