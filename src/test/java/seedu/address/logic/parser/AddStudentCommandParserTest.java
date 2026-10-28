@@ -41,6 +41,14 @@ public class AddStudentCommandParserTest {
     }
 
     @Test
+    public void parse_unicodeWhitespaceInTelehandle_failure() {
+        for (String whitespace : new String[] {"\u00a0", "\u2003", "\u202f", "\u3000"}) {
+            assertParseFailure(parser, " n/Carol Lee t/abc" + whitespace + "123 c/T05 m/CS2103T",
+                    Telehandle.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    @Test
     public void parse_missingFieldsOrPreamble_failure() {
         String expected = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddStudentCommand.MESSAGE_USAGE);
         assertParseFailure(parser, " n/John Doe t/birdman c/T05", expected);
