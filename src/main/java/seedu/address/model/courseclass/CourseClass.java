@@ -3,15 +3,19 @@ package seedu.address.model.courseclass;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.student.Student;
 import seedu.address.model.student.Telehandle;
@@ -32,10 +36,15 @@ public class CourseClass {
     private final Set<Tag> tags = new HashSet<>();
     private final UniqueStudentList students;
     private final ObjectProperty<HomeworkStatus> homeworkStatus = new SimpleObjectProperty<>();
+    private final ObservableMap<Telehandle, HomeworkStatus> studentHomeworkStatuses =
+            FXCollections.observableHashMap();
+    private final ObservableMap<Telehandle, HomeworkStatus> unmodifiableStudentHomeworkStatuses =
+            FXCollections.unmodifiableObservableMap(studentHomeworkStatuses);
 
     /** Creates a deep copy of {@code source}, including its students. */
     public CourseClass(CourseClass source) {
-        this(source.name, source.code, source.tags, source.getStudentList(), source.getHomeworkStatus());
+        this(source.name, source.code, source.tags, source.getStudentList(), source.getHomeworkStatus(),
+                source.getStudentHomeworkStatuses());
     }
 
     /**
@@ -63,13 +72,21 @@ public class CourseClass {
      */
     public CourseClass(Name name, CourseCode code, Set<Tag> tags, List<Student> students,
             HomeworkStatus homeworkStatus) {
+        this(name, code, tags, students, homeworkStatus, Map.of());
+    }
+
+    /** Creates a course class with class-wide and individual homework statuses. */
+    public CourseClass(Name name, CourseCode code, Set<Tag> tags, List<Student> students,
+            HomeworkStatus homeworkStatus, Map<Telehandle, HomeworkStatus> studentHomeworkStatuses) {
         requireAllNonNull(name, code, tags, students, homeworkStatus);
+        requireAllNonNull(studentHomeworkStatuses);
         this.name = name;
         this.code = code;
         this.tags.addAll(tags);
         this.students = new UniqueStudentList();
         this.students.setStudents(students);
         this.homeworkStatus.set(homeworkStatus);
+        studentHomeworkStatuses.forEach(this::setStudentHomeworkStatus);
     }
 
     public Name getName() {
@@ -85,6 +102,18 @@ public class CourseClass {
         return homeworkStatus.get();
     }
 
+    /** Returns the effective homework status for an enrolled student. */
+    public HomeworkStatus getHomeworkStatus(Telehandle telehandle) {
+        requireAllNonNull(telehandle);
+        return studentHomeworkStatuses.getOrDefault(telehandle, getHomeworkStatus());
+    }
+
+    /** Returns the individual homework status for a student, or the class default if none is set. */
+    public HomeworkStatus getHomeworkStatus(Student student) {
+        requireAllNonNull(student);
+        return getHomeworkStatus(student.getTelehandle());
+    }
+
     /** Returns the observable homework status shared by all students in this class. */
     public ReadOnlyObjectProperty<HomeworkStatus> homeworkStatusProperty() {
         return homeworkStatus;
@@ -94,6 +123,34 @@ public class CourseClass {
     public void setHomeworkStatus(HomeworkStatus homeworkStatus) {
         requireAllNonNull(homeworkStatus);
         this.homeworkStatus.set(homeworkStatus);
+    }
+
+    /** Returns an immutable copy of the individual homework status overrides. */
+    public Map<Telehandle, HomeworkStatus> getStudentHomeworkStatuses() {
+        return Collections.unmodifiableMap(new HashMap<>(studentHomeworkStatuses));
+    }
+
+    /** Returns an observable view of the individual homework status overrides for UI updates. */
+    public ObservableMap<Telehandle, HomeworkStatus> studentHomeworkStatusesProperty() {
+        return unmodifiableStudentHomeworkStatuses;
+    }
+
+    /** Sets an individual homework status override for an enrolled student. */
+    public void setStudentHomeworkStatus(Telehandle telehandle, HomeworkStatus homeworkStatus) {
+        requireAllNonNull(telehandle, homeworkStatus);
+        if (!hasStudent(telehandle)) {
+            throw new IllegalArgumentException("Student must be enrolled in the course class.");
+        }
+        studentHomeworkStatuses.put(telehandle, homeworkStatus);
+    }
+
+    /** Clears an individual override so the student inherits the class-wide status. */
+    public void clearStudentHomeworkStatus(Telehandle telehandle) {
+        requireAllNonNull(telehandle);
+        if (!hasStudent(telehandle)) {
+            throw new IllegalArgumentException("Student must be enrolled in the course class.");
+        }
+        studentHomeworkStatuses.remove(telehandle);
     }
 
     /**
@@ -124,11 +181,16 @@ public class CourseClass {
     /** Replaces {@code target} with {@code editedStudent} in this class. */
     public void setStudent(Student target, Student editedStudent) {
         students.setStudent(target, editedStudent);
+        HomeworkStatus previousStatus = studentHomeworkStatuses.remove(target.getTelehandle());
+        if (previousStatus != null) {
+            studentHomeworkStatuses.put(editedStudent.getTelehandle(), previousStatus);
+        }
     }
 
     /** Removes the student with the given telehandle from this class. */
     public void removeStudent(Telehandle telehandle) {
         students.remove(telehandle);
+        studentHomeworkStatuses.remove(telehandle);
     }
 
     /**
@@ -181,13 +243,14 @@ public class CourseClass {
         return name.equals(otherCourseClass.name)
                 && code.equals(otherCourseClass.code)
                 && tags.equals(otherCourseClass.tags)
-                && getHomeworkStatus().equals(otherCourseClass.getHomeworkStatus());
+                && getHomeworkStatus().equals(otherCourseClass.getHomeworkStatus())
+                && getStudentHomeworkStatuses().equals(otherCourseClass.getStudentHomeworkStatuses());
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, code, tags, getHomeworkStatus());
+        return Objects.hash(name, code, tags, getHomeworkStatus(), getStudentHomeworkStatuses());
     }
 
     @Override
@@ -197,6 +260,7 @@ public class CourseClass {
                 .add("code", code)
                 .add("tags", tags)
                 .add("homeworkStatus", getHomeworkStatus())
+                .add("studentHomeworkStatuses", getStudentHomeworkStatuses())
                 .toString();
     }
 

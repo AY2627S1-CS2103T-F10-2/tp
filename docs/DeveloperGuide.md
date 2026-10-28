@@ -202,17 +202,20 @@ behaviour.
 
 ### Updating class homework status: `hwork`
 
-The `hwork` command stores one `HomeworkStatus` on the selected `CourseClass`. This value is shared by all enrolled
-students in that class; it is not stored on individual `Student` objects.
+The `hwork` command stores a class-wide `HomeworkStatus` on the selected `CourseClass`, together with optional
+per-enrolment overrides keyed by telehandle. A student without an override inherits the class-wide status. The
+override belongs to the class enrolment rather than the `Student` object because the same student may belong to
+multiple classes with different homework states.
 
 #### Command parsing and execution
 
 `AddressBookParser` routes `hwork` to `SetHomeworkStatusCommandParser`. The parser requires a positive displayed class
-index and an `s/` status prefix. `ParserUtil` converts the status to one of `PENDING`, `COMPLETED`, or `NOT_SET`.
-During execution, `SetHomeworkStatusCommand` validates the displayed index, updates only the selected class, preserves
-the active course-class filter, logs the previous and new statuses, and returns a success message. `LogicManager` then
-stores an undo snapshot and saves the updated course-class book together with the undo history through
-`Storage#saveCourseClassBookData`.
+index and an `s/` status prefix, with an optional `t/` telehandle prefix. `ParserUtil` converts statuses to one of
+`PENDING`, `COMPLETED`, or `NOT_SET`; the individual-only `inherit` value clears an override. During execution,
+`SetHomeworkStatusCommand` validates the displayed index and enrolment, preserves the active course-class filter,
+logs the scope and status transition without logging student names or telehandles, and returns a success message.
+`LogicManager` then stores an undo snapshot and saves the updated course-class book together with the undo history
+through `Storage#saveCourseClassBookData`.
 
 The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`. Parser interactions are
 summarised at command creation so that the model, UI refresh, undo, and storage interactions remain readable.
@@ -221,15 +224,17 @@ summarised at command creation so that the model, UI refresh, undo, and storage 
 
 #### Persistence and UI display
 
-`JsonAdaptedCourseClass` serializes the status using its value such as `pending` or `completed`. When the field is absent
-from older JSON data, storage defaults it to `NOT_SET`. `CourseClassCard` observes the class status property so the
-homework badge updates when `hwork` changes an already displayed class card.
+`JsonAdaptedCourseClass` serializes the class status and the optional telehandle-to-status override map. When either
+new field is absent from older JSON data, storage defaults it to `NOT_SET` and an empty override map respectively.
+`CourseClassCard` observes both status sources so the class and individual student badges update when `hwork` changes
+an already displayed class card.
 
 #### Testing
 
 The feature is covered by parser, command, model, integration, storage, and UI tests. These tests verify class-level
-updates, logging-related command execution, persistence, isolation between classes, preservation through class edits,
-legacy JSON compatibility, and refresh of an existing homework-status badge.
+updates, individual overrides and inheritance, logging-related command execution, persistence, isolation between
+students and classes, preservation through class edits, legacy JSON compatibility, and refresh of existing class and
+student homework-status badges.
 
 ### Removing a student from a class group: `dstudent`
 
@@ -396,7 +401,7 @@ student updates, UI renumbering, and persistence after reloading the data file.
 
 #### Implementation
 
-The `undo` command restores the course-class data to the state before the most recent successful data-changing command. It uses a last-in-first-out stack of complete `CourseClassBook` snapshots. Each snapshot includes course-class metadata, enrolled students, notes, and homework status.
+The `undo` command restores the course-class data to the state before the most recent successful data-changing command. It uses a last-in-first-out stack of complete `CourseClassBook` snapshots. Each snapshot includes course-class metadata, enrolled students, notes, class homework status, and individual homework overrides.
 
 `AddressBookParser` routes `undo` to `UndoCommandParser`, which accepts no arguments. `Command#isMutating()` identifies commands that can change course-class data. Before such a command executes, `LogicManager` copies the current course-class book. The snapshot is added to the undo stack only after the command succeeds and actually changes the stored data.
 
@@ -776,6 +781,10 @@ testers are expected to do more *exploratory* testing.
 
    1. Test case: `hwork 1 s/unknown`<br>
       Expected: No status changes. The application rejects the invalid status while the index remains valid.
+
+   1. Test case: `hwork 1 t/alice_tan s/completed`, then `hwork 1 t/alice_tan s/inherit`<br>
+      Expected: Only Alice's badge changes to completed initially; after `inherit`, Alice displays the class-wide
+      status again.
 
 1. Clearing and undoing class data
 

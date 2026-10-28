@@ -10,6 +10,7 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.SetHomeworkStatusCommand;
 import seedu.address.model.courseclass.HomeworkStatus;
+import seedu.address.model.student.Telehandle;
 
 public class SetHomeworkStatusCommandParserTest {
     private final SetHomeworkStatusCommandParser parser = new SetHomeworkStatusCommandParser();
@@ -24,6 +25,16 @@ public class SetHomeworkStatusCommandParserTest {
                 new SetHomeworkStatusCommand(Index.fromOneBased(2), HomeworkStatus.PENDING));
         assertParseSuccess(parser, "3 s/not_set",
                 new SetHomeworkStatusCommand(Index.fromOneBased(3), HomeworkStatus.NOT_SET));
+    }
+
+    @Test
+    public void parse_individualStatus_success() {
+        assertParseSuccess(parser, "1 t/alice_tan s/completed",
+                new SetHomeworkStatusCommand(Index.fromOneBased(1), new Telehandle("alice_tan"),
+                        HomeworkStatus.COMPLETED));
+        assertParseSuccess(parser, "1 t/alice_tan s/inherit",
+                SetHomeworkStatusCommand.clearStudentOverride(Index.fromOneBased(1),
+                        new Telehandle("alice_tan")));
     }
 
     @Test

@@ -3,6 +3,7 @@ package seedu.address.ui;
 import java.util.Comparator;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -14,6 +15,7 @@ import javafx.scene.shape.Rectangle;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.student.Student;
+import seedu.address.model.student.Telehandle;
 
 /**
  * A UI component that displays information of a {@code CourseClass}.
@@ -70,7 +72,12 @@ public class CourseClassCard extends UiPart<Region> {
         courseClass.getStudentList().addListener(
                 (ListChangeListener<Student>) change -> refreshStudents());
         courseClass.homeworkStatusProperty().addListener((observable, oldStatus, newStatus)
-                -> refreshHomeworkStatus());
+                -> {
+                    refreshHomeworkStatus();
+                    refreshStudents();
+                });
+        courseClass.studentHomeworkStatusesProperty().addListener(
+                (MapChangeListener<Telehandle, HomeworkStatus>) change -> refreshStudents());
 
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
@@ -97,7 +104,8 @@ public class CourseClassCard extends UiPart<Region> {
         studentsBox.getChildren().clear();
         for (int i = 0; i < enrolledStudents.size(); i++) {
             studentsBox.getChildren().add(
-                    new StudentCard(enrolledStudents.get(i), i + 1).getRoot());
+                    new StudentCard(enrolledStudents.get(i),
+                            courseClass.getHomeworkStatus(enrolledStudents.get(i)), i + 1).getRoot());
         }
         if (studentsBox.getChildren().isEmpty()) {
             Label placeholder = new Label("No students added yet");
