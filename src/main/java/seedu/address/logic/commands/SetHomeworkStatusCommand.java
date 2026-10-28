@@ -1,7 +1,6 @@
 package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
-import static seedu.address.model.Model.PREDICATE_SHOW_ALL_COURSE_CLASSES;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -54,7 +53,6 @@ public class SetHomeworkStatusCommand extends Command {
         CourseClass targetClass = model.getFilteredCourseClassList().get(index.getZeroBased());
         HomeworkStatus previousStatus = targetClass.getHomeworkStatus();
         targetClass.setHomeworkStatus(homeworkStatus);
-        model.updateFilteredCourseClassList(PREDICATE_SHOW_ALL_COURSE_CLASSES);
 
         logger.info(String.format("Homework status updated: action=set, classGroup=%s, courseCode=%s, "
                         + "previousStatus=%s, newStatus=%s",

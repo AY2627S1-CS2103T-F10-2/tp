@@ -116,6 +116,7 @@ Format: `hwork INDEX s/STATUS`
 * `INDEX` identifies the course class in the displayed list and must be a positive integer.
 * `STATUS` must be one of `pending`, `completed`, or `not-set`.
 * Updating the status changes the class-level status only; students and their notes are unchanged.
+* If the class list is filtered, the current filter remains active after the status is updated.
 
 Example:
 
