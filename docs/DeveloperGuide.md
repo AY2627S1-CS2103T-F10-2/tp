@@ -9,7 +9,9 @@ title: Developer Guide
 
 ## **Acknowledgements**
 
-* _{List the sources of reused or adapted ideas, code, documentation, and third-party libraries here, with links to the originals.}_
+* Aiken Duet is adapted from [AddressBook-Level3](https://github.com/se-edu/addressbook-level3).
+* The application uses [JavaFX](https://openjfx.io/), [Jackson](https://github.com/FasterXML/jackson),
+  [JUnit 5](https://github.com/junit-team/junit5), and [PlantUML](https://plantuml.com/).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +38,7 @@ The following provides a quick overview of the main components and their interac
 
 **Main components of the architecture**
 
-**`Main`** (consisting of classes [`Main`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
+**`Main`** (consisting of classes [`Main`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
 * At app launch, it initializes the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
 
@@ -51,7 +53,8 @@ The bulk of the app's work is done by the following four components:
 
 **How the architecture components interact with each other**
 
-The *Sequence Diagram* below shows how the components interact with each other for the scenario where the user issues the command `delete 1`.
+The *Sequence Diagram* below illustrates the general interaction between the architecture components when a user
+executes a command. Feature-specific interactions are documented in the [Implementation](#implementation) section.
 
 <img src="images/ArchitectureSequenceDiagram.png" width="574" />
 
@@ -68,41 +71,40 @@ The sections below give more details of each component.
 
 ### UI component
 
-The **API** of this component is specified in [`Ui.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/Ui.java)
+The **API** of this component is specified in [`Ui.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/ui/Ui.java).
 
 ![Structure of the UI Component](images/UiClassDiagram.png)
 
-The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
+The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`,
+`CourseClassListPanel`, and `StatusBarFooter`. Course-class cards contain their enrolled students, homework status,
+and notes. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common
+behavior among classes that represent visible GUI parts.
 
-The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
+The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files
+in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/resources/view/MainWindow.fxml)
+specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/ui/MainWindow.java).
 
 The `UI` component,
 
 * executes user commands using the `Logic` component.
 * listens for changes to `Model` data so that the UI can be updated with the modified data.
 * keeps a reference to the `Logic` component, because the `UI` relies on the `Logic` to execute commands.
-* depends on some classes in the `Model` component because it displays `Person` objects from the model.
+* depends on classes in the `Model` component because it displays `CourseClass` and `Student` objects.
 
 ### Logic component
 
-**API** : [`Logic.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/logic/Logic.java)
+**API** : [`Logic.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/logic/Logic.java)
 
 Here's a (partial) class diagram of the `Logic` component:
 
 <img src="images/LogicClassDiagram.png" width="550"/>
 
-The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete 1")` API call as an example.
-
-![Interactions Inside the Logic Component for the `delete 1` Command](images/DeleteSequenceDiagram.png)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
-</div>
-
 How the `Logic` component works:
 
-1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
-1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
+1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which
+   creates the matching feature parser where one is required.
+1. This results in a `Command` object (for example, `AddCourseClassCommand`), which is executed by `LogicManager`.
+1. The command can communicate with the `Model` when it is executed (for example, to add a course class).<br>
    Note that although this is shown as a single step in the diagram above for simplicity, the code can require several interactions between the command object and the `Model` to complete the operation.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
 
@@ -115,28 +117,23 @@ How the parsing works:
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/model/Model.java)
 
 <img src="images/ModelClassDiagram.png" width="450" />
 
 
 The `Model` component,
 
-* stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
-* stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
+* stores the course-class book, including `CourseClass` objects, enrolled `Student` objects, notes, and homework status.
+* exposes course classes selected by the current filter in an unmodifiable `ObservableList<CourseClass>` that the UI
+  can observe, so the displayed list updates when the model changes.
+* stores snapshots of the course-class book for the persistent undo feature.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The alternative, arguably more object-oriented, design below keeps a unique list of tags in `AddressBook`, and each `Person` references tags from that list. This lets `AddressBook` maintain one `Tag` object per unique tag instead of each `Person` holding its own `Tag` objects.<br>
-
-<img src="images/BetterModelClassDiagram.png" width="450" />
-
-</div>
-
-
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/storage/Storage.java)
 
 <img src="images/StorageClassDiagram.png" width="550" />
 
@@ -261,7 +258,8 @@ The command uses a two-step confirmation flow to prevent accidental removal:
 3. Before confirmation, the command returns a preview message and does not modify the model.
 4. `LogicManager` stores the unconfirmed command in `pendingDeleteStudentCommand`.
 5. A subsequent `yes` creates a confirmed copy of the command. The command removes the student from the target
-   `CourseClass`, and `LogicManager` persists the updated `CourseClassBook` through `Storage#saveCourseClassBook`.
+   `CourseClass`, and `LogicManager` persists the updated `CourseClassBook` and undo history through
+   `Storage#saveCourseClassBookData`.
 6. A subsequent `no` clears the pending command and returns a cancellation message without changing or saving data.
 7. Any other confirmation input returns an error and leaves the pending deletion unchanged, allowing the user to
    enter `yes` or `no` again.
@@ -681,15 +679,16 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 ### Non-Functional Requirements
 
-1. Aiken Duet should work on any _mainstream OS_ with Java `25` or later installed.
+1. Aiken Duet should work on any _mainstream OS_ with Java `25` installed.
 2. Aiken Duet should respond to add, edit, delete, list, and find commands within 2 seconds when storing up to 100 classes and 1,000 students on a typical laptop.
 3. A teaching assistant who is familiar with CLI applications should be able to create a class, add a student, find that student, and record an observation within 15 minutes of first using Aiken Duet with the User Guide available.
 4. Aiken Duet should store its data locally and should not transmit student information over a network unless the user explicitly initiates such an operation.
 5. Invalid commands should not modify existing class, student, enrolment, or teaching-observation data, and should not cause Aiken Duet to terminate unexpectedly.
 6. Aiken Duet should parse and save application data within 2 seconds.
 7. Should the local save file be corrupted, the system should not overwrite the corrupted file with a blank slate and should alert the user of the error.
-8. The data file must saved in a standard location such as a data folder at the root directory.
-9. The teaching assistent should only need the jar file to run the application and should not need to install any other dependency (other than java).
+8. The data file must be saved in a standard location such as a data folder at the root directory.
+9. The teaching assistant should only need the JAR file to run the application and should not need to install any
+   dependency other than Java 25.
 10. Saved data should be in an easy to edit format for ease of changing in case of save data corruption.
 
 ### Glossary
@@ -726,17 +725,15 @@ testers are expected to do more *exploratory* testing.
 
    1. Download the JAR file and copy it into an empty folder.
 
-   1. Double-click the JAR file.<br>
-      Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
+   1. Open a terminal in that folder and run `java -jar "addressbook.jar"`.<br>
+      Expected: The GUI opens with a set of sample course classes. The window size may not be optimal.
 
 1. Saving window preferences
 
    1. Resize the window to an optimal size. Move the window to a different location. Close the window.
 
-   1. Relaunch the app by double-clicking the JAR file.<br>
+   1. Relaunch the app using `java -jar "addressbook.jar"`.<br>
        Expected: The most recent window size and location are retained.
-
-1. _{ more test cases …​ }_
 
 ### Managing course classes
 

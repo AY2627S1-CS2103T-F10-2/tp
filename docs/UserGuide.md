@@ -12,12 +12,13 @@ Aiken Duet is a **desktop application for Teaching Assistants (TA) to manage stu
 
 ## Quick start
 
-1. Ensure that Java `25` or later is installed on your computer.<br>
+1. Ensure that Java `25` is installed on your computer. Other Java versions are not supported.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
-1. Download the latest `.jar` file from [here](https://github.com/se-edu/addressbook-level3/releases).
+1. Download the latest `addressbook.jar` file from the
+   [Aiken Duet releases page](https://github.com/AY2627S1-CS2103T-F10-2/tp/releases).
 
-1. Copy the file to the folder you want to use as the _home folder_ for your AddressBook.
+1. Copy the file to an empty, writable folder that you want to use as the _home folder_ for Aiken Duet.
 
 1. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar addressbook.jar`.<br>
    A GUI similar to the one below should appear in a few seconds. Note how the app contains some sample data.<br>
@@ -328,12 +329,6 @@ recommend backing up the file before editing it.<br>
 Furthermore, certain edits can cause the application to behave in unexpected ways (e.g., if a value entered is outside
 of the acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
 </div>
-
-### Archiving data files `[coming in v2.0]`
-
-_Details coming soon ..._
-
---------------------------------------------------------------------------------------------------------------------
 
 ## FAQ
 
