@@ -21,7 +21,8 @@ public class NameTest {
 
     @Test
     public void constructor_invalidNames_throwsIllegalArgumentException() {
-        for (String name : new String[] {"", " ", " F111", "F111!", "T_05", "-T05", "F\n111"}) {
+        for (String name : new String[] {"", " ", " F111", "F111!", "T_05", "-T05", "F\n111",
+            "T i/5", "T o/5"}) {
             assertFalse(Name.isValidName(name));
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Name(name));
             assertEquals(Name.MESSAGE_CONSTRAINTS, exception.getMessage());
