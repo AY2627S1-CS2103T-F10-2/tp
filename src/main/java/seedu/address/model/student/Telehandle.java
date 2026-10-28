@@ -3,9 +3,12 @@ package seedu.address.model.student;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
+import java.util.Locale;
+
 /**
  * Represents a student's telehandle.
  * Guarantees: immutable; contains 5 to 32 ASCII letters, digits, or underscores.
+ * Equality ignores case; the original capitalisation is preserved for display and storage.
  */
 public class Telehandle {
 
@@ -51,11 +54,11 @@ public class Telehandle {
             return false;
         }
 
-        return value.equals(otherTelehandle.value);
+        return value.equalsIgnoreCase(otherTelehandle.value);
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return value.toLowerCase(Locale.ROOT).hashCode();
     }
 }

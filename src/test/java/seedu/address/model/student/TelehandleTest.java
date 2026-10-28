@@ -35,6 +35,21 @@ public class TelehandleTest {
     }
 
     @Test
+    public void equals_differentCapitalisation_returnsTrueWithSameHashCode() {
+        Telehandle lowercase = new Telehandle("alice1");
+        Telehandle uppercase = new Telehandle("ALICE1");
+        Telehandle mixedCase = new Telehandle("Alice1");
+
+        assertEquals(lowercase, uppercase);
+        assertEquals(uppercase, lowercase);
+        assertEquals(uppercase, mixedCase);
+        assertEquals(lowercase.hashCode(), uppercase.hashCode());
+        assertEquals(lowercase.hashCode(), mixedCase.hashCode());
+        assertEquals("ALICE1", uppercase.value);
+        assertEquals("Alice1", mixedCase.toString());
+    }
+
+    @Test
     public void equals_sameValue_returnsTrue() {
         Telehandle first = new Telehandle("birdman");
         Telehandle second = new Telehandle("birdman");

@@ -123,6 +123,30 @@ public class AddStudentLogicIntegrationTest {
     }
 
     @Test
+    public void execute_duplicateEnrollmentWithDifferentCapitalisation_failsWithoutChangingData() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/Alice Tan t/alice1 c/T05 m/CS2103T");
+
+        CommandException exception = assertThrows(CommandException.class, () ->
+                logic.execute("add n/Bob Smith t/ALICE1 c/T05 m/CS2103T"));
+
+        assertEquals(String.format(AddStudentCommand.MESSAGE_DUPLICATE_STUDENT, "T05", "CS2103T"),
+                exception.getMessage());
+        Student expected = new Student(new StudentName("Alice Tan"), new Telehandle("alice1"));
+        assertEquals(List.of(expected), model.getCourseClassBook().getCourseClassList().getFirst().getStudentList());
+        assertEquals(List.of(expected), classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().getFirst().getStudentList());
+
+        logic.execute("dstudent t/ALICE1 c/T05 m/CS2103T");
+        logic.execute("yes");
+        assertEquals(0, model.getCourseClassBook().getCourseClassList().getFirst().getStudentList().size());
+    }
+
+    @Test
     public void execute_invalidTelehandle_failsWithoutChangingData() throws Exception {
         Model model = new ModelManager();
         JsonCourseClassBookStorage classStorage = createClassStorage();
