@@ -119,7 +119,6 @@ Formats:
 * `hwork INDEX t/TELEHANDLE s/STATUS`
 
 * `INDEX` identifies the course class in the displayed list and must be a positive integer.
-* `STATUS` must be one of `pending`, `completed`, or `not-set`.
 * The class-wide `STATUS` must be one of `pending`, `completed`, or `not-set`.
 * The individual form overrides the class default for the enrolled student identified by `TELEHANDLE`.
 * Use `s/inherit` with the individual form to clear that override and return the student to the class default.
@@ -157,13 +156,15 @@ Format: `aclass n/NAME c/COURSE_CODE [t/TAG]…​`
 * `COURSE_CODE` identifies the module containing the class group.
 * `t/TAG` is optional and can be provided multiple times.
 * The `n/` and `c/` prefixes are required and can be entered in either order. Each can be used only once.
-  When `n/` comes first, put `c/` before any `t/` tags so that tag-like text in the class name is preserved.
+  When `n/` comes first, the full text up to `c/` is treated as the class name. Put actual `t/` tags after `c/`.
+  This allows a class name itself to contain tag-like text, such as `Group t/05`.
 * A class is considered a duplicate when it has the same name and course code as an existing class, regardless of tags.
 * After a class is added, it appears in the class list and is saved automatically.
 
 Examples:
 * `aclass n/F10-2 c/CS2103T` adds a class group without tags.
 * `aclass n/F10-2 c/CS2103T t/tutorial t/odd-week` adds a class group with two tags.
+* `aclass n/Group t/05 c/CS2103T` adds a class whose name is `Group t/05`.
 
 If the required prefixes are missing, duplicated, or contain invalid values, the application shows the command format
 and does not add the class. Attempting to add an existing class shows `This class already exists in the system.`

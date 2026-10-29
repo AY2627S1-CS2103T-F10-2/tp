@@ -167,10 +167,12 @@ contains a class-group name, a course code, an optional set of tags, and an init
 * `n/` for the class-group name; and
 * `c/` for the course code.
 
-Both prefixes are required and may appear in either order. `t/` is optional and may be repeated; repeated identical
-tags are stored once because tags are represented as a set. The parser rejects a non-empty preamble, missing required
-prefixes, and duplicate `n/` or `c/` prefixes. `ParserUtil` validates the name, course code, and tags before the
-parser constructs the `CourseClass` and `AddCourseClassCommand` objects.
+Both prefixes are required and may appear in either order. When `n/` appears first, the parser finds the following
+`c/` boundary before tokenizing tags. This preserves prefix-like text in a class name (for example, `Group t/05`),
+while actual `t/` tags remain after `c/`. `t/` is optional and may be repeated; repeated identical tags are stored
+once because tags are represented as a set. The parser rejects a non-empty preamble, missing required prefixes, and
+duplicate `n/` or `c/` prefixes. `ParserUtil` validates the name, course code, and tags before the parser constructs
+the `CourseClass` and `AddCourseClassCommand` objects.
 
 #### Execution and persistence
 
@@ -192,10 +194,10 @@ The sequence diagram below shows the successful execution flow for
 #### Testing
 
 The feature is covered by parser, command, integration, UI, and storage tests. In particular,
-`AddCourseClassCommandParserTest` covers valid prefix order, optional and repeated tags, missing fields, preambles,
-duplicate prefixes, and invalid values. `AddCourseClassCommandIntegrationTest` verifies that a class is added and that
-an identical class is rejected. The broader course-class integration and storage tests verify display and persistence
-behaviour.
+`AddCourseClassCommandParserTest` covers valid prefix order, prefix-like text in class names, optional and repeated
+tags, missing fields, preambles, duplicate prefixes, and invalid values. `AddCourseClassCommandIntegrationTest`
+verifies that a class is added and that an identical class is rejected. The broader course-class integration and
+storage tests verify display and persistence behaviour.
 
 ### Updating class homework status: `hwork`
 
