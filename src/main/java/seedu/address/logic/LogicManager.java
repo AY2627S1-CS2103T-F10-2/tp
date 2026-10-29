@@ -2,6 +2,7 @@ package seedu.address.logic;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
@@ -13,7 +14,9 @@ import seedu.address.logic.commands.DeleteStudentCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.CourseClassBook;
 import seedu.address.model.Model;
+import seedu.address.model.ReadOnlyCourseClassBook;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.storage.Storage;
 
@@ -57,16 +60,27 @@ public class LogicManager implements Logic {
      * Executes a command and persists the updated course-class book when appropriate.
      */
     private CommandResult executeCommand(Command command) throws CommandException {
-        CommandResult commandResult = command.execute(model);
+        CourseClassBook stateBefore = new CourseClassBook(model.getCourseClassBook());
+        List<? extends ReadOnlyCourseClassBook> historyBefore = model.getUndoHistory();
+        try {
+            CommandResult commandResult = command.execute(model);
 
-        if (command instanceof DeleteStudentCommand deleteStudentCommand
-                && !deleteStudentCommand.isConfirmed()) {
-            pendingDeleteStudentCommand = deleteStudentCommand;
+            if (command instanceof DeleteStudentCommand deleteStudentCommand
+                    && !deleteStudentCommand.isConfirmed()) {
+                pendingDeleteStudentCommand = deleteStudentCommand;
+                return commandResult;
+            }
+
+            if (command.isMutating() && !courseClassBooksEqualForUndo(stateBefore, model.getCourseClassBook())) {
+                model.addUndoSnapshot(stateBefore);
+            }
+            saveCourseClassBook();
             return commandResult;
+        } catch (CommandException e) {
+            model.setCourseClassBook(stateBefore);
+            model.setUndoHistory(historyBefore);
+            throw e;
         }
-
-        saveCourseClassBook();
-        return commandResult;
     }
 
     /**
@@ -91,12 +105,28 @@ public class LogicManager implements Logic {
      */
     private void saveCourseClassBook() throws CommandException {
         try {
-            storage.saveCourseClassBook(model.getCourseClassBook());
+            storage.saveCourseClassBookData(model.getCourseClassBook(), model.getUndoHistory());
         } catch (AccessDeniedException e) {
             throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
         } catch (IOException ioe) {
             throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
         }
+    }
+
+    /** Compares all persisted course-class data, including students omitted by CourseClass#equals. */
+    private boolean courseClassBooksEqualForUndo(ReadOnlyCourseClassBook first, ReadOnlyCourseClassBook second) {
+        if (first.getCourseClassList().size() != second.getCourseClassList().size()) {
+            return false;
+        }
+        for (int i = 0; i < first.getCourseClassList().size(); i++) {
+            CourseClass firstClass = first.getCourseClassList().get(i);
+            CourseClass secondClass = second.getCourseClassList().get(i);
+            if (!firstClass.equals(secondClass)
+                    || !firstClass.getStudentList().equals(secondClass.getStudentList())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

@@ -1,54 +1,48 @@
 @startuml
+!pragma layout smetana
 !include style.puml
 skinparam arrowThickness 1.1
 skinparam arrowColor MODEL_COLOR
 skinparam classBackgroundColor MODEL_COLOR
 
-Package Model as ModelPackage <<Rectangle>>{
-Class "<<interface>>\nReadOnlyAddressBook" as ReadOnlyAddressBook
+package Model <<Rectangle>> {
+Class "<<interface>>\nReadOnlyCourseClassBook" as ReadOnlyCourseClassBook
 Class "<<interface>>\nReadOnlyUserPrefs" as ReadOnlyUserPrefs
 Class "<<interface>>\nModel" as Model
-Class AddressBook
+Class CourseClassBook
 Class ModelManager
 Class UserPrefs
-
-Class UniquePersonList
-Class Person
-Class Address
-Class Email
-Class Name
-Class Phone
+Class UniqueCourseClassList
+Class CourseClass
+Class UniqueStudentList
+Class Student
+Class Note
+Class StudentName
+Class Telehandle
+Class ClassGroup
+Class CourseCode
+Class HomeworkStatus
 Class Tag
-
-Class I #FFFFFF
 }
 
-Class HiddenOutside #FFFFFF
-HiddenOutside ..> Model
-
-AddressBook .up.|> ReadOnlyAddressBook
-
+CourseClassBook .up.|> ReadOnlyCourseClassBook
 ModelManager .up.|> Model
-Model .right.> ReadOnlyUserPrefs
-Model .left.> ReadOnlyAddressBook
-ModelManager -left-> "1" AddressBook
-ModelManager -right-> "1" UserPrefs
+Model --> ReadOnlyCourseClassBook
+Model --> ReadOnlyUserPrefs
+ModelManager --> "1" CourseClassBook
+ModelManager --> "1" UserPrefs
+ModelManager --> "* filtered" CourseClass
 UserPrefs .up.|> ReadOnlyUserPrefs
 
-AddressBook *--> "1" UniquePersonList
-UniquePersonList --> "~* all" Person
-Person *--> Name
-Person *--> Phone
-Person *--> Email
-Person *--> Address
-Person *--> "*" Tag
-
-Person -[hidden]up--> I
-UniquePersonList -[hidden]right-> I
-
-Name -[hidden]right-> Phone
-Phone -[hidden]right-> Address
-Address -[hidden]right-> Email
-
-ModelManager --> "~* filtered" Person
+CourseClassBook *--> "1" UniqueCourseClassList
+UniqueCourseClassList --> "*" CourseClass
+CourseClass *--> ClassGroup
+CourseClass *--> CourseCode
+CourseClass *--> HomeworkStatus
+CourseClass *--> "*" Tag
+CourseClass *--> "1" UniqueStudentList
+UniqueStudentList --> "*" Student
+Student *--> StudentName
+Student *--> Telehandle
+Student *--> "*" Note
 @enduml

@@ -3,7 +3,12 @@ package seedu.address.storage;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -38,7 +43,7 @@ public class JsonCourseClassBookStorage {
      * @throws DataLoadingException if loading the data from storage failed.
      */
     public Optional<ReadOnlyCourseClassBook> readCourseClassBook() throws DataLoadingException {
-        return readCourseClassBook(filePath);
+        return readCourseClassBookData().map(CourseClassBookStorageData::getCourseClassBook);
     }
 
     /**
@@ -48,6 +53,17 @@ public class JsonCourseClassBookStorage {
      * @throws DataLoadingException if loading the data from storage failed.
      */
     public Optional<ReadOnlyCourseClassBook> readCourseClassBook(Path filePath) throws DataLoadingException {
+        return readCourseClassBookData(filePath).map(CourseClassBookStorageData::getCourseClassBook);
+    }
+
+    /** Reads the course-class book together with its persisted undo history. */
+    public Optional<CourseClassBookStorageData> readCourseClassBookData() throws DataLoadingException {
+        return readCourseClassBookData(filePath);
+    }
+
+    /** Reads course-class data and undo history from the given path. */
+    public Optional<CourseClassBookStorageData> readCourseClassBookData(Path filePath)
+            throws DataLoadingException {
         requireNonNull(filePath);
 
         Optional<JsonSerializableCourseClassBook> jsonCourseClassBook = JsonUtil.readJsonFile(
@@ -57,7 +73,9 @@ public class JsonCourseClassBookStorage {
         }
 
         try {
-            return Optional.of(jsonCourseClassBook.get().toModelType());
+            return Optional.of(new CourseClassBookStorageData(
+                    jsonCourseClassBook.get().toModelType(),
+                    jsonCourseClassBook.get().toUndoHistory()));
         } catch (IllegalValueException ive) {
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
             throw new DataLoadingException(ive);
@@ -70,7 +88,7 @@ public class JsonCourseClassBookStorage {
      * @throws IOException if there was any problem writing to the file.
      */
     public void saveCourseClassBook(ReadOnlyCourseClassBook courseClassBook) throws IOException {
-        saveCourseClassBook(courseClassBook, filePath);
+        saveCourseClassBookData(courseClassBook, List.of());
     }
 
     /**
@@ -79,11 +97,41 @@ public class JsonCourseClassBookStorage {
      * @param filePath location of the data. Cannot be null.
      */
     public void saveCourseClassBook(ReadOnlyCourseClassBook courseClassBook, Path filePath) throws IOException {
+        saveCourseClassBookData(courseClassBook, List.of(), filePath);
+    }
+
+    /** Saves the course-class book together with its undo history. */
+    public void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+            List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
+        saveCourseClassBookData(courseClassBook, undoHistory, filePath);
+    }
+
+    /** Saves course-class data and undo history to the given path. */
+    public void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+            List<? extends ReadOnlyCourseClassBook> undoHistory, Path filePath) throws IOException {
         requireNonNull(courseClassBook);
+        requireNonNull(undoHistory);
         requireNonNull(filePath);
 
         FileUtil.createIfMissing(filePath);
-        JsonUtil.saveJsonFile(new JsonSerializableCourseClassBook(courseClassBook), filePath);
+        Path absoluteFilePath = filePath.toAbsolutePath();
+        Path temporaryFile = Files.createTempFile(absoluteFilePath.getParent(), "courseclassbook", ".tmp");
+        try {
+            JsonUtil.saveJsonFile(new JsonSerializableCourseClassBook(courseClassBook, undoHistory), temporaryFile);
+            try {
+                moveFile(temporaryFile, absoluteFilePath,
+                        StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                moveFile(temporaryFile, absoluteFilePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temporaryFile);
+        }
+    }
+
+    /** Moves a temporary storage file into its final location. */
+    Path moveFile(Path source, Path target, CopyOption... options) throws IOException {
+        return Files.move(source, target, options);
     }
 
 }

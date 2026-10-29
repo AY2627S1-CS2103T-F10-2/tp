@@ -17,6 +17,9 @@ import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 
 public class SetHomeworkStatusCommandTest {
     private final Model model = new ModelManager();
@@ -42,15 +45,64 @@ public class SetHomeworkStatusCommandTest {
     }
 
     @Test
-    public void execute_validIndex_resetsCourseClassFilter() throws Exception {
+    public void execute_individualStatus_doesNotChangeOtherStudents() throws Exception {
+        Student alice = new Student(new StudentName("Alice Tan"), new Telehandle("alice_tan"));
+        Student benson = new Student(new StudentName("Benson Meier"), new Telehandle("benson"));
+        courseClass.addStudent(alice);
+        courseClass.addStudent(benson);
+        model.addCourseClass(courseClass);
+        new SetHomeworkStatusCommand(Index.fromOneBased(1), HomeworkStatus.PENDING).execute(model);
+
+        CommandResult result = new SetHomeworkStatusCommand(Index.fromOneBased(1),
+                alice.getTelehandle(), HomeworkStatus.COMPLETED).execute(model);
+
+        assertEquals(HomeworkStatus.COMPLETED, courseClass.getHomeworkStatus(alice));
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(benson));
+        assertEquals(String.format(SetHomeworkStatusCommand.MESSAGE_STUDENT_SUCCESS,
+                "alice_tan", "F10-2", "completed"), result.getFeedbackToUser());
+    }
+
+    @Test
+    public void execute_inheritStatus_clearsIndividualOverride() throws Exception {
+        Student alice = new Student(new StudentName("Alice Tan"), new Telehandle("alice_tan"));
+        courseClass.addStudent(alice);
+        courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
+        courseClass.setStudentHomeworkStatus(alice.getTelehandle(), HomeworkStatus.COMPLETED);
+        model.addCourseClass(courseClass);
+
+        new SetHomeworkStatusCommand(Index.fromOneBased(1), alice.getTelehandle(), HomeworkStatus.PENDING)
+                .execute(model);
+        CommandResult result = SetHomeworkStatusCommand.clearStudentOverride(Index.fromOneBased(1),
+                alice.getTelehandle()).execute(model);
+
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(alice));
+        assertTrue(courseClass.getStudentHomeworkStatuses().isEmpty());
+        assertEquals(String.format(SetHomeworkStatusCommand.MESSAGE_STUDENT_SUCCESS,
+                "alice_tan", "F10-2", "pending"), result.getFeedbackToUser());
+    }
+
+    @Test
+    public void execute_individualStatusForUnknownStudent_throwsCommandException() throws Exception {
+        model.addCourseClass(courseClass);
+
+        CommandException exception = assertThrows(CommandException.class, () ->
+                new SetHomeworkStatusCommand(Index.fromOneBased(1), new Telehandle("alice_tan"),
+                        HomeworkStatus.COMPLETED).execute(model));
+
+        assertEquals(SetHomeworkStatusCommand.MESSAGE_STUDENT_NOT_IN_CLASS, exception.getMessage());
+    }
+
+    @Test
+    public void execute_validIndex_preservesCourseClassFilter() throws Exception {
         CourseClass otherClass = new CourseClass(new Name("F10-3"), new CourseCode("CS2103T"), Set.of());
         model.addCourseClass(courseClass);
         model.addCourseClass(otherClass);
-        model.updateFilteredCourseClassList(courseClass::equals);
+        model.updateFilteredCourseClassList(candidate -> candidate.isSameCourseClass(courseClass));
 
         new SetHomeworkStatusCommand(Index.fromOneBased(1), HomeworkStatus.COMPLETED).execute(model);
 
-        assertEquals(2, model.getFilteredCourseClassList().size());
+        assertEquals(1, model.getFilteredCourseClassList().size());
+        assertEquals(courseClass, model.getFilteredCourseClassList().getFirst());
     }
 
     @Test

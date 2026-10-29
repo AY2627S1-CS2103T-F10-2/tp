@@ -60,6 +60,8 @@ public class EditCourseClassCommandParserTest {
     public void parse_invalidFields_failure() {
         assertParseFailure(parser, "1 n/", Name.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 n/F10*2", Name.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, "1 n/T i/5", Name.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, "1 n/T o/5", Name.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 c/", CourseCode.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 c/CS*", CourseCode.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 t/tutorial*", Tag.MESSAGE_CONSTRAINTS);

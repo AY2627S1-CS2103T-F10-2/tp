@@ -9,7 +9,9 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_TELEHANDLE;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.logging.Logger;
 
+import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
@@ -43,6 +45,8 @@ public class AddNoteCommand extends Command {
     public static final String MESSAGE_STUDENT_NOT_FOUND =
             "Student @%1$s is not enrolled in %2$s in %3$s";
 
+    private static final Logger logger = LogsCenter.getLogger(AddNoteCommand.class);
+
     private final Telehandle telehandle;
     private final ClassGroup classGroup;
     private final CourseCode moduleName;
@@ -71,6 +75,11 @@ public class AddNoteCommand extends Command {
     }
 
     @Override
+    public boolean isMutating() {
+        return true;
+    }
+
+    @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
@@ -85,7 +94,12 @@ public class AddNoteCommand extends Command {
                         telehandle, classGroup, moduleName)));
 
         Note note = new Note(noteText, LocalDateTime.now(clock));
-        targetClass.setStudent(targetStudent, targetStudent.withNote(note));
+        Student updatedStudent = targetStudent.withNote(note);
+        targetClass.setStudent(targetStudent, updatedStudent);
+
+        logger.info(() -> String.format(
+                "action=addStudentNote telehandle=%s classGroup=%s courseCode=%s newNoteCount=%d",
+                telehandle, classGroup, moduleName, updatedStudent.getNotes().size()));
 
         return new CommandResult(String.format(MESSAGE_SUCCESS,
                 targetStudent.getName(), telehandle, classGroup, moduleName));

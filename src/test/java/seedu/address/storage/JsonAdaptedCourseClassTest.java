@@ -41,7 +41,7 @@ public class JsonAdaptedCourseClassTest {
     public void toModelType_missingOptionalFieldsAndDuplicateTags_preservesValidData() throws Exception {
         CourseClass restored = new JsonAdaptedCourseClass("F10-2", "CS2103T", null, null).toModelType();
         assertEquals(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()), restored);
-        assertTrue(restored.getStudents().getPersonList().isEmpty());
+        assertTrue(restored.getStudentList().isEmpty());
         restored = new JsonAdaptedCourseClass("F10-2", "CS2103T",
                 List.of(new JsonAdaptedTag("tutorial"), new JsonAdaptedTag("tutorial")), null).toModelType();
         assertEquals(Set.of(new Tag("tutorial")), restored.getTags());
@@ -50,7 +50,7 @@ public class JsonAdaptedCourseClassTest {
     @Test
     public void toModelType_enrolledStudents_restoresStudentList() throws Exception {
         Student student = new Student(new StudentName("John Doe"), new Telehandle("birdman"));
-        CourseClass restored = new JsonAdaptedCourseClass("F10-2", "CS2103T", null, null,
+        CourseClass restored = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
                 List.of(new JsonAdaptedStudent(student))).toModelType();
 
         assertEquals(List.of(student), restored.getStudentList());
@@ -62,26 +62,32 @@ public class JsonAdaptedCourseClassTest {
         JsonAdaptedStudent duplicate = new JsonAdaptedStudent("Different Name", "birdman");
 
         assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
-                null, List.of(first, duplicate)).toModelType());
+                List.of(first, duplicate)).toModelType());
     }
 
     @Test
     public void toModelType_nullEnrolledStudent_rejectsMalformedData() {
         assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
-                null, Arrays.asList((JsonAdaptedStudent) null)).toModelType());
+                Arrays.asList((JsonAdaptedStudent) null)).toModelType());
     }
 
     @Test
-    public void toModelType_homeworkStatus_restoresStatus() throws Exception {
-        CourseClass restored = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
-                null, null, "completed").toModelType();
+    public void toModelType_homeworkStatus_restoresEachValidStatus() throws Exception {
+        CourseClass notSet = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, "not-set").toModelType();
+        CourseClass pending = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, "pending").toModelType();
+        CourseClass completed = new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
+                null, "completed").toModelType();
 
-        assertEquals(HomeworkStatus.COMPLETED, restored.getHomeworkStatus());
+        assertEquals(HomeworkStatus.NOT_SET, notSet.getHomeworkStatus());
+        assertEquals(HomeworkStatus.PENDING, pending.getHomeworkStatus());
+        assertEquals(HomeworkStatus.COMPLETED, completed.getHomeworkStatus());
     }
 
     @Test
     public void toModelType_invalidHomeworkStatus_rejectsMalformedData() {
         assertThrows(IllegalValueException.class, () -> new JsonAdaptedCourseClass("F10-2", "CS2103T", null,
-                null, null, "unknown").toModelType());
+                null, "unknown").toModelType());
     }
 }

@@ -9,7 +9,9 @@ title: Developer Guide
 
 ## **Acknowledgements**
 
-* _{List the sources of reused or adapted ideas, code, documentation, and third-party libraries here, with links to the originals.}_
+* Aiken Duet is adapted from [AddressBook-Level3](https://github.com/se-edu/addressbook-level3).
+* The application uses [JavaFX](https://openjfx.io/), [Jackson](https://github.com/FasterXML/jackson),
+  [JUnit 5](https://github.com/junit-team/junit5), and [PlantUML](https://plantuml.com/).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +38,7 @@ The following provides a quick overview of the main components and their interac
 
 **Main components of the architecture**
 
-**`Main`** (consisting of classes [`Main`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
+**`Main`** (consisting of classes [`Main`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
 * At app launch, it initializes the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
 
@@ -51,7 +53,8 @@ The bulk of the app's work is done by the following four components:
 
 **How the architecture components interact with each other**
 
-The *Sequence Diagram* below shows how the components interact with each other for the scenario where the user issues the command `delete 1`.
+The *Sequence Diagram* below illustrates the general interaction between the architecture components when a user
+executes a command. Feature-specific interactions are documented in the [Implementation](#implementation) section.
 
 <img src="images/ArchitectureSequenceDiagram.png" width="574" />
 
@@ -68,41 +71,40 @@ The sections below give more details of each component.
 
 ### UI component
 
-The **API** of this component is specified in [`Ui.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/Ui.java)
+The **API** of this component is specified in [`Ui.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/ui/Ui.java).
 
 ![Structure of the UI Component](images/UiClassDiagram.png)
 
-The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
+The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`,
+`CourseClassListPanel`, and `StatusBarFooter`. Course-class cards contain their enrolled students, homework status,
+and notes. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common
+behavior among classes that represent visible GUI parts.
 
-The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
+The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files
+in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/resources/view/MainWindow.fxml)
+specifies the layout of [`MainWindow`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/ui/MainWindow.java).
 
 The `UI` component,
 
 * executes user commands using the `Logic` component.
 * listens for changes to `Model` data so that the UI can be updated with the modified data.
 * keeps a reference to the `Logic` component, because the `UI` relies on the `Logic` to execute commands.
-* depends on some classes in the `Model` component because it displays `Person` objects from the model.
+* depends on classes in the `Model` component because it displays `CourseClass` and `Student` objects.
 
 ### Logic component
 
-**API** : [`Logic.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/logic/Logic.java)
+**API** : [`Logic.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/logic/Logic.java)
 
 Here's a (partial) class diagram of the `Logic` component:
 
 <img src="images/LogicClassDiagram.png" width="550"/>
 
-The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete 1")` API call as an example.
-
-![Interactions Inside the Logic Component for the `delete 1` Command](images/DeleteSequenceDiagram.png)
-
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
-</div>
-
 How the `Logic` component works:
 
-1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
-1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
+1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which
+   creates the matching feature parser where one is required.
+1. This results in a `Command` object (for example, `AddCourseClassCommand`), which is executed by `LogicManager`.
+1. The command can communicate with the `Model` when it is executed (for example, to add a course class).<br>
    Note that although this is shown as a single step in the diagram above for simplicity, the code can require several interactions between the command object and the `Model` to complete the operation.
 1. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
 
@@ -115,35 +117,33 @@ How the parsing works:
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/model/Model.java)
 
 <img src="images/ModelClassDiagram.png" width="450" />
 
 
 The `Model` component,
 
-* stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
-* stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
+* stores the course-class book, including `CourseClass` objects, enrolled `Student` objects, notes, and homework status.
+* exposes course classes selected by the current filter in an unmodifiable `ObservableList<CourseClass>` that the UI
+  can observe, so the displayed list updates when the model changes.
+* stores snapshots of the course-class book for the persistent undo feature.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The alternative, arguably more object-oriented, design below keeps a unique list of tags in `AddressBook`, and each `Person` references tags from that list. This lets `AddressBook` maintain one `Tag` object per unique tag instead of each `Person` holding its own `Tag` objects.<br>
-
-<img src="images/BetterModelClassDiagram.png" width="450" />
-
-</div>
-
-
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-F10-2/tp/blob/master/src/main/java/seedu/address/storage/Storage.java)
 
 <img src="images/StorageClassDiagram.png" width="550" />
 
 The `Storage` component,
-* can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
-* is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
-* depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
+* can save course-class data and user preference data in JSON format, and read them back into corresponding objects.
+* is implemented by `StorageManager`, which delegates the actual file access to `JsonCourseClassBookStorage` and `JsonUserPrefsStorage`.
+* uses `JsonSerializableCourseClassBook` to represent the current course-class book in JSON. Each item in `courseClasses` is represented by a `JsonAdaptedCourseClass`.
+* stores the current course-class book and its `undoHistory` together in `data/courseclasses.json`. Each undo entry uses the same serializable structure and represents a complete previous `CourseClassBook` state.
+* returns the current course-class book and its undo snapshots together through `CourseClassBookStorageData`, so the undo history is available after restarting the application.
+* depends on some classes in the `Model` component because its job is to save and retrieve objects that belong to the `Model`.
 
 ### Common classes
 
@@ -180,8 +180,14 @@ already exists, the command throws `This class already exists in the system.` Ot
 `Model#addCourseClass` and returns a formatted success message containing the class name, course code, and tags.
 
 `ModelManager#addCourseClass` delegates to `CourseClassBook`, then resets the filtered course-class list so the new
-class is immediately visible in the UI. After a successful command, `LogicManager` saves the complete
-`CourseClassBook` through `Storage#saveCourseClassBook`, so the new class is persisted automatically.
+class is immediately visible in the UI. After a successful command, `LogicManager` records an undo snapshot and saves
+the complete course-class book and undo history through `Storage#saveCourseClassBookData`, so the new class is
+persisted automatically.
+
+The sequence diagram below shows the successful execution flow for
+`aclass n/F10-2 c/CS2103T t/tutorial`.
+
+![Interactions for the `aclass` command](images/AddClassSequenceDiagram.png)
 
 #### Testing
 
@@ -193,33 +199,39 @@ behaviour.
 
 ### Updating class homework status: `hwork`
 
-The `hwork` command stores one `HomeworkStatus` on the selected `CourseClass`. This value is shared by all enrolled
-students in that class; it is not stored on individual `Student` objects.
+The `hwork` command stores a class-wide `HomeworkStatus` on the selected `CourseClass`, together with optional
+per-enrolment overrides keyed by telehandle. A student without an override inherits the class-wide status. The
+override belongs to the class enrolment rather than the `Student` object because the same student may belong to
+multiple classes with different homework states.
 
 #### Command parsing and execution
 
 `AddressBookParser` routes `hwork` to `SetHomeworkStatusCommandParser`. The parser requires a positive displayed class
-index and an `s/` status prefix. `ParserUtil` converts the status to one of `PENDING`, `COMPLETED`, or `NOT_SET`.
-During execution, `SetHomeworkStatusCommand` validates the displayed index, updates only the selected class, refreshes
- the filtered course-class list, logs the previous and new statuses, and returns a success message. `LogicManager` then
-stores an undo snapshot and saves the updated course-class book together with the undo history through
-`Storage#saveCourseClassBookData`.
+index and an `s/` status prefix, with an optional `t/` telehandle prefix. `ParserUtil` converts statuses to one of
+`PENDING`, `COMPLETED`, or `NOT_SET`; the individual-only `inherit` value clears an override. During execution,
+`SetHomeworkStatusCommand` validates the displayed index and enrolment, preserves the active course-class filter,
+logs the scope and status transition without logging student names or telehandles, and returns a success message.
+`LogicManager` then stores an undo snapshot and saves the updated course-class book together with the undo history
+through `Storage#saveCourseClassBookData`.
 
-The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`.
+The sequence diagram below shows the successful execution flow for `hwork 1 s/completed`. Parser interactions are
+summarised at command creation so that the model, UI refresh, undo, and storage interactions remain readable.
 
-<img src="images/HomeworkStatusSequenceDiagram.png" width="1200" />
+![Interactions for the `hwork` command](images/HomeworkStatusSequenceDiagram.png)
 
 #### Persistence and UI display
 
-`JsonAdaptedCourseClass` serializes the status using its value such as `pending` or `completed`. When the field is absent
-from older JSON data, storage defaults it to `NOT_SET`. `CourseClassCard` observes the class status property so the
-homework badge updates when `hwork` changes an already displayed class card.
+`JsonAdaptedCourseClass` serializes the class status and the optional telehandle-to-status override map. When either
+new field is absent from older JSON data, storage defaults it to `NOT_SET` and an empty override map respectively.
+`CourseClassCard` observes both status sources so the class and individual student badges update when `hwork` changes
+an already displayed class card.
 
 #### Testing
 
 The feature is covered by parser, command, model, integration, storage, and UI tests. These tests verify class-level
-updates, logging-related command execution, persistence, isolation between classes, preservation through class edits,
-legacy JSON compatibility, and refresh of an existing homework-status badge.
+updates, individual overrides and inheritance, logging-related command execution, persistence, isolation between
+students and classes, preservation through class edits, legacy JSON compatibility, and refresh of existing class and
+student homework-status badges.
 
 ### Removing a student from a class group: `dstudent`
 
@@ -251,7 +263,8 @@ The command uses a two-step confirmation flow to prevent accidental removal:
 3. Before confirmation, the command returns a preview message and does not modify the model.
 4. `LogicManager` stores the unconfirmed command in `pendingDeleteStudentCommand`.
 5. A subsequent `yes` creates a confirmed copy of the command. The command removes the student from the target
-   `CourseClass`, and `LogicManager` persists the updated `CourseClassBook` through `Storage#saveCourseClassBook`.
+   `CourseClass`, and `LogicManager` persists the updated `CourseClassBook` and undo history through
+   `Storage#saveCourseClassBookData`.
 6. A subsequent `no` clears the pending command and returns a cancellation message without changing or saving data.
 7. Any other confirmation input returns an error and leaves the pending deletion unchanged, allowing the user to
    enter `yes` or `no` again.
@@ -259,6 +272,10 @@ The command uses a two-step confirmation flow to prevent accidental removal:
 The model operation is scoped to the selected class: `CourseClass#removeStudent` delegates to
 `UniqueStudentList#remove`, which removes the student by telehandle. Because each `CourseClass` owns its own enrolled
 student list, removing an enrolment from one class does not remove the same student from another class.
+
+The interaction between the parser, confirmation flow, model, and storage is shown below.
+
+![Interactions for the `dstudent` command](images/DeleteStudentSequenceDiagram.png)
 
 #### Testing
 
@@ -283,6 +300,13 @@ The command returns every matching enrolment with the student's Telegram
 handle, class group, and module code, allowing similarly named students and
 multiple enrolments to be distinguished.
 
+The sequence diagram below shows the successful search path. It focuses on
+command parsing and the read-only traversal of the model. Formatting of each
+matching result and persistence are omitted: formatting is internal to
+`FindStudentCommand`, while a search does not modify stored data.
+
+<img src="images/FindStudentSequenceDiagram.png" width="900" />
+
 This approach searches the existing per-class student lists instead of
 introducing a separate global student index. It keeps the first feature
 increment small and avoids duplicating enrolment data, while still satisfying
@@ -298,15 +322,24 @@ multiple classes.
 ### Student notes feature
 
 The student notes feature is implemented by `AddNoteCommandParser`,
-`AddNoteCommand`, `Note`, and the note-related behaviour in `Student` and
-`StudentCard`.
+`AddNoteCommand`, `DeleteNoteCommandParser`, `DeleteNoteCommand`, `Note`, and
+the note-related behaviour in `Student` and `StudentCard`.
 
 #### Model and command execution
 
 `Note` is an immutable value object containing non-blank text and a
 `LocalDateTime` timestamp. Each `Student` stores an unmodifiable list of notes.
-`Student#withNote` creates a new `Student` with the new note appended, preserving
-the order in which notes were recorded.
+Note addition and deletion therefore use an immutable copy-and-replace
+approach: `Student#withNote` and `Student#withoutNoteAt` return an updated
+`Student`, which replaces the original enrolment in the relevant `CourseClass`.
+The original `Student` and the order of all retained notes remain unchanged.
+
+![Updating a student's notes using immutable replacement](images/StudentNoteUpdateSequenceDiagram.png)
+
+The diagram focuses on a successful update within the Model domain. Class and
+student lookup, validation failures, note construction, logging, UI refresh,
+and persistence are omitted because they are covered elsewhere in this guide.
+If validation fails, the student replacement does not occur.
 
 The command execution flow is as follows:
 
@@ -325,6 +358,19 @@ The command execution flow is as follows:
 1. After successful execution, `LogicManager` asks `StorageManager` to save the
    updated course-class book.
 
+Note deletion proceeds as follows:
+
+1. `AddressBookParser` delegates a `dnote` command to
+   `DeleteNoteCommandParser`, which parses the class, student, and one-based note
+   index.
+1. `DeleteNoteCommand` locates the specified class and student. It validates the
+   index against that enrolment's current note list before making any change.
+1. The command calls `Student#withoutNoteAt` using the zero-based index and
+   replaces the original student through `CourseClass#setStudent`.
+1. `LogicManager` saves the updated course-class book. If the class, student, or
+   note index is invalid, the command throws a `CommandException` before
+   replacing the student, so stored data remains unchanged.
+
 #### Persistence
 
 `JsonAdaptedStudent` converts each note using `JsonAdaptedNote`, which stores
@@ -336,94 +382,87 @@ remain compatible and are loaded with an empty note list.
 #### UI display
 
 `CourseClassCard` listens for changes to its observable student list and
-refreshes the affected student cards after a note is added. `StudentCard`
-displays each note below the student's name and Telegram handle in stored order.
-Timestamps use the format `dd MMM yyyy, HH:mm`, and note labels wrap long text.
-The notes container is hidden for students without notes.
+refreshes the affected student cards after a note is added or deleted.
+`StudentCard` numbers and displays each note below the student's name and
+Telegram handle in stored order. The one-based number shown here is the index
+accepted by `dnote`. Timestamps use the format `dd MMM yyyy, HH:mm`, and note
+labels wrap long text. The notes container is hidden for students without notes.
 
-### \[Proposed\] Undo/redo feature
+#### Testing
 
-#### Proposed Implementation
+The feature is tested at the model, parser, command, routing, storage-integration,
+and UI levels. Tests cover deletion from different list positions, invalid
+indexes, missing classes and students, isolation between enrolments, immutable
+student updates, UI renumbering, and persistence after reloading the data file.
 
-The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It extends `AddressBook` with an undo/redo history, stored internally as an `addressBookStateList` and `currentStatePointer`. Additionally, it implements the following operations:
+### Undoing course-class changes: `undo`
 
-* `VersionedAddressBook#commit()` — Saves the current address book state in its history.
-* `VersionedAddressBook#undo()` — Restores the previous address book state from its history.
-* `VersionedAddressBook#redo()` — Restores a previously undone address book state from its history.
+#### Implementation
 
-These operations are exposed in the `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
+The `undo` command restores the course-class data to the state before the most recent successful data-changing command. It uses a last-in-first-out stack of complete `CourseClassBook` snapshots. Each snapshot includes course-class metadata, enrolled students, notes, class homework status, and individual homework overrides.
 
-Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
+`AddressBookParser` routes `undo` to `UndoCommandParser`, which accepts no arguments. `Command#isMutating()` identifies commands that can change course-class data. Before such a command executes, `LogicManager` copies the current course-class book. The snapshot is added to the undo stack only after the command succeeds and actually changes the stored data.
 
-Step 1. The user launches the application for the first time. The `VersionedAddressBook` will be initialized with the initial address book state, and the `currentStatePointer` pointing to that single address book state.
+Commands that create undo snapshots include:
 
-![UndoRedoState0](images/UndoRedoState0.png)
+* `aclass`, `add`, `eclass`, and `cclass`
+* confirmed `dclass` and `dstudent`
+* `note` and `dnote`
+* `hwork`
 
-Step 2. The user executes `delete 5` command to delete the 5th person in the address book. The `delete` command calls `Model#commitAddressBook()`, causing the modified state of the address book after the `delete 5` command executes to be saved in the `addressBookStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
+Search, list, help, and exit do not create snapshots. Failed commands and cancelled `dstudent` confirmations do not create snapshots. A preview is not recorded; only a confirmed deletion is.
 
-![UndoRedoState1](images/UndoRedoState1.png)
+When `undo` executes, `ModelManager` removes the latest snapshot from its `Deque<CourseClassBook>` and restores it. Repeating `undo` walks backwards through the stack. Redo is not implemented.
 
-Step 3. The user executes `add n/David …​` to add a new person. The `add` command also calls `Model#commitAddressBook()`, causing another modified address book state to be saved into the `addressBookStateList`.
+#### Undo command sequence
 
-![UndoRedoState2](images/UndoRedoState2.png)
+Read both diagrams from top to bottom. Each horizontal arrow represents one
+method call.
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If a command fails its execution, it will not call `Model#commitAddressBook()`, so the address book state will not be saved into the `addressBookStateList`.
+##### Logic-level diagram
 
-</div>
+![Interactions inside the Logic component for the `undo` command](images/UndoSequenceDiagram-Logic.png)
 
-Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoAddressBook()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous address book state, and restores the address book to that state.
+The user first enters `undo`. `LogicManager` sends the command text to
+`AddressBookParser`, which creates an `UndoCommand`. `LogicManager` then
+executes the command, and `UndoCommand` asks the `Model` to run
+`undoCourseClassBook()`.
 
-![UndoRedoState3](images/UndoRedoState3.png)
+The `Model` returns either a restored snapshot or an empty result if there is no
+history. If the operation succeeds, `UndoCommand` creates a success result.
+`LogicManager` then saves the restored course-class book and the remaining undo
+history through `Storage`. Finally, the success message is returned to the user
+interface. The diagram simplifies the parser step by treating
+`UndoCommandParser` as part of `AddressBookParser`.
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index 0, pointing to the initial AddressBook state, then there are no previous AddressBook states to restore. The `undo` command uses `Model#canUndoAddressBook()` to check if this is the case. If so, it will return an error to the user rather
-than attempting to perform the undo.
+##### Model-level diagram
 
-</div>
+![Undo snapshot restoration inside the Model component](images/UndoSequenceDiagram-Model.png)
 
-The following sequence diagram shows how an undo operation goes through the `Logic` component:
+This diagram zooms in on the model restoration step. `UndoCommand` calls
+`ModelManager.undoCourseClassBook()`, and `ModelManager` checks the
+`Deque<CourseClassBook>`. If the deque is empty, it returns `Optional.empty()`.
+Otherwise, it calls `removeLast()` to obtain the latest saved snapshot.
+`ModelManager` then calls `resetData(...)` on the current `CourseClassBook` and
+returns the restored state to `UndoCommand`.
 
-![UndoSequenceDiagram](images/UndoSequenceDiagram-Logic.png)
+#### Persistence
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** The lifeline for `UndoCommand` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
+Undo uses the existing course-class JSON storage rather than a separate storage system. `JsonCourseClassBookStorage` saves the current book and snapshots together in `data/courseclasses.json`. The existing `courseClasses` data remains, with an `undoHistory` list containing serialized previous books.
 
-</div>
+`MainApp` loads both the current book and `undoHistory` into `ModelManager`. After successful commands, `LogicManager` saves both; undo saves the restored current state and the remaining history. Older JSON files without `undoHistory` remain compatible and start with an empty undo stack.
 
-Similarly, how an undo operation goes through the `Model` component is shown below:
+Course-class saves use a temporary file before moving the completed data into place. An atomic move is used when supported, with a replacement fallback otherwise.
 
-![UndoSequenceDiagram](images/UndoSequenceDiagram-Model.png)
+#### Design considerations
 
-The `redo` command does the opposite — it calls `Model#redoAddressBook()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
+* Snapshot history was chosen to keep related course-class data consistent and avoid requiring every command to implement its own inverse operation.
+* Storing complete snapshots uses more memory and storage than storing command-specific inverse data. A history limit could be considered in the future.
+* Reusing the existing JSON file keeps current data and undo history together across application restarts.
 
-<div markdown="span" class="alert alert-info">:information_source: **Note:** If the `currentStatePointer` is at index `addressBookStateList.size() - 1`, pointing to the latest address book state, then there are no undone AddressBook states to restore. The `redo` command uses `Model#canRedoAddressBook()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
+#### Testing
 
-</div>
-
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
-
-![UndoRedoState4](images/UndoRedoState4.png)
-
-Step 6. The user executes `clear`, which calls `Model#commitAddressBook()`. Since the `currentStatePointer` is not pointing at the end of the `addressBookStateList`, all address book states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …​` command. This is the behavior that most modern desktop applications follow.
-
-![UndoRedoState5](images/UndoRedoState5.png)
-
-The following activity diagram summarizes what happens when a user executes a new command:
-
-<img src="images/CommitActivityDiagram.png" width="250" />
-
-#### Design considerations:
-
-**Aspect: How undo & redo execute:**
-
-* **Alternative 1 (current choice):** Saves the entire address book.
-  * Pros: Easy to implement.
-  * Cons: May have performance issues in terms of memory usage.
-
-* **Alternative 2:** Individual command knows how to undo/redo by
-  itself.
-  * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
-  * Cons: We must ensure that the implementation of each individual command is correct.
-
-_{more aspects and alternatives to be added}_
+`UndoCommandTest` covers restoration and an empty undo stack. `UndoLogicIntegrationTest` covers last-in-first-out behaviour, class deletion, student removal, homework status, failed and cancelled commands, and restart persistence. `MainAppTest` verifies startup history loading, while storage tests verify round-trip persistence and compatibility with legacy JSON without `undoHistory`.
 
 ### \[Proposed\] Data archiving
 
@@ -645,15 +684,16 @@ Priorities: Must-have - `* * *`, Should-have - `* *`, Nice-to-have - `*`
 
 ### Non-Functional Requirements
 
-1. Aiken Duet should work on any _mainstream OS_ with Java `25` or later installed.
+1. Aiken Duet should work on any _mainstream OS_ with Java `25` installed.
 2. Aiken Duet should respond to add, edit, delete, list, and find commands within 2 seconds when storing up to 100 classes and 1,000 students on a typical laptop.
 3. A teaching assistant who is familiar with CLI applications should be able to create a class, add a student, find that student, and record an observation within 15 minutes of first using Aiken Duet with the User Guide available.
 4. Aiken Duet should store its data locally and should not transmit student information over a network unless the user explicitly initiates such an operation.
 5. Invalid commands should not modify existing class, student, enrolment, or teaching-observation data, and should not cause Aiken Duet to terminate unexpectedly.
 6. Aiken Duet should parse and save application data within 2 seconds.
 7. Should the local save file be corrupted, the system should not overwrite the corrupted file with a blank slate and should alert the user of the error.
-8. The data file must saved in a standard location such as a data folder at the root directory.
-9. The teaching assistent should only need the jar file to run the application and should not need to install any other dependency (other than java).
+8. The data file must be saved in a standard location such as a data folder at the root directory.
+9. The teaching assistant should only need the JAR file to run the application and should not need to install any
+   dependency other than Java 25.
 10. Saved data should be in an easy to edit format for ease of changing in case of save data corruption.
 
 ### Glossary
@@ -690,54 +730,142 @@ testers are expected to do more *exploratory* testing.
 
    1. Download the JAR file and copy it into an empty folder.
 
-   1. Double-click the JAR file.<br>
-      Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
+   1. Open a terminal in that folder and run `java -jar "addressbook.jar"`.<br>
+      Expected: The GUI opens with a set of sample course classes. The window size may not be optimal.
 
 1. Saving window preferences
 
    1. Resize the window to an optimal size. Move the window to a different location. Close the window.
 
-   1. Relaunch the app by double-clicking the JAR file.<br>
+   1. Relaunch the app using `java -jar "addressbook.jar"`.<br>
        Expected: The most recent window size and location are retained.
 
-1. _{ more test cases …​ }_
+### Managing course classes
 
-### Deleting a person
+1. Deleting a course class while all course classes are being shown
 
-1. Deleting a person while all persons are being shown
+   1. Prerequisites: Create at least two classes, then list them using `lclass`.
 
-   1. Prerequisites: List all persons using the `list` command, with multiple persons in the list.
+   1. Test case: `dclass 1`<br>
+      Expected: The first displayed course class is deleted. Its students and notes are removed with it.
 
-   1. Test case: `delete 1`<br>
-      Expected: The first contact is deleted from the list. The status message shows the deleted contact's details.
+   1. Test case: `dclass 0`<br>
+      Expected: No class is deleted. The application reports that the index must be a positive integer.
 
-   1. Test case: `delete 0`<br>
-      Expected: No person is deleted. The status message shows error details.
+   1. Test case: `dclass -1`<br>
+      Expected: No class is deleted. The application reports the invalid command format.
 
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
-      Expected: Similar to previous.
+   1. Test case: `dclass 999` when fewer than 999 classes are displayed<br>
+      Expected: No class is deleted. The application reports that the class index is invalid.
 
-1. _{ more test cases …​ }_
+1. Editing a course class
+
+   1. Test case: `eclass 1 n/L01 c/CS2101 t/lab`<br>
+      Expected: The first displayed class is updated while its enrolled students and notes are preserved.
+
+   1. Test case: `eclass 1`<br>
+      Expected: The command is rejected because no field was supplied to edit.
+
+1. Updating homework status
+
+   1. Prerequisites: Create at least one class and display it with `lclass`.
+
+   1. Test case: `hwork 1 s/not-set`, then `hwork 1 s/pending`, then `hwork 1 s/completed`<br>
+      Expected: Each command succeeds and the class badge changes to the requested status.
+
+   1. Test case: `hwork 0 s/pending`<br>
+      Expected: No status changes. The application rejects the non-positive boundary value.
+
+   1. Test case: `hwork 1 s/unknown`<br>
+      Expected: No status changes. The application rejects the invalid status while the index remains valid.
+
+   1. Test case: `hwork 1 t/alice_tan s/completed`, then `hwork 1 t/alice_tan s/inherit`<br>
+      Expected: Only Alice's badge changes to completed initially; after `inherit`, Alice displays the class-wide
+      status again.
+
+1. Clearing and undoing class data
+
+   1. Prerequisites: Create two classes and confirm they are visible with `lclass`.
+
+   1. Test case: `cclass`, followed by `undo`<br>
+      Expected: All classes are first cleared and then restored by `undo`.
+
+   1. Test case: `undo` with no successful change to undo<br>
+      Expected: The application reports that there is no change to undo.
 
 ### Adding a class group
 
-1. Adding a class without tags
+1. Adding a class using valid representatives from each input partition
 
-   1. Test case: `aclass n/T05 c/CS2103T`<br>
-      Expected: A class group named `T05` appears in the class list with course code `CS2103T`.
+   1. Test case: `aclass n/F c/CS2103T`<br>
+      Expected: A one-character class group appears in the class list with course code `CS2103T`.
 
-1. Adding a class with tags
+   1. Test case: `aclass n/L01 c/CS2103T`<br>
+      Expected: A class group without tags appears in the class list.
+
+1. Adding a class with valid tags
 
    1. Test case: `aclass n/L01 c/CS2103T t/lab t/odd-week`<br>
       Expected: The class group appears in the class list with both tags.
 
-1. Rejecting invalid or duplicate classes
+   1. Test case: `aclass n/F10-2 c/CS2103T t/tutorial t/tutorial`<br>
+      Expected: The class is added with one `tutorial` tag; repeated equivalent tag inputs do not create duplicates.
+
+1. Rejecting one invalid input at a time
+
+   1. Test case: `aclass n/ c/CS2103T`<br>
+      Expected: The command is rejected for an invalid class-group name; no class is added.
+
+   1. Test case: `aclass n/T i/5 c/CS2103T`<br>
+      Expected: The command is rejected because `i/` is reserved for note indexes; no class is added.
+
+   1. Test case: `aclass n/T o/5 c/CS2103T`<br>
+      Expected: The command is rejected because `o/` is reserved for note observations; no class is added.
+
+   1. Test case: `aclass n/T05 c/`<br>
+      Expected: The command is rejected for an invalid course code; no class is added.
+
+   1. Test case: `aclass n/T05 c/CS2103T t/invalid*`<br>
+      Expected: The command is rejected for an invalid tag; no class is added.
+
+1. Rejecting missing or duplicate classes
 
    1. Test case: `aclass n/T05`<br>
       Expected: The application displays the invalid command format and does not add a class.
 
    1. Test case: `aclass n/T05 c/CS2103T` again<br>
       Expected: The application reports `This class already exists in the system.` and does not create a duplicate.
+
+### Adding a student to a class group
+
+1. Adding students with valid input partitions
+
+   1. Prerequisites: Create `T05` in `CS2103T` using `aclass n/T05 c/CS2103T`.
+
+   1. Test case: `add n/Anne-Marie t/abcde c/T05 m/CS2103T`<br>
+      Expected: The student is added. This covers a valid hyphenated name and the minimum five-character
+      telehandle boundary.
+
+   1. Test case: `add n/O'Connor t/birdman c/T05 m/CS2103T`<br>
+      Expected: The student is added. This covers a valid apostrophe-containing name and a non-boundary
+      telehandle.
+
+1. Rejecting one invalid input at a time
+
+   1. Test case: `add n/John2 t/birdman c/T05 m/CS2103T`<br>
+      Expected: The command is rejected for an invalid student name; no student is added.
+
+   1. Test case: `add n/John Doe t/abcd c/T05 m/CS2103T`<br>
+      Expected: The command is rejected for a telehandle below the minimum length; no student is added.
+
+   1. Test case: `add n/John Doe t/@birdman c/T05 m/CS2103T`<br>
+      Expected: The command is rejected for a telehandle with a forbidden `@` prefix; no student is added.
+
+   1. Test case: `add n/John Doe t/birdman c/F111! m/CS2103T`<br>
+      Expected: The command is rejected for an invalid class group; no student is added.
+
+   1. Test case: `add n/John Doe t/birdman c/T05 m/`<br>
+      Expected: The command is rejected for an invalid module code; no student is added.
 
 ### Removing a student from a class group
 
@@ -764,6 +892,15 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `dstudent t/birdman c/T05`<br>
       Expected: The application displays the invalid command format and does not change any data.
 
+   1. Test case: `dstudent t/abcd c/T05 m/CS2103T`<br>
+      Expected: The command is rejected for an invalid telehandle; no data changes.
+
+   1. Test case: `dstudent t/birdman c/F111! m/CS2103T`<br>
+      Expected: The command is rejected for an invalid class group; no data changes.
+
+   1. Test case: `dstudent t/birdman c/T05 m/`<br>
+      Expected: The command is rejected for an invalid module code; no data changes.
+
    1. Test case: `dstudent t/unknown c/T05 m/CS2103T`<br>
       Expected: The application reports that the student is not enrolled in the specified class group.
 
@@ -772,6 +909,57 @@ testers are expected to do more *exploratory* testing.
 
    1. Test case: `no`<br>
       Expected: The application cancels the pending deletion and confirms that no records were changed.
+
+### Adding and deleting student notes
+
+1. Adding numbered notes
+
+   1. Prerequisites: Create a class group using `aclass n/T05 c/CS2103T`, then add a student using
+      `add n/John Doe t/birdman c/T05 m/CS2103T`.
+
+   1. Test case: `note t/birdman c/T05 m/CS2103T o/Participated actively`, followed by
+      `note t/birdman c/T05 m/CS2103T o/Needs follow-up`.<br>
+      Expected: Two notes appear below the student in recorded order, numbered `1` and `2`.
+
+1. Rejecting one invalid note input at a time
+
+   1. Test case: `note t/birdman c/T05 m/CS2103T o/   `<br>
+      Expected: The command is rejected for blank note text and no note is added.
+
+   1. Test case: `note t/birdman c/T05 m/CS2103T o/[U+200B]`, where `[U+200B]` is replaced with a zero-width
+      space character.<br>
+      Expected: The command is rejected because the observation contains no visible characters and no note is added.
+
+   1. Test case: `note t/abcd c/T05 m/CS2103T o/Needs follow-up`<br>
+      Expected: The command is rejected for an invalid telehandle and no note is added.
+
+   1. Test case: `note t/birdman c/F111! m/CS2103T o/Needs follow-up`<br>
+      Expected: The command is rejected for an invalid class group and no note is added.
+
+   1. Test case: `note t/birdman c/T05 m/ o/Needs follow-up`<br>
+      Expected: The command is rejected for an invalid module code and no note is added.
+
+1. Deleting a note
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/1`<br>
+      Expected: The first note is deleted immediately. `Needs follow-up` remains and is renumbered as note `1`.
+
+   1. Restart the application.<br>
+      Expected: The deleted note remains absent and `Needs follow-up` is restored from storage.
+
+1. Invalid deletion requests
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/0`<br>
+      Expected: The application reports that the index must be a positive integer and does not change any notes.
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/-1`<br>
+      Expected: The application rejects the negative index boundary and does not change any notes.
+
+   1. Test case: `dnote t/birdman c/T05 m/CS2103T i/2` after the first note has been deleted.<br>
+      Expected: The application reports that note index `2` is invalid and does not change the remaining note.
+
+   1. Test case: `dnote t/abcd c/T05 m/CS2103T i/1`<br>
+      Expected: The command is rejected for an invalid telehandle before note-index lookup occurs.
 
 ### Finding enrolled students by name
 

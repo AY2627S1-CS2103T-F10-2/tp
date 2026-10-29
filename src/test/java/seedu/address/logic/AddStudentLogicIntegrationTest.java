@@ -49,6 +49,30 @@ public class AddStudentLogicIntegrationTest {
     }
 
     @Test
+    public void execute_studentAndNoteCommandsWithLongClassGroup_succeed() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+        Student expectedStudent = new Student(new StudentName("John Doe"), new Telehandle("birdman"));
+
+        logic.execute("aclass n/F111 c/CS2103T");
+        CommandResult result = logic.execute("add n/John Doe t/birdman c/F111 m/CS2103T");
+
+        assertEquals(String.format(AddStudentCommand.MESSAGE_SUCCESS, "John Doe", "F111", "CS2103T"),
+                result.getFeedbackToUser());
+        assertEquals(List.of(expectedStudent), classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().get(0).getStudentList());
+
+        logic.execute("note t/birdman c/F111 m/CS2103T o/Needs follow-up");
+        logic.execute("dnote t/birdman c/F111 m/CS2103T i/1");
+        logic.execute("dstudent t/birdman c/F111 m/CS2103T");
+        logic.execute("yes");
+
+        assertEquals(0, model.findCourseClassByGroup(new ClassGroup("F111"), new CourseCode("CS2103T"))
+                .orElseThrow().getStudentList().size());
+    }
+
+    @Test
     public void execute_addStudentToHyphenatedClassGroup_succeeds() throws Exception {
         Model model = new ModelManager();
         JsonCourseClassBookStorage classStorage = createClassStorage();
@@ -96,6 +120,47 @@ public class AddStudentLogicIntegrationTest {
                 exception.getMessage());
         assertEquals(1, model.findCourseClassByGroup(new ClassGroup("T05"), new CourseCode("CS2103T"))
                 .orElseThrow().getStudentList().size());
+    }
+
+    @Test
+    public void execute_duplicateEnrollmentWithDifferentCapitalisation_failsWithoutChangingData() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/Alice Tan t/alice1 c/T05 m/CS2103T");
+
+        CommandException exception = assertThrows(CommandException.class, () ->
+                logic.execute("add n/Bob Smith t/ALICE1 c/T05 m/CS2103T"));
+
+        assertEquals(String.format(AddStudentCommand.MESSAGE_DUPLICATE_STUDENT, "T05", "CS2103T"),
+                exception.getMessage());
+        Student expected = new Student(new StudentName("Alice Tan"), new Telehandle("alice1"));
+        assertEquals(List.of(expected), model.getCourseClassBook().getCourseClassList().getFirst().getStudentList());
+        assertEquals(List.of(expected), classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().getFirst().getStudentList());
+
+        logic.execute("dstudent t/ALICE1 c/T05 m/CS2103T");
+        logic.execute("yes");
+        assertEquals(0, model.getCourseClassBook().getCourseClassList().getFirst().getStudentList().size());
+    }
+
+    @Test
+    public void execute_invalidTelehandle_failsWithoutChangingData() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = createClassStorage();
+        Logic logic = createLogic(model, classStorage);
+
+        logic.execute("aclass n/T05 c/CS2103T");
+
+        ParseException exception = assertThrows(ParseException.class, () ->
+                logic.execute("add n/Carol Lee t/abc/123 c/T05 m/CS2103T"));
+
+        assertEquals(Telehandle.MESSAGE_CONSTRAINTS, exception.getMessage());
+        assertEquals(0, model.getCourseClassBook().getCourseClassList().getFirst().getStudentList().size());
+        assertEquals(0, classStorage.readCourseClassBook().orElseThrow()
+                .getCourseClassList().getFirst().getStudentList().size());
     }
 
     @Test

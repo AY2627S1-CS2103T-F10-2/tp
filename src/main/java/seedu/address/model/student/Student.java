@@ -1,5 +1,6 @@
 package seedu.address.model.student;
 
+import static seedu.address.commons.util.AppUtil.checkArgument;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
 import java.util.ArrayList;
@@ -67,6 +68,22 @@ public class Student {
         requireAllNonNull(note);
         List<Note> updatedNotes = new ArrayList<>(notes);
         updatedNotes.add(note);
+        return new Student(name, telehandle, updatedNotes);
+    }
+
+    /**
+     * Returns a copy of this student without the note at {@code zeroBasedIndex}.
+     *
+     * @param zeroBasedIndex zero-based position of the note to remove
+     * @return updated student
+     */
+    public Student withoutNoteAt(int zeroBasedIndex) {
+        checkArgument(zeroBasedIndex >= 0 && zeroBasedIndex < notes.size(),
+                "Note index must refer to an existing note");
+        List<Note> updatedNotes = new ArrayList<>(notes);
+        updatedNotes.remove(zeroBasedIndex);
+        assert updatedNotes.size() == notes.size() - 1
+                : "Deleting one note must reduce the note count by one";
         return new Student(name, telehandle, updatedNotes);
     }
 

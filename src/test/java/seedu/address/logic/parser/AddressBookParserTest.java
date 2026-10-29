@@ -18,6 +18,7 @@ import seedu.address.logic.commands.AddNoteCommand;
 import seedu.address.logic.commands.AddStudentCommand;
 import seedu.address.logic.commands.ClearCourseClassCommand;
 import seedu.address.logic.commands.DeleteCourseClassCommand;
+import seedu.address.logic.commands.DeleteNoteCommand;
 import seedu.address.logic.commands.DeleteStudentCommand;
 import seedu.address.logic.commands.EditCourseClassCommand;
 import seedu.address.logic.commands.EditCourseClassCommand.EditCourseClassDescriptor;
@@ -27,6 +28,7 @@ import seedu.address.logic.commands.FindStudentCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.commands.SetHomeworkStatusCommand;
+import seedu.address.logic.commands.UndoCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.courseclass.ClassGroup;
 import seedu.address.model.courseclass.CourseClass;
@@ -77,11 +79,27 @@ public class AddressBookParserTest {
     }
 
     @Test
+    public void parseCommand_undo() throws Exception {
+        assertTrue(parser.parseCommand(UndoCommand.COMMAND_WORD) instanceof UndoCommand);
+        assertThrows(ParseException.class, String.format(MESSAGE_INVALID_COMMAND_FORMAT, UndoCommand.MESSAGE_USAGE), ()
+                -> parser.parseCommand(UndoCommand.COMMAND_WORD + " 1"));
+    }
+
+    @Test
     public void parseCommand_deleteStudent() throws Exception {
         DeleteStudentCommand expected = new DeleteStudentCommand(
                 new Telehandle("birdman"), new ClassGroup("T05"), new CourseCode("CS2103T"));
 
         assertEquals(expected, parser.parseCommand("dstudent t/birdman c/T05 m/CS2103T"));
+    }
+
+    @Test
+    public void parseCommand_deleteNote() throws Exception {
+        DeleteNoteCommand expected = new DeleteNoteCommand(
+                new Telehandle("birdman"), new ClassGroup("T05"),
+                new CourseCode("CS2103T"), INDEX_FIRST_PERSON);
+
+        assertEquals(expected, parser.parseCommand("dnote t/birdman c/T05 m/CS2103T i/1"));
     }
 
     @Test

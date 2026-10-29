@@ -2,7 +2,6 @@ package seedu.address.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,6 +21,9 @@ import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.courseclass.NameContainsKeywordsPredicate;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.model.tag.Tag;
 
 public class CourseClassCommandTest {
@@ -144,7 +146,9 @@ public class CourseClassCommandTest {
     }
 
     @Test
-    public void edit_codeOnly_preservesNameTagsAndStudentBook() throws Exception {
+    public void edit_codeOnly_preservesNameTagsAndStudents() throws Exception {
+        Student student = new Student(new StudentName("John Doe"), new Telehandle("john_doe"));
+        first.addStudent(student);
         model.addCourseClass(first);
         EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
         descriptor.setCourseCode(new CourseCode("CS2101"));
@@ -153,7 +157,7 @@ public class CourseClassCommandTest {
         assertEquals(first.getName(), edited.getName());
         assertEquals(first.getTags(), edited.getTags());
         assertEquals(new CourseCode("CS2101"), edited.getCourseCode());
-        assertSame(first.getStudents(), edited.getStudents());
+        assertEquals(List.of(student), edited.getStudentList());
     }
 
     @Test

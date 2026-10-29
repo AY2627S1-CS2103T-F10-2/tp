@@ -1,6 +1,7 @@
 package seedu.address.logic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COURSE_CLASS_DISPLAYED_INDEX;
 import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -8,6 +9,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,7 @@ import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.CourseClassBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyCourseClassBook;
@@ -25,6 +28,9 @@ import seedu.address.model.UserPrefs;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
 import seedu.address.model.courseclass.Name;
+import seedu.address.model.student.Student;
+import seedu.address.model.student.StudentName;
+import seedu.address.model.student.Telehandle;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -76,6 +82,55 @@ public class LogicManagerTest {
     public void execute_storageThrowsAdException_throwsCommandException() {
         assertCommandFailureForExceptionFromStorage(DUMMY_AD_EXCEPTION, String.format(
                 LogicManager.FILE_OPS_PERMISSION_ERROR_FORMAT, DUMMY_AD_EXCEPTION.getMessage()));
+    }
+
+    @Test
+    public void execute_undoStorageThrowsIoException_restoresStateAndHistory() throws Exception {
+        logic.execute("aclass n/F10-2 c/CS2103T");
+
+        JsonCourseClassBookStorage failingCourseClassStorage =
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("undoFailure.json")) {
+                    @Override
+                    public void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+                            List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
+                        throw DUMMY_IO_EXCEPTION;
+                    }
+                };
+        logic = new LogicManager(model, new StorageManager(failingCourseClassStorage,
+                new JsonUserPrefsStorage(temporaryFolder.resolve("undoFailurePrefs.json"))));
+
+        CommandException exception = org.junit.jupiter.api.Assertions
+                .assertThrows(CommandException.class, () -> logic.execute("undo"));
+
+        assertEquals(String.format(LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage()),
+                exception.getMessage());
+        assertEquals(1, model.getFilteredCourseClassList().size());
+        assertEquals("F10-2", model.getFilteredCourseClassList().get(0).getName().fullName);
+        assertEquals(1, model.getUndoHistory().size());
+        assertTrue(model.getUndoHistory().get(0).getCourseClassList().isEmpty());
+    }
+
+    @Test
+    public void execute_studentDataChange_createsUndoEntry() throws Exception {
+        CourseClassBook initialBook = new CourseClassBook();
+        initialBook.addCourseClass(new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of()));
+        ModelManager studentMutatingModel = new ModelManager(initialBook, new UserPrefs()) {
+            @Override
+            public void setCourseClass(CourseClass target, CourseClass editedCourseClass) {
+                super.setCourseClass(target, editedCourseClass);
+                editedCourseClass.addStudent(new Student(new StudentName("Alice Pauline"),
+                        new Telehandle("alice")));
+            }
+        };
+        logic = new LogicManager(studentMutatingModel, new StorageManager(
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("students.json")),
+                new JsonUserPrefsStorage(temporaryFolder.resolve("studentsPrefs.json"))));
+
+        logic.execute("eclass 1 n/F10-2");
+
+        assertEquals(1, studentMutatingModel.getUndoHistory().size());
+        assertTrue(studentMutatingModel.getUndoHistory().get(0).getCourseClassList().getFirst()
+                .getStudentList().isEmpty());
     }
 
     @Test
@@ -148,7 +203,8 @@ public class LogicManagerTest {
         // Inject LogicManager with a JsonCourseClassBookStorage that throws the IOException e when saving
         JsonCourseClassBookStorage addressBookStorage = new JsonCourseClassBookStorage(prefPath) {
             @Override
-            public void saveCourseClassBook(ReadOnlyCourseClassBook addressBook) throws IOException {
+            public void saveCourseClassBookData(ReadOnlyCourseClassBook addressBook,
+                    List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
                 throw e;
             }
         };
@@ -161,9 +217,7 @@ public class LogicManagerTest {
 
         // Triggers the saveCourseClassBook method by executing an add command
         String addCommand = "aclass n/F10-2 c/CS2103T";
-        CourseClass expectedClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
         ModelManager expectedModel = new ModelManager();
-        expectedModel.addCourseClass(expectedClass);
         assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
     }
 }

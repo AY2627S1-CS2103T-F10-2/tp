@@ -14,6 +14,7 @@ import seedu.address.logic.commands.AddStudentCommand;
 import seedu.address.logic.commands.ClearCourseClassCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCourseClassCommand;
+import seedu.address.logic.commands.DeleteNoteCommand;
 import seedu.address.logic.commands.DeleteStudentCommand;
 import seedu.address.logic.commands.EditCourseClassCommand;
 import seedu.address.logic.commands.ExitCommand;
@@ -22,6 +23,7 @@ import seedu.address.logic.commands.FindStudentCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCourseClassCommand;
 import seedu.address.logic.commands.SetHomeworkStatusCommand;
+import seedu.address.logic.commands.UndoCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
 /**
@@ -59,6 +61,7 @@ public class AddressBookParser {
         return switch (commandWord) {
             case EditCourseClassCommand.COMMAND_WORD -> new EditCourseClassCommandParser().parse(arguments);
             case DeleteCourseClassCommand.COMMAND_WORD -> new DeleteCourseClassCommandParser().parse(arguments);
+            case DeleteNoteCommand.COMMAND_WORD -> new DeleteNoteCommandParser().parse(arguments);
             case DeleteStudentCommand.COMMAND_WORD -> new DeleteStudentCommandParser().parse(arguments);
             case ClearCourseClassCommand.COMMAND_WORD -> new ClearCourseClassCommand();
             case FindCourseClassCommand.COMMAND_WORD -> new FindCourseClassCommandParser().parse(arguments);
@@ -70,6 +73,7 @@ public class AddressBookParser {
             case AddStudentCommand.COMMAND_WORD -> new AddStudentCommandParser().parse(arguments);
             case AddNoteCommand.COMMAND_WORD -> new AddNoteCommandParser().parse(arguments);
             case SetHomeworkStatusCommand.COMMAND_WORD -> new SetHomeworkStatusCommandParser().parse(arguments);
+            case UndoCommand.COMMAND_WORD -> new UndoCommandParser().parse(arguments);
             default -> {
                 logger.finer("This user input caused a ParseException: " + userInput);
                 throw new ParseException(MESSAGE_UNKNOWN_COMMAND);

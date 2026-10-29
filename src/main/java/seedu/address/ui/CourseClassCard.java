@@ -3,6 +3,7 @@ package seedu.address.ui;
 import java.util.Comparator;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -13,8 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.HomeworkStatus;
-import seedu.address.model.person.Person;
 import seedu.address.model.student.Student;
+import seedu.address.model.student.Telehandle;
 
 /**
  * A UI component that displays information of a {@code CourseClass}.
@@ -68,12 +69,15 @@ public class CourseClassCard extends UiPart<Region> {
         studentsBox.setClip(studentListClip);
         refreshStudents();
 
-        courseClass.getStudents().getPersonList().addListener(
-                (ListChangeListener<Person>) change -> refreshStudents());
         courseClass.getStudentList().addListener(
                 (ListChangeListener<Student>) change -> refreshStudents());
         courseClass.homeworkStatusProperty().addListener((observable, oldStatus, newStatus)
-                -> refreshHomeworkStatus());
+                -> {
+                    refreshHomeworkStatus();
+                    refreshStudents();
+                });
+        courseClass.studentHomeworkStatusesProperty().addListener(
+                (MapChangeListener<Telehandle, HomeworkStatus>) change -> refreshStudents());
 
         courseClass.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
@@ -91,26 +95,23 @@ public class CourseClassCard extends UiPart<Region> {
     /**
      * Refreshes the student count and the student cards shown inside this class card.
      *
-     * <p>The legacy person list is retained for brownfield compatibility, while students added through the
-     * current enrolment model are displayed using {@link StudentCard}.</p>
+     * <p>The class's student list is the single source of truth for the count and displayed cards.</p>
      */
     private void refreshStudents() {
-        ObservableList<Person> legacyStudents = courseClass.getStudents().getPersonList();
         ObservableList<Student> enrolledStudents = courseClass.getStudentList();
-        int legacyStudentCount = courseClass.getStudents().getPersonList().size();
-        int enrolledStudentCount = courseClass.getStudentList().size();
-        studentCount.setText("Students: " + (legacyStudentCount + enrolledStudentCount));
+        studentCount.setText("Students: " + enrolledStudents.size());
 
         studentsBox.getChildren().clear();
-        for (int i = 0; i < legacyStudents.size(); i++) {
-            studentsBox.getChildren().add(
-                    new PersonCard(legacyStudents.get(i), i + 1).getRoot());
-        }
         for (int i = 0; i < enrolledStudents.size(); i++) {
             studentsBox.getChildren().add(
-                    new StudentCard(enrolledStudents.get(i), legacyStudents.size() + i + 1).getRoot());
+                    new StudentCard(enrolledStudents.get(i),
+                            courseClass.getHomeworkStatus(enrolledStudents.get(i)), i + 1).getRoot());
         }
-        if (!studentsBox.getChildren().isEmpty()) {
+        if (studentsBox.getChildren().isEmpty()) {
+            Label placeholder = new Label("No students added yet");
+            placeholder.getStyleClass().addAll("cell_small_label", "empty-student-list");
+            studentsBox.getChildren().add(placeholder);
+        } else {
             studentsBox.getChildren().get(studentsBox.getChildren().size() - 1)
                     .getStyleClass().add("student-row-last");
         }

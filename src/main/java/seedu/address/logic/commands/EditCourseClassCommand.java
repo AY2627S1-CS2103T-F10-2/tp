@@ -62,6 +62,11 @@ public class EditCourseClassCommand extends Command {
     }
 
     @Override
+    public boolean isMutating() {
+        return true;
+    }
+
+    @Override
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
         List<CourseClass> lastShownList = model.getFilteredCourseClassList();
@@ -95,8 +100,9 @@ public class EditCourseClassCommand extends Command {
                 editCourseClassDescriptor.getCourseCode().orElse(courseClassToEdit.getCourseCode());
         Set<Tag> updatedTags = editCourseClassDescriptor.getTags().orElse(courseClassToEdit.getTags());
 
-        return new CourseClass(updatedName, updatedCourseCode, updatedTags, courseClassToEdit.getStudents(),
-                courseClassToEdit.getStudentList(), courseClassToEdit.getHomeworkStatus());
+        return new CourseClass(updatedName, updatedCourseCode, updatedTags,
+                courseClassToEdit.getStudentList(), courseClassToEdit.getHomeworkStatus(),
+                courseClassToEdit.getStudentHomeworkStatuses());
 
     }
 

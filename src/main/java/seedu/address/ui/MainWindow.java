@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -35,6 +36,7 @@ public class MainWindow extends UiPart<Stage> {
     private Stage primaryStage;
     private Logic logic;
     private Path dataFilePath;
+    private WindowFrame windowFrame;
 
     // Independent Ui parts residing in this Ui container
     private CourseClassListPanel courseClassListPanel;
@@ -80,11 +82,8 @@ public class MainWindow extends UiPart<Stage> {
         // Configure the UI
         primaryStage.initStyle(StageStyle.UNDECORATED);
         windowTitle.textProperty().bind(primaryStage.titleProperty());
-        primaryStage.maximizedProperty().addListener((observable, previous, maximized) -> {
-            maximizeButton.setText(maximized ? "\u2750" : "\u25a1");
-            maximizeButton.setAccessibleText(maximized ? "Restore window" : "Maximize window");
-        });
-        new WindowFrame(primaryStage, titleDragArea);
+        windowFrame = new WindowFrame(primaryStage, titleDragArea, this::updateMaximizeButton);
+        updateMaximizeButton(false);
         setWindowDefaultSize(logic.getGuiSettings());
 
         setAccelerators();
@@ -103,7 +102,12 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private void handleMaximize() {
-        primaryStage.setMaximized(!primaryStage.isMaximized());
+        windowFrame.toggleMaximize();
+    }
+
+    private void updateMaximizeButton(boolean maximized) {
+        maximizeButton.setText(maximized ? "\u2750" : "\u25a1");
+        maximizeButton.setAccessibleText(maximized ? "Restore window" : "Maximize window");
     }
 
     private void setAccelerators() {
@@ -190,8 +194,9 @@ public class MainWindow extends UiPart<Stage> {
      */
     @FXML
     private void handleExit() {
-        GuiSettings guiSettings = new GuiSettings(primaryStage.getWidth(), primaryStage.getHeight(),
-                (int) primaryStage.getX(), (int) primaryStage.getY());
+        Rectangle2D windowBounds = windowFrame.getWindowBounds();
+        GuiSettings guiSettings = new GuiSettings(windowBounds.getWidth(), windowBounds.getHeight(),
+                (int) windowBounds.getMinX(), (int) windowBounds.getMinY());
         logic.setGuiSettings(guiSettings);
         helpWindow.hide();
         primaryStage.hide();

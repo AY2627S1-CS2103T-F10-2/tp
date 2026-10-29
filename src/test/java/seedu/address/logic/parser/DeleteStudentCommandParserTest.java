@@ -44,7 +44,7 @@ public class DeleteStudentCommandParserTest {
         assertParseFailure(parser, " t/birdman c/T05 m/CS2103T m/CS2101",
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_MODULE_NAME));
         assertParseFailure(parser, " t/abcd c/T05 m/CS2103T", Telehandle.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " t/birdman c/F10-22 m/CS2103T", ClassGroup.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " t/birdman c/F111! m/CS2103T", ClassGroup.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " t/birdman c/T05 m/", CourseCode.MESSAGE_CONSTRAINTS);
     }
 }

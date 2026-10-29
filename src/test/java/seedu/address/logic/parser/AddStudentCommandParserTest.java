@@ -33,6 +33,22 @@ public class AddStudentCommandParserTest {
     }
 
     @Test
+    public void parse_invalidTelehandleCharacters_failure() {
+        for (String telehandle : new String[] {"abc/123", "abc!123", "abc.def", "bird@man", "abc-123"}) {
+            assertParseFailure(parser, " n/Carol Lee t/" + telehandle + " c/T05 m/CS2103T",
+                    Telehandle.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    @Test
+    public void parse_unicodeWhitespaceInTelehandle_failure() {
+        for (String whitespace : new String[] {"\u00a0", "\u2003", "\u202f", "\u3000"}) {
+            assertParseFailure(parser, " n/Carol Lee t/abc" + whitespace + "123 c/T05 m/CS2103T",
+                    Telehandle.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    @Test
     public void parse_missingFieldsOrPreamble_failure() {
         String expected = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddStudentCommand.MESSAGE_USAGE);
         assertParseFailure(parser, " n/John Doe t/birdman c/T05", expected);
@@ -53,7 +69,7 @@ public class AddStudentCommandParserTest {
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_MODULE_NAME));
         assertParseFailure(parser, " n/John2 t/birdman c/T05 m/CS2103T", StudentName.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " n/John Doe t/abcd c/T05 m/CS2103T", Telehandle.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " n/John Doe t/birdman c/F10-22 m/CS2103T", ClassGroup.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " n/John Doe t/birdman c/F111! m/CS2103T", ClassGroup.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, " n/John Doe t/birdman c/T05 m/", CourseCode.MESSAGE_CONSTRAINTS);
     }
 }

@@ -49,10 +49,12 @@ import seedu.address.MainApp;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.logic.Logic;
 import seedu.address.logic.LogicManager;
+import seedu.address.logic.commands.UndoCommand;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
@@ -63,7 +65,6 @@ import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
 import seedu.address.testutil.GuiTestProcess;
-import seedu.address.testutil.TypicalPersons;
 
 public class CourseClassUiTest {
     @TempDir
@@ -220,26 +221,43 @@ public class CourseClassUiTest {
                         mouseEvent(MouseEvent.MOUSE_RELEASED, width - 1, 200, 920, 200));
 
                 // Verify the controller's requests without native window-manager feedback.
-                // A visible stage's maximized/iconified state may be overridden by the platform.
                 stage.hide();
+                double restoredX = stage.getX();
+                double restoredY = stage.getY();
+                double restoredWidth = stage.getWidth();
+                double restoredHeight = stage.getHeight();
                 Button maximize = (Button) stage.getScene().lookup("#maximizeButton");
                 maximize.fire();
-                assertTrue(stage.isMaximized());
                 assertEquals("Restore window", maximize.getAccessibleText());
                 assertEquals("\u2750", maximize.getText());
                 maximize.fire();
-                assertFalse(stage.isMaximized());
                 assertEquals("Maximize window", maximize.getAccessibleText());
                 assertEquals("\u25a1", maximize.getText());
+                assertEquals(restoredX, stage.getX(), 0.01);
+                assertEquals(restoredY, stage.getY(), 0.01);
+                assertEquals(restoredWidth, stage.getWidth(), 0.01);
+                assertEquals(restoredHeight, stage.getHeight(), 0.01);
+                double firstRestoredWidth = stage.getWidth();
+                double firstRestoredHeight = stage.getHeight();
+                maximize.fire();
+                maximize.fire();
+                assertEquals(firstRestoredWidth, stage.getWidth(), 0.01);
+                assertEquals(firstRestoredHeight, stage.getHeight(), 0.01);
                 Button minimize = (Button) stage.getScene().lookup("#minimizeButton");
+                maximize.fire();
+                assertEquals("Restore window", maximize.getAccessibleText());
                 minimize.fire();
                 assertTrue(stage.isIconified());
                 stage.setIconified(false);
                 window.show();
                 assertTrue(stage.isShowing());
+                assertEquals("Restore window", maximize.getAccessibleText());
                 close.fire();
                 assertFalse(stage.isShowing());
-                assertEquals((int) stage.getX(), model.getGuiSettings().getWindowCoordinates().x);
+                assertEquals(restoredWidth, model.getGuiSettings().getWindowWidth(), 0.01);
+                assertEquals(restoredHeight, model.getGuiSettings().getWindowHeight(), 0.01);
+                assertEquals((int) restoredX, model.getGuiSettings().getWindowCoordinates().x);
+                assertEquals((int) restoredY, model.getGuiSettings().getWindowCoordinates().y);
             } finally {
                 stage.close();
             }
@@ -345,7 +363,7 @@ public class CourseClassUiTest {
             VBox root = new VBox(title);
             Scene scene = new Scene(root, 800, 600);
             stage.setScene(scene);
-            new WindowFrame(stage, title);
+            WindowFrame windowFrame = new WindowFrame(stage, title);
             stage.setX(50);
             stage.setY(60);
             stage.setWidth(800);
@@ -363,22 +381,42 @@ public class CourseClassUiTest {
                 title.fireEvent(new MouseEvent(MouseEvent.MOUSE_CLICKED, 200, 200, 100, 100,
                         MouseButton.SECONDARY, 2, false, false, false, false,
                         false, false, false, false, false, false, null));
-                assertFalse(stage.isMaximized());
+                assertFalse(windowFrame.isMaximized());
                 title.fireEvent(mouseEvent(MouseEvent.MOUSE_CLICKED, 200, 200, 100, 100));
-                assertFalse(stage.isMaximized());
+                assertFalse(windowFrame.isMaximized());
                 MouseEvent doubleClick = new MouseEvent(MouseEvent.MOUSE_CLICKED, 200, 200, 100, 100,
                         MouseButton.PRIMARY, 2, false, false, false, false,
                         false, false, false, false, false, false, null);
                 title.fireEvent(doubleClick);
-                assertTrue(stage.isMaximized());
+                assertTrue(windowFrame.isMaximized());
+                double maximizedX = stage.getX();
+                double maximizedY = stage.getY();
                 title.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100));
                 title.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 200, 200, 130, 120));
-                assertEquals(50, stage.getX());
-                assertEquals(60, stage.getY());
+                assertEquals(maximizedX, stage.getX());
+                assertEquals(maximizedY, stage.getY());
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
                 assertEquals(Cursor.DEFAULT, scene.getCursor());
                 title.fireEvent(doubleClick.copyFor(title, title));
-                assertFalse(stage.isMaximized());
+                assertFalse(windowFrame.isMaximized());
+
+                // Exercise every comparison in matchesLastRestoredBounds() before changing the window normally.
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+                stage.setY(stage.getY() + 10);
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+                stage.setWidth(stage.getWidth() + 10);
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+                stage.setHeight(stage.getHeight() + 10);
+                windowFrame.toggleMaximize();
+                windowFrame.toggleMaximize();
+
+                double restoredWidth = stage.getWidth();
+                double restoredHeight = stage.getHeight();
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 200, 200, 100, 100));
+                title.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 200, 200, 110, 100));
 
                 stage.setResizable(false);
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
@@ -386,8 +424,8 @@ public class CourseClassUiTest {
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, 1, 1, 130, 120));
-                assertEquals(800, stage.getWidth());
-                assertEquals(600, stage.getHeight());
+                assertEquals(restoredWidth, stage.getWidth());
+                assertEquals(restoredHeight, stage.getHeight());
                 stage.setResizable(true);
                 stage.setFullScreen(true);
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
@@ -396,11 +434,15 @@ public class CourseClassUiTest {
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_MOVED, 1, 1, 100, 100));
                 assertEquals(Cursor.NW_RESIZE, scene.getCursor());
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 1, 1, 100, 100));
-                stage.setMaximized(true);
+                windowFrame.toggleMaximize();
                 assertEquals(Cursor.DEFAULT, scene.getCursor());
+                assertEquals(restoredWidth, windowFrame.getWindowBounds().getWidth(), 0.01);
+                assertEquals(restoredHeight, windowFrame.getWindowBounds().getHeight(), 0.01);
+                double maximizedWidth = stage.getWidth();
+                double maximizedHeight = stage.getHeight();
                 root.fireEvent(mouseEvent(MouseEvent.MOUSE_DRAGGED, 1, 1, 130, 120));
-                assertEquals(800, stage.getWidth());
-                assertEquals(600, stage.getHeight());
+                assertEquals(maximizedWidth, stage.getWidth());
+                assertEquals(maximizedHeight, stage.getHeight());
             } finally {
                 stage.close();
             }
@@ -536,6 +578,56 @@ public class CourseClassUiTest {
     }
 
     @Test
+    public void mainWindow_undoRestoresDeletedClassAndStudentInList() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "mainWindow_undoRestoresDeletedClassAndStudentInList",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Model model = new ModelManager();
+            Logic logic = new LogicManager(model, new StorageManager(
+                    new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json")),
+                    new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
+            Stage stage = new Stage();
+            try {
+                MainWindow window = new MainWindow(stage, logic, temporaryFolder.resolve("classes.json"));
+                window.fillInnerParts();
+                window.show();
+                ListView<?> list = (ListView<?>) window.getCourseClassListPanel().getRoot()
+                        .lookup("#courseClassListView");
+                TextField input = (TextField) stage.getScene().lookup("#commandTextField");
+                TextArea feedback = (TextArea) stage.getScene().lookup("#resultDisplay");
+
+                enterCommand(input, "aclass n/T05 c/CS2103T");
+                enterCommand(input, "add n/John Doe t/birdman c/T05 m/CS2103T");
+                assertEquals(1, list.getItems().size());
+                assertEquals(1, ((CourseClass) list.getItems().get(0)).getStudentList().size());
+
+                enterCommand(input, "dstudent t/birdman c/T05 m/CS2103T");
+                enterCommand(input, "yes");
+                assertTrue(((CourseClass) list.getItems().get(0)).getStudentList().isEmpty());
+
+                enterCommand(input, UndoCommand.COMMAND_WORD);
+                assertEquals(UndoCommand.MESSAGE_SUCCESS, feedback.getText());
+                assertEquals(1, ((CourseClass) list.getItems().get(0)).getStudentList().size());
+
+                enterCommand(input, "dclass 1");
+                assertTrue(list.getItems().isEmpty());
+                enterCommand(input, UndoCommand.COMMAND_WORD);
+                assertEquals(1, list.getItems().size());
+                assertEquals("T05", ((CourseClass) list.getItems().get(0)).getName().fullName);
+                assertEquals(1, ((CourseClass) list.getItems().get(0)).getStudentList().size());
+            } finally {
+                stage.close();
+            }
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
     public void courseClassCard_displaysHomeworkStatusBadge() throws Exception {
         if (GuiTestProcess.isRequired()) {
             GuiTestProcess.run(getClass(), "courseClassCard_displaysHomeworkStatusBadge", temporaryFolder);
@@ -577,19 +669,46 @@ public class CourseClassUiTest {
         }
         FutureTask<Void> task = new FutureTask<>(() -> {
             CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
-            courseClass.getStudents().addPerson(TypicalPersons.ALICE);
-            courseClass.getStudents().addPerson(TypicalPersons.BOB);
+            courseClass.addStudent(new Student(new StudentName("Alice Pauline"), new Telehandle("alice")));
+            courseClass.addStudent(new Student(new StudentName("Benson Meier"), new Telehandle("benson")));
             CourseClassCard card = new CourseClassCard(courseClass, 3);
             VBox students = (VBox) card.getRoot().lookup("#studentsBox");
             assertEquals(2, students.getChildren().size());
             assertEquals("Students: 2", ((Label) card.getRoot().lookup("#studentCount")).getText());
             assertEquals("3. ", ((Label) card.getRoot().lookup("#id")).getText());
-            assertEquals(TypicalPersons.ALICE.getName().fullName, ((Label) students.getChildren().get(0)
-                    .lookup("#name")).getText());
+            assertEquals("Alice Pauline", ((Label) students.getChildren().get(0).lookup("#name")).getText());
             assertEquals("1. ", ((Label) students.getChildren().get(0).lookup("#id")).getText());
-            assertEquals(TypicalPersons.BOB.getName().fullName, ((Label) students.getChildren().get(1)
-                    .lookup("#name")).getText());
+            assertEquals("Benson Meier", ((Label) students.getChildren().get(1).lookup("#name")).getText());
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void card_displaysIndividualHomeworkStatuses() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "card_displaysIndividualHomeworkStatuses", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+            Student alice = new Student(new StudentName("Alice Pauline"), new Telehandle("alice"));
+            Student benson = new Student(new StudentName("Benson Meier"), new Telehandle("benson"));
+            courseClass.addStudent(alice);
+            courseClass.addStudent(benson);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            new Scene(card.getRoot(), 700, 300);
+
+            courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
+            courseClass.setStudentHomeworkStatus(alice.getTelehandle(), HomeworkStatus.COMPLETED);
+
+            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
+            assertEquals("Homework: completed", ((Label) students.getChildren().get(0)
+                    .lookup("#homeworkStatus")).getText());
+            assertEquals("Homework: pending", ((Label) students.getChildren().get(1)
+                    .lookup("#homeworkStatus")).getText());
             return null;
         });
         Platform.runLater(task);
@@ -664,8 +783,8 @@ public class CourseClassUiTest {
 
             Label firstNoteLabel = (Label) notesBox.getChildren().get(0);
             Label secondNoteLabel = (Label) notesBox.getChildren().get(1);
-            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
-            assertEquals("[09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
+            assertEquals("1. [08 Oct 2026, 14:30] Needs follow-up", firstNoteLabel.getText());
+            assertEquals("2. [09 Oct 2026, 09:05] " + secondNote.getText(), secondNoteLabel.getText());
             assertTrue(firstNoteLabel.isWrapText());
             assertTrue(secondNoteLabel.isWrapText());
             assertEquals(0, firstNoteLabel.getMinWidth());
@@ -719,11 +838,67 @@ public class CourseClassUiTest {
             assertTrue(refreshedNotesBox.isManaged());
             assertEquals(1, refreshedNotesBox.getChildren().size());
             Label refreshedNoteLabel = (Label) refreshedNotesBox.getChildren().get(0);
-            assertEquals("[08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
+            assertEquals("1. [08 Oct 2026, 14:30] Needs follow-up", refreshedNoteLabel.getText());
             card.getRoot().applyCss();
             card.getRoot().layout();
             assertTrue(studentsBox.getHeight() > initialHeight);
             assertEquals(studentsBox.getHeight(), clip.getHeight());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void courseClassCard_refreshesNumberedNotesAfterDeletion() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_refreshesNumberedNotesAfterDeletion",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note firstNote = new Note("Participated actively", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Note secondNote = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 9, 9, 0));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"),
+                    List.of(firstNote, secondNote));
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+
+            courseClass.setStudent(student, student.withoutNoteAt(0));
+
+            VBox notesBox = (VBox) studentsBox.getChildren().getFirst().lookup("#notesBox");
+            assertEquals(1, notesBox.getChildren().size());
+            Label remainingNoteLabel = (Label) notesBox.getChildren().getFirst();
+            assertEquals("1. [09 Oct 2026, 09:00] Needs follow-up", remainingNoteLabel.getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void courseClassCard_deletingLastNote_hidesNotesContainer() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "courseClassCard_deletingLastNote_hidesNotesContainer",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Note note = new Note("Needs follow-up", LocalDateTime.of(2026, 10, 8, 14, 30));
+            Student student = new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan"), List.of(note));
+            CourseClass courseClass = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(student);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            VBox studentsBox = (VBox) card.getRoot().lookup("#studentsBox");
+
+            courseClass.setStudent(student, student.withoutNoteAt(0));
+
+            VBox notesBox = (VBox) studentsBox.getChildren().getFirst().lookup("#notesBox");
+            assertFalse(notesBox.isManaged());
+            assertFalse(notesBox.isVisible());
+            assertTrue(notesBox.getChildren().isEmpty());
             return null;
         });
         Platform.runLater(task);
@@ -764,30 +939,78 @@ public class CourseClassUiTest {
             Label count = (Label) card.getRoot().lookup("#studentCount");
 
             assertEquals("Students: 0", count.getText());
+            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
+            assertEquals(1, students.getChildren().size());
+            assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
 
             courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
 
             assertEquals("Students: 1", count.getText());
-            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
             assertEquals(1, students.getChildren().size());
             assertEquals("Aaron Tan", ((Label) students.getChildren().get(0).lookup("#name")).getText());
             assertEquals("@aarontan", ((Label) students.getChildren().get(0)
                     .lookup("#telehandle")).getText());
 
-            courseClass.getStudents().addPerson(TypicalPersons.ALICE);
+            courseClass.addStudent(new Student(new StudentName("Beth Tan"), new Telehandle("bethtan")));
             assertEquals("Students: 2", count.getText());
             assertEquals(2, students.getChildren().size());
             assertEquals("1. ", ((Label) students.getChildren().get(0).lookup("#id")).getText());
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
             assertFalse(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
             assertTrue(students.getChildren().get(1).getStyleClass().contains("student-row-last"));
-            PersonListPanel legacyPanel = new PersonListPanel(courseClass.getStudents().getPersonList());
-            ListView<?> legacyList = (ListView<?>) legacyPanel.getRoot().lookup("#personListView");
-            assertSame(courseClass.getStudents().getPersonList(), legacyList.getItems());
             courseClass.removeStudent(new Telehandle("aarontan"));
             assertEquals("Students: 1", count.getText());
             assertEquals(1, students.getChildren().size());
             assertTrue(students.getChildren().get(0).getStyleClass().contains("student-row-last"));
+            courseClass.removeStudent(new Telehandle("bethtan"));
+            assertEquals("Students: 0", count.getText());
+            assertEquals(1, students.getChildren().size());
+            assertEquals("No students added yet", ((Label) students.getChildren().getFirst()).getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void listPanel_clickingClassOrStudent_doesNotSelectOrReplaceCard() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "listPanel_clickingClassOrStudent_doesNotSelectOrReplaceCard",
+                    temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            Model model = new ModelManager();
+            CourseClass courseClass = new CourseClass(new Name("F111"), new CourseCode("CS2103T"), Set.of());
+            courseClass.addStudent(new Student(new StudentName("Aaron Tan"), new Telehandle("aarontan")));
+            model.addCourseClass(courseClass);
+            CourseClassListPanel panel = new CourseClassListPanel(model.getFilteredCourseClassList());
+            Scene scene = new Scene(panel.getRoot(), 700, 400);
+            scene.getStylesheets().add(MainApp.class.getResource("/view/DarkTheme.css").toExternalForm());
+            panel.getRoot().applyCss();
+            panel.getRoot().layout();
+            ListView<?> listView = (ListView<?>) panel.getRoot().lookup("#courseClassListView");
+            CourseClassListPanel.CourseClassListViewCell cell = listView.lookupAll(".list-cell").stream()
+                    .filter(node -> node instanceof CourseClassListPanel.CourseClassListViewCell listCell
+                            && !listCell.isEmpty())
+                    .map(node -> (CourseClassListPanel.CourseClassListViewCell) node)
+                    .findFirst().orElseThrow();
+            Region graphic = (Region) cell.getGraphic();
+            VBox students = (VBox) graphic.lookup("#studentsBox");
+            Region student = (Region) students.getChildren().getFirst();
+
+            for (Region target : List.of(graphic, student)) {
+                target.fireEvent(mouseEvent(MouseEvent.MOUSE_PRESSED, 10, 10, 10, 10));
+                target.fireEvent(mouseEvent(MouseEvent.MOUSE_RELEASED, 10, 10, 10, 10));
+                target.fireEvent(mouseEvent(MouseEvent.MOUSE_CLICKED, 10, 10, 10, 10));
+                panel.getRoot().applyCss();
+                panel.getRoot().layout();
+
+                assertTrue(listView.getSelectionModel().isEmpty());
+                assertFalse(listView.isFocusTraversable());
+                assertSame(graphic, cell.getGraphic());
+                assertSame(student, students.getChildren().getFirst());
+            }
             return null;
         });
         Platform.runLater(task);

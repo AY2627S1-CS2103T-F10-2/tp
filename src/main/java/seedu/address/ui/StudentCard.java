@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
 
@@ -32,6 +33,8 @@ public class StudentCard extends UiPart<Region> {
     @FXML
     private Label telehandle;
     @FXML
+    private Label homeworkStatus;
+    @FXML
     private VBox notesBox;
 
     /**
@@ -41,6 +44,11 @@ public class StudentCard extends UiPart<Region> {
      * @param displayedIndex index displayed beside the student
      */
     public StudentCard(Student student, int displayedIndex) {
+        this(student, HomeworkStatus.NOT_SET, displayedIndex);
+    }
+
+    /** Creates a {@code StudentCard} showing the student's effective homework status. */
+    public StudentCard(Student student, HomeworkStatus homeworkStatus, int displayedIndex) {
         super(FXML);
         this.student = student;
         if (displayedIndex % 2 == 0) {
@@ -49,6 +57,8 @@ public class StudentCard extends UiPart<Region> {
         id.setText(displayedIndex + ". ");
         name.setText(student.getName().fullName);
         telehandle.setText("@" + student.getTelehandle().value);
+        this.homeworkStatus.setText("Homework: " + homeworkStatus.getSerializedValue());
+        this.homeworkStatus.getStyleClass().add("homework-status-" + homeworkStatus.getSerializedValue());
         displayNotes();
     }
 
@@ -58,9 +68,10 @@ public class StudentCard extends UiPart<Region> {
         notesBox.setManaged(hasNotes);
         notesBox.setVisible(hasNotes);
 
-        for (Note note : student.getNotes()) {
+        for (int i = 0; i < student.getNotes().size(); i++) {
+            Note note = student.getNotes().get(i);
             String timestamp = NOTE_TIMESTAMP_FORMAT.format(note.getTimestamp());
-            Label noteLabel = new Label(String.format("[%s] %s", timestamp, note.getText()));
+            Label noteLabel = new Label(String.format("%d. [%s] %s", i + 1, timestamp, note.getText()));
             noteLabel.setWrapText(true);
             noteLabel.setMinWidth(0);
             noteLabel.setPrefWidth(0);

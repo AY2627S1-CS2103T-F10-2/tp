@@ -23,7 +23,6 @@ import seedu.address.model.student.Telehandle;
 import seedu.address.storage.JsonCourseClassBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
-import seedu.address.testutil.TypicalPersons;
 
 public class CourseClassLogicIntegrationTest {
     @TempDir
@@ -58,22 +57,6 @@ public class CourseClassLogicIntegrationTest {
         logic.execute("cclass");
         assertTrue(logic.getFilteredCourseClassList().isEmpty());
         assertTrue(bookStorage.readCourseClassBook().orElseThrow().getCourseClassList().isEmpty());
-    }
-
-    @Test
-    public void execute_edit_preservesClassStudents() throws Exception {
-        Model model = new ModelManager();
-        CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
-        courseClass.getStudents().addPerson(TypicalPersons.ALICE);
-        model.addCourseClass(courseClass);
-        JsonCourseClassBookStorage bookStorage =
-                new JsonCourseClassBookStorage(temporaryFolder.resolve("classes.json"));
-        Logic logic = new LogicManager(model, new StorageManager(bookStorage,
-                new JsonUserPrefsStorage(temporaryFolder.resolve("prefs.json"))));
-        logic.execute("eclass 1 n/F10-3");
-        assertEquals(courseClass.getStudents(), logic.getFilteredCourseClassList().get(0).getStudents());
-        assertEquals(courseClass.getStudents(),
-                bookStorage.readCourseClassBook().orElseThrow().getCourseClassList().get(0).getStudents());
     }
 
     @Test

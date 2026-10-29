@@ -1,0 +1,60 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+actor User as user USER_COLOR
+
+box Logic LOGIC_COLOR_T1
+participant ":LogicManager" as LogicManager LOGIC_COLOR
+participant ":AddressBookParser" as AddressBookParser LOGIC_COLOR
+participant ":AddCourseClassCommandParser" as AddCourseClassCommandParser LOGIC_COLOR
+participant "a:AddCourseClassCommand" as AddCourseClassCommand LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant ":Model" as Model MODEL_COLOR
+end box
+
+box Storage STORAGE_COLOR_T1
+participant ":Storage" as Storage STORAGE_COLOR
+end box
+
+user -[USER_COLOR]> LogicManager : execute("aclass n/F10-2 c/CS2103T t/tutorial")
+activate LogicManager LOGIC_COLOR
+LogicManager -[LOGIC_COLOR]> AddressBookParser : parseCommand(...)
+activate AddressBookParser LOGIC_COLOR
+AddressBookParser -[LOGIC_COLOR]> AddCourseClassCommandParser : parse(arguments)
+activate AddCourseClassCommandParser LOGIC_COLOR
+AddCourseClassCommandParser -[LOGIC_COLOR]> AddCourseClassCommandParser : parse name, code, and tags
+create AddCourseClassCommand
+AddCourseClassCommandParser -[LOGIC_COLOR]> AddCourseClassCommand : create with new CourseClass
+AddCourseClassCommand -[LOGIC_COLOR]--> AddCourseClassCommandParser : a
+AddCourseClassCommandParser -[LOGIC_COLOR]--> AddressBookParser : a
+deactivate AddCourseClassCommandParser
+AddressBookParser -[LOGIC_COLOR]--> LogicManager : a
+deactivate AddressBookParser
+
+LogicManager -[MODEL_COLOR]> Model : getCourseClassBook()
+Model -[MODEL_COLOR]--> LogicManager : stateBefore
+LogicManager -[MODEL_COLOR]> Model : getUndoHistory()
+Model -[MODEL_COLOR]--> LogicManager : historyBefore
+
+LogicManager -[LOGIC_COLOR]> AddCourseClassCommand : execute(Model)
+activate AddCourseClassCommand LOGIC_COLOR
+AddCourseClassCommand -[MODEL_COLOR]> Model : hasCourseClass(toAdd)
+Model -[MODEL_COLOR]--> AddCourseClassCommand : false
+AddCourseClassCommand -[MODEL_COLOR]> Model : addCourseClass(toAdd)
+Model -[MODEL_COLOR]--> AddCourseClassCommand : class added
+AddCourseClassCommand -[LOGIC_COLOR]--> LogicManager : success result
+deactivate AddCourseClassCommand
+
+LogicManager -[MODEL_COLOR]> Model : addUndoSnapshot(stateBefore)
+Model -[MODEL_COLOR]--> LogicManager : snapshot added
+LogicManager -[STORAGE_COLOR]> Storage : saveCourseClassBookData(\nmodel.getCourseClassBook(),\nmodel.getUndoHistory())
+activate Storage STORAGE_COLOR
+Storage -[STORAGE_COLOR]--> LogicManager : saved
+deactivate Storage
+LogicManager -[USER_COLOR]--> user : new class added
+deactivate LogicManager
+
+@enduml

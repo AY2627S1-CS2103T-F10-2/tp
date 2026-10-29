@@ -1,0 +1,47 @@
+@startuml
+!include style.puml
+skinparam ArrowFontStyle plain
+
+box Logic LOGIC_COLOR_T1
+participant "command:Command" as Command LOGIC_COLOR
+end box
+
+box Model MODEL_COLOR_T1
+participant "targetClass:CourseClass" as CourseClass MODEL_COLOR
+participant "targetStudent:Student" as Student MODEL_COLOR
+participant "updatedStudent:Student" as UpdatedStudent MODEL_COLOR
+participant "students:UniqueStudentList" as UniqueStudentList MODEL_COLOR
+end box
+
+[-> Command : execute(model)
+activate Command
+
+note over Command, CourseClass
+  Class and student lookup, validation, and
+  note construction are omitted.
+end note
+
+Command -> Student : withNote(note) for note, or\nwithoutNoteAt(index) for dnote
+activate Student
+
+Student -> Student : copy notes and apply update
+create UpdatedStudent
+Student -> UpdatedStudent : Student(..., updatedNotes)
+activate UpdatedStudent
+UpdatedStudent --> Student
+deactivate UpdatedStudent
+Student --> Command : updatedStudent
+deactivate Student
+
+Command -> CourseClass : setStudent(targetStudent,\nupdatedStudent)
+activate CourseClass
+CourseClass -> UniqueStudentList : setStudent(targetStudent,\nupdatedStudent)
+activate UniqueStudentList
+UniqueStudentList --> CourseClass
+deactivate UniqueStudentList
+CourseClass --> Command
+deactivate CourseClass
+
+[<-- Command : CommandResult
+deactivate Command
+@enduml
