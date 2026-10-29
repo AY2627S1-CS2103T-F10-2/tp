@@ -53,4 +53,27 @@ public class HomeworkStatusLogicIntegrationTest {
         assertEquals(HomeworkStatus.PENDING, classStorage.readCourseClassBook().orElseThrow()
                 .getCourseClassList().get(1).getHomeworkStatus());
     }
+
+    @Test
+    public void execute_individualHomeworkStatus_appliesOnlyToTargetStudentAndPersists() throws Exception {
+        Model model = new ModelManager();
+        JsonCourseClassBookStorage classStorage = new JsonCourseClassBookStorage(
+                temporaryFolder.resolve("individual-classes.json"));
+        Logic logic = new LogicManager(model, new StorageManager(classStorage,
+                new JsonUserPrefsStorage(temporaryFolder.resolve("individual-preferences.json"))));
+
+        logic.execute("aclass n/T05 c/CS2103T");
+        logic.execute("add n/John Doe t/john_doe c/T05 m/CS2103T");
+        logic.execute("add n/Jane Doe t/jane_doe c/T05 m/CS2103T");
+        logic.execute("hwork 1 s/pending");
+        logic.execute("hwork 1 t/john_doe s/completed");
+
+        var courseClass = model.getFilteredCourseClassList().getFirst();
+        assertEquals(HomeworkStatus.COMPLETED, courseClass.getHomeworkStatus(new Telehandle("john_doe")));
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(new Telehandle("jane_doe")));
+
+        var restoredClass = classStorage.readCourseClassBook().orElseThrow().getCourseClassList().getFirst();
+        assertEquals(HomeworkStatus.COMPLETED, restoredClass.getHomeworkStatus(new Telehandle("john_doe")));
+        assertEquals(HomeworkStatus.PENDING, restoredClass.getHomeworkStatus(new Telehandle("jane_doe")));
+    }
 }

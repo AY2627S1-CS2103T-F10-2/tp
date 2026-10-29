@@ -32,8 +32,10 @@
         <Insets right="10" />
       </GridPane.margin>
     </Label>
+    <Label fx:id="homeworkStatus" styleClass="homework-status" minWidth="0" wrapText="true"
+           GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.valignment="TOP" />
     <VBox fx:id="notesBox" fillWidth="true" maxWidth="Infinity" spacing="3"
-          minWidth="0" GridPane.columnIndex="0" GridPane.rowIndex="1"
+          minWidth="0" GridPane.columnIndex="0" GridPane.rowIndex="2"
           GridPane.columnSpan="3" GridPane.valignment="TOP">
       <GridPane.margin>
         <Insets top="4" />

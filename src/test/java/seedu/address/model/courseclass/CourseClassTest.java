@@ -114,6 +114,25 @@ public class CourseClassTest {
     }
 
     @Test
+    public void studentHomeworkStatus_overridesAndInheritsClassStatus() {
+        Student alice = new Student(new StudentName("Alice Tan"), new Telehandle("alice_tan"));
+        Student benson = new Student(new StudentName("Benson Meier"), new Telehandle("benson"));
+        CourseClass courseClass = new CourseClass(name, code, Set.of(), List.of(alice, benson));
+
+        courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(alice));
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(benson));
+
+        courseClass.setStudentHomeworkStatus(alice.getTelehandle(), HomeworkStatus.COMPLETED);
+        assertEquals(HomeworkStatus.COMPLETED, courseClass.getHomeworkStatus(alice));
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(benson));
+
+        courseClass.clearStudentHomeworkStatus(alice.getTelehandle());
+        assertEquals(HomeworkStatus.PENDING, courseClass.getHomeworkStatus(alice));
+        assertTrue(courseClass.getStudentHomeworkStatuses().isEmpty());
+    }
+
+    @Test
     public void equals_ignoresStudentEnrollment() {
         CourseClass courseClass = new CourseClass(name, code, Set.of());
         CourseClass copy = new CourseClass(name, code, Set.of());

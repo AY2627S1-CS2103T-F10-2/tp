@@ -54,6 +54,7 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.courseclass.CourseClass;
 import seedu.address.model.courseclass.CourseCode;
+import seedu.address.model.courseclass.HomeworkStatus;
 import seedu.address.model.courseclass.Name;
 import seedu.address.model.student.Note;
 import seedu.address.model.student.Student;
@@ -679,6 +680,35 @@ public class CourseClassUiTest {
             assertEquals("1. ", ((Label) students.getChildren().get(0).lookup("#id")).getText());
             assertEquals("Benson Meier", ((Label) students.getChildren().get(1).lookup("#name")).getText());
             assertEquals("2. ", ((Label) students.getChildren().get(1).lookup("#id")).getText());
+            return null;
+        });
+        Platform.runLater(task);
+        task.get(15, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void card_displaysIndividualHomeworkStatuses() throws Exception {
+        if (GuiTestProcess.isRequired()) {
+            GuiTestProcess.run(getClass(), "card_displaysIndividualHomeworkStatuses", temporaryFolder);
+            return;
+        }
+        FutureTask<Void> task = new FutureTask<>(() -> {
+            CourseClass courseClass = new CourseClass(new Name("F10-2"), new CourseCode("CS2103T"), Set.of());
+            Student alice = new Student(new StudentName("Alice Pauline"), new Telehandle("alice"));
+            Student benson = new Student(new StudentName("Benson Meier"), new Telehandle("benson"));
+            courseClass.addStudent(alice);
+            courseClass.addStudent(benson);
+            CourseClassCard card = new CourseClassCard(courseClass, 1);
+            new Scene(card.getRoot(), 700, 300);
+
+            courseClass.setHomeworkStatus(HomeworkStatus.PENDING);
+            courseClass.setStudentHomeworkStatus(alice.getTelehandle(), HomeworkStatus.COMPLETED);
+
+            VBox students = (VBox) card.getRoot().lookup("#studentsBox");
+            assertEquals("Homework: completed", ((Label) students.getChildren().get(0)
+                    .lookup("#homeworkStatus")).getText());
+            assertEquals("Homework: pending", ((Label) students.getChildren().get(1)
+                    .lookup("#homeworkStatus")).getText());
             return null;
         });
         Platform.runLater(task);
