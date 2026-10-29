@@ -17,9 +17,11 @@ Aiken Duet is a desktop application that helps teaching assistants manage classe
 
 ## Getting started
 
-1. Download the latest release from the [releases page](https://github.com/AY2627S1-CS2103T-F10-2/tp/releases).
-2. Run the downloaded JAR file with `java -jar aiken-duet.jar`.
-3. Type `help` in the command box to see the available commands.
+1. Ensure that Java 25 is installed.
+2. Download `addressbook.jar` from the [releases page](https://github.com/AY2627S1-CS2103T-F10-2/tp/releases).
+3. Copy the JAR file to an empty, writable folder.
+4. Open a terminal in that folder and run `java -jar addressbook.jar`.
+5. Type `help` in the command box to see the available commands.
 
 ## Documentation
 
