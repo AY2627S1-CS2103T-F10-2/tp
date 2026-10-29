@@ -29,6 +29,12 @@ public class AddCourseClassCommandParserTest {
     }
 
     @Test
+    public void parse_nameContainsTagPrefix_success() {
+        CourseClass courseClass = new CourseClass(new Name("Group t/05"), new CourseCode("CS2103T"), Set.of());
+        assertParseSuccess(parser, " n/Group t/05 c/CS2103T", new AddCourseClassCommand(courseClass));
+    }
+
+    @Test
     public void parse_missingFieldsOrPreamble_failure() {
         String expected = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddCourseClassCommand.MESSAGE_USAGE);
         assertParseFailure(parser, " n/F10-2", expected);

@@ -157,6 +157,7 @@ Format: `aclass n/NAME c/COURSE_CODE [t/TAG]…​`
 * `COURSE_CODE` identifies the module containing the class group.
 * `t/TAG` is optional and can be provided multiple times.
 * The `n/` and `c/` prefixes are required and can be entered in either order. Each can be used only once.
+  When `n/` comes first, put `c/` before any `t/` tags so that tag-like text in the class name is preserved.
 * A class is considered a duplicate when it has the same name and course code as an existing class, regardless of tags.
 * After a class is added, it appears in the class list and is saved automatically.
 
