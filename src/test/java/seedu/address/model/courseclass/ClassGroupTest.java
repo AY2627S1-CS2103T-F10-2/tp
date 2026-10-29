@@ -21,7 +21,8 @@ public class ClassGroupTest {
 
     @Test
     public void constructor_invalidClassGroups_throwsIllegalArgumentException() {
-        for (String classGroup : new String[] {"", " ", " T05", "F111!", "T_05", "-T05"}) {
+        for (String classGroup : new String[] {"", " ", " T05", "F111!", "T_05", "-T05",
+            "T i/5", "T o/5"}) {
             assertFalse(ClassGroup.isValidClassGroup(classGroup));
             assertThrows(IllegalArgumentException.class, () -> new ClassGroup(classGroup));
         }

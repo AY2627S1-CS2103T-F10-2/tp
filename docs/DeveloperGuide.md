@@ -807,6 +807,12 @@ testers are expected to do more *exploratory* testing.
    1. Test case: `aclass n/ c/CS2103T`<br>
       Expected: The command is rejected for an invalid class-group name; no class is added.
 
+   1. Test case: `aclass n/T i/5 c/CS2103T`<br>
+      Expected: The command is rejected because `i/` is reserved for note indexes; no class is added.
+
+   1. Test case: `aclass n/T o/5 c/CS2103T`<br>
+      Expected: The command is rejected because `o/` is reserved for note observations; no class is added.
+
    1. Test case: `aclass n/T05 c/`<br>
       Expected: The command is rejected for an invalid course code; no class is added.
 
