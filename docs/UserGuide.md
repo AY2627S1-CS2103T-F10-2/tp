@@ -197,7 +197,8 @@ Format: `note t/TELEHANDLE c/CLASS_GROUP m/MODULE_NAME o/OBSERVATION`
 * `TELEHANDLE` identifies the student.
 * `CLASS_GROUP` identifies the tutorial, laboratory, or recitation group.
 * `MODULE_NAME` identifies the module containing the class group.
-* `OBSERVATION` is the non-blank note to record.
+* `OBSERVATION` must contain at least one visible character. Whitespace and invisible Unicode characters alone are
+  rejected.
 * `o/OBSERVATION` must be the final parameter. Everything after `o/` is treated as observation text, so the
   observation may contain prefix-like text such as `m/ath`.
 * The date and time are generated automatically when the command is executed.

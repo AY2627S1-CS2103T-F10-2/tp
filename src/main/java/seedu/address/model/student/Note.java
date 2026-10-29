@@ -14,7 +14,7 @@ import seedu.address.commons.util.ToStringBuilder;
  */
 public class Note {
 
-    public static final String MESSAGE_CONSTRAINTS = "Notes should not be blank";
+    public static final String MESSAGE_CONSTRAINTS = "Notes must contain at least one visible character";
 
     private final String text;
     private final LocalDateTime timestamp;
@@ -43,9 +43,17 @@ public class Note {
         return timestamp;
     }
 
-    /** Returns true if the given text is not null or blank. */
+    /** Returns true if the given text contains at least one visible character. */
     public static boolean isValidText(String test) {
-        return test != null && !test.isBlank();
+        return test != null && test.codePoints().anyMatch(Note::isVisibleCharacter);
+    }
+
+    /** Returns true if {@code codePoint} represents visible note content. */
+    private static boolean isVisibleCharacter(int codePoint) {
+        return !Character.isWhitespace(codePoint)
+                && !Character.isSpaceChar(codePoint)
+                && !Character.isISOControl(codePoint)
+                && Character.getType(codePoint) != Character.FORMAT;
     }
 
     @Override
