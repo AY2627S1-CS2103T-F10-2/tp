@@ -182,6 +182,23 @@ public class JsonCourseClassBookStorageTest {
     }
 
     @Test
+    public void read_reservedPrefixInCurrentDataOrUndoHistory_throwsDataLoadingException() throws Exception {
+        Path file = temporaryFolder.resolve("legacy-prefixes.json");
+        JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
+        for (String prefix : new String[] {"n/", "t/", "c/", "m/", "i/", "o/"}) {
+            String book = "{\"courseClasses\":[{\"name\":\"Group " + prefix
+                    + "05\",\"courseCode\":\"CS2103T\",\"tags\":[]}]}";
+            for (String json : new String[] {book, "{\"courseClasses\":[],\"undoHistory\":[" + book + "]}"}) {
+                Files.writeString(file, json);
+                DataLoadingException exception = assertThrows(DataLoadingException.class,
+                        storage::readCourseClassBookData);
+                assertEquals(Name.MESSAGE_CONSTRAINTS, exception.getCause().getMessage());
+                assertEquals(json, Files.readString(file));
+            }
+        }
+    }
+
+    @Test
     public void read_invalidOrDuplicateClasses_throwsDataLoadingException() throws Exception {
         Path file = temporaryFolder.resolve("classes.json");
         JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);

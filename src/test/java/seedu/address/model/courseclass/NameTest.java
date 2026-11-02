@@ -12,7 +12,7 @@ public class NameTest {
     @Test
     public void constructor_validNames_success() {
         for (String name : new String[] {"F", "F111", "123", "Tutorial 1", "École", "E\u0301cole",
-            "Tutor's group", "F10-2", "L01/L02"}) {
+            "Tutor's group", "F10-2", "L01/L02", "Group-t/05", "Group math/05"}) {
             assertTrue(Name.isValidName(name));
             assertEquals(name, new Name(name).fullName);
             assertEquals(name, new Name(name).toString());
@@ -22,7 +22,7 @@ public class NameTest {
     @Test
     public void constructor_invalidNames_throwsIllegalArgumentException() {
         for (String name : new String[] {"", " ", " F111", "F111!", "T_05", "-T05", "F\n111",
-            "T i/5", "T o/5"}) {
+            "T n/5", "T t/5", "T c/5", "T m/5", "T i/5", "T o/5"}) {
             assertFalse(Name.isValidName(name));
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Name(name));
             assertEquals(Name.MESSAGE_CONSTRAINTS, exception.getMessage());

@@ -29,9 +29,22 @@ public class AddCourseClassCommandParserTest {
     }
 
     @Test
-    public void parse_nameContainsTagPrefix_success() {
-        CourseClass courseClass = new CourseClass(new Name("Group t/05"), new CourseCode("CS2103T"), Set.of());
-        assertParseSuccess(parser, " n/Group t/05 c/CS2103T", new AddCourseClassCommand(courseClass));
+    public void parse_nameContainsReservedPrefix_failure() {
+        for (String prefix : new String[] {"t/", "m/", "i/", "o/"}) {
+            assertParseFailure(parser, " n/Group " + prefix + "05 c/CS2103T", Name.MESSAGE_CONSTRAINTS);
+        }
+        for (Prefix prefix : new Prefix[] {CliSyntax.PREFIX_NAME, CliSyntax.PREFIX_CODE}) {
+            assertParseFailure(parser, " n/Group " + prefix + "05 c/CS2103T",
+                    Messages.getErrorMessageForDuplicatePrefixes(prefix));
+        }
+    }
+
+    @Test
+    public void parse_nameContainsPunctuation_success() {
+        for (String name : new String[] {"Tutor's group", "F10-2", "L01/L02", "Group-t/05", "Group math/05"}) {
+            assertParseSuccess(parser, " n/" + name + " c/CS2103T", new AddCourseClassCommand(
+                    new CourseClass(new Name(name), new CourseCode("CS2103T"), Set.of())));
+        }
     }
 
     @Test

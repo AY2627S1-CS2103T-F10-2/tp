@@ -30,8 +30,7 @@ public class AddCourseClassCommandParser implements Parser<AddCourseClassCommand
         int namePosition = findPrefixPosition(trimmedArgs, PREFIX_NAME);
         int codePosition = findPrefixPosition(trimmedArgs, PREFIX_CODE);
 
-        // When the name comes first, parse the code before looking for tags. This keeps tag-like text in the
-        // name, such as "Group t/05", from being mistaken for an actual tag.
+        // When the name comes first, validate the full name before looking for tags after the code.
         if (namePosition == 0 && codePosition > namePosition) {
             return parseNameBeforeCode(trimmedArgs, codePosition);
         }

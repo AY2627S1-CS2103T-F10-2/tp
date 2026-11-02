@@ -69,6 +69,33 @@ public class EditCourseClassCommandParserTest {
     }
 
     @Test
+    public void parse_nameContainsReservedUnrecognizedPrefix_failure() {
+        for (String prefix : new String[] {"m/", "i/", "o/"}) {
+            assertParseFailure(parser, "1 n/Group " + prefix + "05", Name.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    @Test
+    public void parse_nameFollowedByTagAndCode_success() {
+        EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
+        descriptor.setName(new Name("Group"));
+        descriptor.setTags(Set.of(new Tag("05")));
+        descriptor.setCourseCode(new CourseCode("CS2101"));
+        assertParseSuccess(parser, "1 n/Group t/05 c/CS2101",
+                new EditCourseClassCommand(Index.fromOneBased(1), descriptor));
+    }
+
+    @Test
+    public void parse_nameContainsPunctuation_success() {
+        for (String name : new String[] {"Tutor's group", "F10-2", "L01/L02", "Group-t/05", "Group math/05"}) {
+            EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
+            descriptor.setName(new Name(name));
+            assertParseSuccess(parser, "1 n/" + name,
+                    new EditCourseClassCommand(Index.fromOneBased(1), descriptor));
+        }
+    }
+
+    @Test
     public void parse_duplicateFields_failure() {
         assertParseFailure(parser, "1 n/F10-2 n/F10-3",
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_NAME));
