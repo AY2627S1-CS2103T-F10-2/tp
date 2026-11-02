@@ -12,7 +12,8 @@ public class CourseCode {
 
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Course Codes should only contain alphanumeric characters, spaces, #, @ and $";
+            "Course Codes should only contain alphanumeric characters, spaces, #, @ and $,"
+                + " should not be blank and be at most 50 characters!";
     public static final String VALIDATION_REGEX = "(?=.*[a-zA-Z0-9#@$])[a-zA-Z0-9 #@$]+";
     public final String value;
 
@@ -31,7 +32,7 @@ public class CourseCode {
      * Returns true if a given string is a valid course code.
      */
     public static boolean isValidCourseCode(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return test.length() <= 50 && test.matches(VALIDATION_REGEX);
     }
 
     @Override

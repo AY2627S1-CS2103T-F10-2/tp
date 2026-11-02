@@ -153,7 +153,8 @@ Adds a class group to the system.
 Format: `aclass n/NAME c/COURSE_CODE [t/TAG]…​`
 
 * `NAME` is the class group name. It cannot contain `n/`, `t/`, `c/`, `m/`, `i/` or `o/` immediately after a space.
-* `COURSE_CODE` identifies the module containing the class group.
+* `COURSE_CODE` identifies the module containing the class group. It must not be blank and is limited to 50 characters,
+  including spaces. It can contain English letters, digits, spaces, `#`, `@` and `$`.
 * `t/TAG` is optional and can be provided multiple times.
 * The `n/` and `c/` prefixes are required and can be entered in either order. Each can be used only once.
   When `n/` comes first, the full text up to `c/` is treated as the class name. Put actual `t/` tags after `c/`.

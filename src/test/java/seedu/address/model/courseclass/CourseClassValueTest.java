@@ -30,6 +30,22 @@ public class CourseClassValueTest {
     }
 
     @Test
+    public void courseCode_lengthLimit_acceptsUpTo50Characters() throws Exception {
+        for (int length : new int[] {49, 50}) {
+            String code = "C".repeat(length);
+            assertTrue(CourseCode.isValidCourseCode(code));
+            assertEquals(code, new CourseCode(code).value);
+            assertEquals(new CourseCode(code), ParserUtil.parseCourseCode(" " + code + " "));
+        }
+        String tooLong = "C".repeat(51);
+        assertFalse(CourseCode.isValidCourseCode(tooLong));
+        assertEquals(CourseCode.MESSAGE_CONSTRAINTS,
+                assertThrows(IllegalArgumentException.class, () -> new CourseCode(tooLong)).getMessage());
+        assertEquals(CourseCode.MESSAGE_CONSTRAINTS,
+                assertThrows(ParseException.class, () -> ParserUtil.parseCourseCode(tooLong)).getMessage());
+    }
+
+    @Test
     public void name_validValues_acceptsAccentsAndClassNames() {
         for (String name : new String[] {"F10-2", "Class 1", "École", "O'Brien", "Class/Tutorial"}) {
             assertTrue(Name.isValidName(name), name);

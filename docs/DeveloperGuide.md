@@ -174,6 +174,10 @@ once because tags are represented as a set. The parser rejects a non-empty pream
 duplicate `n/` or `c/` prefixes. `ParserUtil` validates the name, course code, and tags before the parser constructs
 the `CourseClass` and `AddCourseClassCommand` objects.
 
+`CourseCode.isValidCourseCode` enforces a maximum of 50 characters, including spaces, and rejects blank values.
+Only English letters, digits, spaces, `#`, `@` and `$` are allowed. This validation applies to commands and storage;
+saved course codes longer than 50 characters, including those in undo history, cause the file to fail loading.
+
 #### Execution and persistence
 
 `AddCourseClassCommand#execute` first calls `Model#hasCourseClass`. Course-class identity is defined by
