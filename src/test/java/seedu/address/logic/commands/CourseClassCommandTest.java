@@ -33,6 +33,41 @@ public class CourseClassCommandTest {
     private final CourseClass second = new CourseClass(new Name("F10-3"), new CourseCode("CS2103T"), Set.of());
 
     @Test
+    public void find_oneMatchingClass_usesSingularClass() {
+        model.addCourseClass(first);
+        model.addCourseClass(second);
+
+        CommandResult result = new FindCourseClassCommand(
+                new NameContainsKeywordsPredicate(List.of("F10-2"))).execute(model);
+
+        assertEquals("1 course class listed!", result.getFeedbackToUser());
+        assertEquals(List.of(first), model.getFilteredCourseClassList());
+    }
+
+    @Test
+    public void find_multipleMatchingClasses_usesPluralClasses() {
+        model.addCourseClass(first);
+        model.addCourseClass(second);
+
+        CommandResult result = new FindCourseClassCommand(
+                new NameContainsKeywordsPredicate(List.of("F10-2", "F10-3"))).execute(model);
+
+        assertEquals("2 course classes listed!", result.getFeedbackToUser());
+        assertEquals(List.of(first, second), model.getFilteredCourseClassList());
+    }
+
+    @Test
+    public void find_noMatchingClasses_usesPluralClasses() {
+        model.addCourseClass(first);
+
+        CommandResult result = new FindCourseClassCommand(
+                new NameContainsKeywordsPredicate(List.of("F10-3"))).execute(model);
+
+        assertEquals("0 course classes listed!", result.getFeedbackToUser());
+        assertEquals(List.of(), model.getFilteredCourseClassList());
+    }
+
+    @Test
     public void commandEquality_comparesValuesAndRejectsOtherTypes() {
         assertEquality(new AddCourseClassCommand(first), new AddCourseClassCommand(first),
                 new AddCourseClassCommand(second));

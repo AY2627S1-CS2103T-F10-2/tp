@@ -24,6 +24,19 @@ public class FindStudentCommandTest {
             new StudentNameContainsKeywordsPredicate(List.of("Alex"));
 
     @Test
+    public void execute_oneMatchingStudent_usesSingularEnrolment() {
+        Model model = new ModelManager();
+        CourseClass tutorial = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
+        tutorial.addStudent(new Student(new StudentName("Alex Tan"), new Telehandle("alextan")));
+        model.addCourseClass(tutorial);
+
+        String feedback = new FindStudentCommand(alexPredicate).execute(model).getFeedbackToUser();
+
+        assertEquals("1 matching student enrolment found:" + System.lineSeparator()
+                + "1. Alex Tan (@alextan) — T05, CS2103T", feedback);
+    }
+
+    @Test
     public void execute_matchingStudents_reportsDetailsAndClassMembership() {
         Model model = new ModelManager();
         CourseClass tutorial = new CourseClass(new Name("T05"), new CourseCode("CS2103T"), Set.of());
@@ -36,7 +49,7 @@ public class FindStudentCommandTest {
 
         String feedback = new FindStudentCommand(alexPredicate).execute(model).getFeedbackToUser();
 
-        assertEquals(String.format(FindStudentCommand.MESSAGE_MATCHES_FOUND, 2,
+        assertEquals(String.format("2 matching student enrolments found:%n%s",
                 "1. Alex Tan (@alextan) — T05, CS2103T" + System.lineSeparator()
                         + "2. Alex Lim (@alexlim) — L01, CS2101"), feedback);
     }
@@ -54,7 +67,7 @@ public class FindStudentCommandTest {
 
         String feedback = new FindStudentCommand(alexPredicate).execute(model).getFeedbackToUser();
 
-        assertEquals(String.format(FindStudentCommand.MESSAGE_MATCHES_FOUND, 2,
+        assertEquals(String.format("2 matching student enrolments found:%n%s",
                 "1. Alex Tan (@alextan) — T05, CS2103T" + System.lineSeparator()
                         + "2. Alex Tan (@alextan) — L01, CS2101"), feedback);
     }

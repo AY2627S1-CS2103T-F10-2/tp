@@ -30,9 +30,10 @@ public class FindCourseClassCommand extends Command {
     public CommandResult execute(Model model) {
         requireNonNull(model);
         model.updateFilteredCourseClassList(predicate);
-        return new CommandResult(
-                String.format(Messages.MESSAGE_COURSE_CLASSES_LISTED_OVERVIEW,
-                        model.getFilteredCourseClassList().size()));
+        int matchCount = model.getFilteredCourseClassList().size();
+        return new CommandResult(String.format(matchCount == 1
+                ? Messages.MESSAGE_COURSE_CLASS_LISTED_OVERVIEW
+                : Messages.MESSAGE_COURSE_CLASSES_LISTED_OVERVIEW, matchCount));
     }
 
     @Override

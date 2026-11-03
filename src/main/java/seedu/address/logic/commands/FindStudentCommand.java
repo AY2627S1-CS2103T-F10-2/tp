@@ -21,7 +21,8 @@ public class FindStudentCommand extends Command {
             + "Example: " + COMMAND_WORD + " Alex Bernice";
 
     public static final String MESSAGE_NO_MATCHES = "No matching student enrolments found.";
-    public static final String MESSAGE_MATCHES_FOUND = "%1$d matching student enrolment(s) found:%n%2$s";
+    public static final String MESSAGE_MATCH_FOUND = "%1$d matching student enrolment found:%n%2$s";
+    public static final String MESSAGE_MATCHES_FOUND = "%1$d matching student enrolments found:%n%2$s";
 
     private final StudentNameContainsKeywordsPredicate predicate;
 
@@ -52,7 +53,8 @@ public class FindStudentCommand extends Command {
         if (matchCount == 0) {
             return new CommandResult(MESSAGE_NO_MATCHES);
         }
-        return new CommandResult(String.format(MESSAGE_MATCHES_FOUND, matchCount, matches));
+        return new CommandResult(String.format(matchCount == 1 ? MESSAGE_MATCH_FOUND : MESSAGE_MATCHES_FOUND,
+                matchCount, matches));
     }
 
     @Override

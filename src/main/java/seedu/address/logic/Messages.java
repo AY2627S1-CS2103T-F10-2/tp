@@ -14,7 +14,8 @@ public class Messages {
     public static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command.";
     public static final String MESSAGE_INVALID_COURSE_CLASS_DISPLAYED_INDEX =
             "The course class index provided is invalid.";
-    public static final String MESSAGE_COURSE_CLASSES_LISTED_OVERVIEW = "%1$d course class(es) listed!";
+    public static final String MESSAGE_COURSE_CLASS_LISTED_OVERVIEW = "%1$d course class listed!";
+    public static final String MESSAGE_COURSE_CLASSES_LISTED_OVERVIEW = "%1$d course classes listed!";
     public static final String MESSAGE_INVALID_COMMAND_FORMAT = "Invalid command format!\n%1$s";
     public static final String MESSAGE_DUPLICATE_FIELDS =
                 "Multiple values specified for the following single-valued field(s): ";
