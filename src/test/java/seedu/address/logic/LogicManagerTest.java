@@ -73,6 +73,37 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void execute_readOnlyCommands_doesNotSaveToReadOnlyStorage() throws Exception {
+        logic.execute("aclass n/T05 c/CS2103T");
+        CourseClassBook stateBefore = new CourseClassBook(model.getCourseClassBook());
+        List<? extends ReadOnlyCourseClassBook> historyBefore = model.getUndoHistory();
+        int[] saveAttempts = {0};
+        JsonCourseClassBookStorage readOnlyStorage =
+                new JsonCourseClassBookStorage(temporaryFolder.resolve("readOnly.json")) {
+                    @Override
+                    public void saveCourseClassBookData(ReadOnlyCourseClassBook courseClassBook,
+                            List<? extends ReadOnlyCourseClassBook> undoHistory) throws IOException {
+                        saveAttempts[0]++;
+                        throw DUMMY_AD_EXCEPTION;
+                    }
+                };
+        logic = new LogicManager(model, new StorageManager(readOnlyStorage,
+                new JsonUserPrefsStorage(temporaryFolder.resolve("readOnlyPrefs.json"))));
+
+        assertTrue(logic.execute("help").isShowHelp());
+        logic.execute("fclass L01");
+        assertTrue(model.getFilteredCourseClassList().isEmpty());
+        assertEquals(ListCourseClassCommand.MESSAGE_SUCCESS, logic.execute("lclass").getFeedbackToUser());
+        assertEquals(stateBefore.getCourseClassList(), model.getFilteredCourseClassList());
+        logic.execute("fstudent Alex");
+        assertTrue(logic.execute("exit").isExit());
+
+        assertEquals(0, saveAttempts[0]);
+        assertEquals(stateBefore, model.getCourseClassBook());
+        assertEquals(historyBefore, model.getUndoHistory());
+    }
+
+    @Test
     public void execute_storageThrowsIoException_throwsCommandException() {
         assertCommandFailureForExceptionFromStorage(DUMMY_IO_EXCEPTION, String.format(
                 LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage()));
