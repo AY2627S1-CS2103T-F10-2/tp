@@ -33,6 +33,25 @@ public class StudentNameTest {
     }
 
     @Test
+    public void constructor_nameWithinLengthLimit_success() {
+        for (int length : new int[] {1, 49, 50}) {
+            String name = "A".repeat(length);
+            assertTrue(StudentName.isValidName(name));
+            assertEquals(name, new StudentName(name).fullName);
+        }
+    }
+
+    @Test
+    public void constructor_nameExceedsLengthLimit_throwsIllegalArgumentException() {
+        for (String name : new String[] {"A".repeat(51), "A ".repeat(10000) + "A"}) {
+            assertFalse(StudentName.isValidName(name));
+            IllegalArgumentException exception =
+                    assertThrows(IllegalArgumentException.class, () -> new StudentName(name));
+            assertEquals(StudentName.MESSAGE_CONSTRAINTS, exception.getMessage());
+        }
+    }
+
+    @Test
     public void equals_sameValue_returnsTrue() {
         StudentName first = new StudentName("John Doe");
         StudentName second = new StudentName("John Doe");
