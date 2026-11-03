@@ -11,6 +11,7 @@ import seedu.address.commons.core.LogsCenter;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.DeleteStudentCommand;
+import seedu.address.logic.commands.UndoCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -74,7 +75,9 @@ public class LogicManager implements Logic {
             if (command.isMutating() && !courseClassBooksEqualForUndo(stateBefore, model.getCourseClassBook())) {
                 model.addUndoSnapshot(stateBefore);
             }
-            saveCourseClassBook();
+            if (command.isMutating() || command instanceof UndoCommand) {
+                saveCourseClassBook();
+            }
             return commandResult;
         } catch (CommandException e) {
             model.setCourseClassBook(stateBefore);
