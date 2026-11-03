@@ -30,8 +30,7 @@ public class AddCourseClassCommandParser implements Parser<AddCourseClassCommand
         int namePosition = findPrefixPosition(trimmedArgs, PREFIX_NAME);
         int codePosition = findPrefixPosition(trimmedArgs, PREFIX_CODE);
 
-        // When the name comes first, parse the code before looking for tags. This keeps tag-like text in the
-        // name, such as "Group t/05", from being mistaken for an actual tag.
+        // When the name comes first, validate the full name before looking for tags after the code.
         if (namePosition == 0 && codePosition > namePosition) {
             return parseNameBeforeCode(trimmedArgs, codePosition);
         }
@@ -46,7 +45,7 @@ public class AddCourseClassCommandParser implements Parser<AddCourseClassCommand
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_CODE);
         Name name = ParserUtil.parseCourseClassName(argMultimap.getValue(PREFIX_NAME).get());
-        CourseCode code = ParserUtil.parseCourseCode(argMultimap.getValue(PREFIX_CODE).get());
+        CourseCode code = ParserUtil.parseNewCourseCode(argMultimap.getValue(PREFIX_CODE).get());
         Set<Tag> tags = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
 
         return new AddCourseClassCommand(new CourseClass(name, code, tags));
@@ -67,7 +66,7 @@ public class AddCourseClassCommandParser implements Parser<AddCourseClassCommand
         codeAndTags.verifyNoDuplicatePrefixesFor(PREFIX_CODE);
 
         Name name = ParserUtil.parseCourseClassName(nameValue);
-        CourseCode code = ParserUtil.parseCourseCode(codeAndTags.getValue(PREFIX_CODE).orElseThrow());
+        CourseCode code = ParserUtil.parseNewCourseCode(codeAndTags.getValue(PREFIX_CODE).orElseThrow());
         Set<Tag> tags = ParserUtil.parseTags(codeAndTags.getAllValues(PREFIX_TAG));
 
         return new AddCourseClassCommand(new CourseClass(name, code, tags));

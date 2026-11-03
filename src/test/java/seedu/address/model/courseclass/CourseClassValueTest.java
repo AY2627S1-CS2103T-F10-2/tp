@@ -30,6 +30,21 @@ public class CourseClassValueTest {
     }
 
     @Test
+    public void courseCode_lengthLimit_acceptsUpTo50Characters() throws Exception {
+        for (int length : new int[] {49, 50}) {
+            String code = "C".repeat(length);
+            assertTrue(CourseCode.isValidCourseCode(code));
+            assertEquals(code, new CourseCode(code).value);
+            assertEquals(new CourseCode(code), ParserUtil.parseNewCourseCode(" " + code + " "));
+        }
+        String tooLong = "C".repeat(51);
+        assertTrue(CourseCode.isValidCourseCode(tooLong));
+        assertEquals(new CourseCode(tooLong), ParserUtil.parseCourseCode(tooLong));
+        assertEquals(ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS,
+                assertThrows(ParseException.class, () -> ParserUtil.parseNewCourseCode(tooLong)).getMessage());
+    }
+
+    @Test
     public void name_validValues_acceptsAccentsAndClassNames() {
         for (String name : new String[] {"F10-2", "Class 1", "École", "O'Brien", "Class/Tutorial"}) {
             assertTrue(Name.isValidName(name), name);
@@ -50,7 +65,7 @@ public class CourseClassValueTest {
     public void parseValues_trimsAndReportsConstraints() throws Exception {
         assertEquals(new Name("F10-2"), ParserUtil.parseCourseClassName("  F10-2  "));
         assertEquals(new CourseCode("CS2103T"), ParserUtil.parseCourseCode("  CS2103T  "));
-        assertEquals(Name.MESSAGE_CONSTRAINTS,
+        assertEquals(ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS,
                 assertThrows(ParseException.class, () -> ParserUtil.parseCourseClassName("!")).getMessage());
         assertEquals(CourseCode.MESSAGE_CONSTRAINTS,
                 assertThrows(ParseException.class, () -> ParserUtil.parseCourseCode("!")).getMessage());

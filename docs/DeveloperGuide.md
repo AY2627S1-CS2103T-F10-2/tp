@@ -168,11 +168,16 @@ contains a class-group name, a course code, an optional set of tags, and an init
 * `c/` for the course code.
 
 Both prefixes are required and may appear in either order. When `n/` appears first, the parser finds the following
-`c/` boundary before tokenizing tags. This preserves prefix-like text in a class name (for example, `Group t/05`),
-while actual `t/` tags remain after `c/`. `t/` is optional and may be repeated; repeated identical tags are stored
+`c/` boundary before tokenizing tags. `ParserUtil.parseCourseClassName` rejects
+`n/`, `t/`, `c/`, `m/`, `i/` and `o/` after a space when creating or renaming a class;
+actual `t/` tags remain after `c/`. `t/` is optional and may be repeated; repeated identical tags are stored
 once because tags are represented as a set. The parser rejects a non-empty preamble, missing required prefixes, and
 duplicate `n/` or `c/` prefixes. `ParserUtil` validates the name, course code, and tags before the parser constructs
 the `CourseClass` and `AddCourseClassCommand` objects.
+
+`ParserUtil.parseNewCourseCode` enforces a maximum of 50 characters, including spaces, for `aclass` and `eclass`.
+Only English letters, digits, spaces, `#`, `@` and `$` are allowed, and blank values are rejected.
+`CourseCode` retains its previous validation so longer legacy codes remain loadable and usable in references.
 
 #### Execution and persistence
 
@@ -194,10 +199,15 @@ The sequence diagram below shows the successful execution flow for
 #### Testing
 
 The feature is covered by parser, command, integration, UI, and storage tests. In particular,
-`AddCourseClassCommandParserTest` covers valid prefix order, prefix-like text in class names, optional and repeated
+`AddCourseClassCommandParserTest` covers valid prefix order, reserved prefixes in class names, optional and repeated
 tags, missing fields, preambles, duplicate prefixes, and invalid values. `AddCourseClassCommandIntegrationTest`
 verifies that a class is added and that an identical class is rejected. The broader course-class integration and
 storage tests verify display and persistence behaviour.
+
+Compatibility: previously valid names such as `Group t/05` and course codes longer than 50 characters remain
+loadable and survive saving, including in undo history. The new restrictions apply only when creating or changing
+these fields through `aclass` or `eclass`. Legacy names containing command prefixes can still be ambiguous in
+student/note commands; rename these classes by index using `eclass` before using those commands.
 
 ### Updating class homework status: `hwork`
 

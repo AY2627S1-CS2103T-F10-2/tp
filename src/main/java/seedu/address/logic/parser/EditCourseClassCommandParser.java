@@ -44,7 +44,7 @@ public class EditCourseClassCommandParser implements Parser<EditCourseClassComma
         }
         if (argMultimap.getValue(PREFIX_CODE).isPresent()) {
             editCourseClassDescriptor.setCourseCode(
-                    ParserUtil.parseCourseCode(argMultimap.getValue(PREFIX_CODE).get()));
+                    ParserUtil.parseNewCourseCode(argMultimap.getValue(PREFIX_CODE).get()));
         }
         ParserUtil.parseTagsForEdit(argMultimap.getAllValues(PREFIX_TAG))
                 .ifPresent(editCourseClassDescriptor::setTags);

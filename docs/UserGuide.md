@@ -152,22 +152,24 @@ Adds a class group to the system.
 
 Format: `aclass n/NAME c/COURSE_CODE [t/TAG]…​`
 
-* `NAME` is the class group name. It cannot contain the reserved note-command prefixes `i/` or `o/` after a space.
-* `COURSE_CODE` identifies the module containing the class group.
+* When adding or renaming a class, `NAME` cannot contain `n/`, `t/`, `c/`, `m/`, `i/` or `o/` immediately after a space.
+* `COURSE_CODE` identifies the module containing the class group. When adding or changing it, it must not be blank
+  and is limited to 50 characters, including spaces. It can contain English letters, digits, spaces, `#`, `@` and `$`.
 * `t/TAG` is optional and can be provided multiple times.
 * The `n/` and `c/` prefixes are required and can be entered in either order. Each can be used only once.
   When `n/` comes first, the full text up to `c/` is treated as the class name. Put actual `t/` tags after `c/`.
-  This allows a class name itself to contain tag-like text, such as `Group t/05`.
 * A class is considered a duplicate when it has the same name and course code as an existing class, regardless of tags.
 * After a class is added, it appears in the class list and is saved automatically.
 
 Examples:
 * `aclass n/F10-2 c/CS2103T` adds a class group without tags.
 * `aclass n/F10-2 c/CS2103T t/tutorial t/odd-week` adds a class group with two tags.
-* `aclass n/Group t/05 c/CS2103T` adds a class whose name is `Group t/05`.
 
 If the required prefixes are missing, duplicated, or contain invalid values, the application shows the command format
 and does not add the class. Attempting to add an existing class shows `This class already exists in the system.`
+
+Previously saved names and course codes remain loadable, including undo history. If an older class name contains
+command prefixes, use `eclass INDEX n/NEW_NAME` to rename it before using student/note commands for that class.
 
 ### Removing a student from a class group: `dstudent`
 

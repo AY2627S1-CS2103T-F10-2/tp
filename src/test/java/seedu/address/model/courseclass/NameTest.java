@@ -12,7 +12,8 @@ public class NameTest {
     @Test
     public void constructor_validNames_success() {
         for (String name : new String[] {"F", "F111", "123", "Tutorial 1", "École", "E\u0301cole",
-            "Tutor's group", "F10-2", "L01/L02"}) {
+            "Tutor's group", "F10-2", "L01/L02", "Group-t/05", "Group math/05",
+            "T n/5", "Group t/05", "T c/5", "T m/5"}) {
             assertTrue(Name.isValidName(name));
             assertEquals(name, new Name(name).fullName);
             assertEquals(name, new Name(name).toString());
