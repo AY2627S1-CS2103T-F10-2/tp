@@ -10,7 +10,8 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 public class StudentName {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Names should only contain letters, spaces, accents, apostrophes, and hyphens, and should not be blank";
+            "Names should only contain letters, spaces, accents, apostrophes, and hyphens,"
+                + " should not be blank and be at most 50 characters";
 
     /**
      * A name starts and ends with a letter, and may contain letters, combining marks, apostrophes, hyphens,
@@ -39,7 +40,7 @@ public class StudentName {
      * @return true if {@code test} is valid
      */
     public static boolean isValidName(String test) {
-        return test != null && test.matches(VALIDATION_REGEX);
+        return test != null && test.length() <= 50 && test.matches(VALIDATION_REGEX);
     }
 
     @Override

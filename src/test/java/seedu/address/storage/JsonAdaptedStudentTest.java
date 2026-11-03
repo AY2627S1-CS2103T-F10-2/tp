@@ -22,7 +22,7 @@ public class JsonAdaptedStudentTest {
 
     @Test
     public void toModelType_invalidFields_rejectsMalformedData() {
-        for (String name : new String[] {null, "", "John2"}) {
+        for (String name : new String[] {null, "", "John2", "A".repeat(51)}) {
             assertThrows(IllegalValueException.class, () ->
                     new JsonAdaptedStudent(name, "birdman").toModelType());
         }
@@ -30,6 +30,12 @@ public class JsonAdaptedStudentTest {
             assertThrows(IllegalValueException.class, () ->
                     new JsonAdaptedStudent("John Doe", telehandle).toModelType());
         }
+    }
+
+    @Test
+    public void toModelType_nameAtLengthLimit_returnsStudent() throws Exception {
+        String name = "A".repeat(50);
+        assertEquals(name, new JsonAdaptedStudent(name, "birdman").toModelType().getName().fullName);
     }
 
     @Test

@@ -19,6 +19,20 @@ public class AddStudentCommandParserTest {
     private final AddStudentCommandParser parser = new AddStudentCommandParser();
 
     @Test
+    public void parse_nameAtLengthLimit_success() {
+        String name = "A".repeat(50);
+        assertParseSuccess(parser, " n/" + name + " t/birdman c/T05 m/CS2103T",
+                new AddStudentCommand(new Student(new StudentName(name), new Telehandle("birdman")),
+                        new ClassGroup("T05"), new CourseCode("CS2103T")));
+    }
+
+    @Test
+    public void parse_nameExceedsLengthLimit_failure() {
+        assertParseFailure(parser, " n/" + "A".repeat(51) + " t/birdman c/T05 m/CS2103T",
+                StudentName.MESSAGE_CONSTRAINTS);
+    }
+
+    @Test
     public void parse_validFields_success() {
         AddStudentCommand expected = new AddStudentCommand(
                 new Student(new StudentName("John Doe"), new Telehandle("birdman")),
