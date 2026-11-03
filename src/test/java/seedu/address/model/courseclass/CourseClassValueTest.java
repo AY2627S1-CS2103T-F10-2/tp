@@ -35,14 +35,13 @@ public class CourseClassValueTest {
             String code = "C".repeat(length);
             assertTrue(CourseCode.isValidCourseCode(code));
             assertEquals(code, new CourseCode(code).value);
-            assertEquals(new CourseCode(code), ParserUtil.parseCourseCode(" " + code + " "));
+            assertEquals(new CourseCode(code), ParserUtil.parseNewCourseCode(" " + code + " "));
         }
         String tooLong = "C".repeat(51);
-        assertFalse(CourseCode.isValidCourseCode(tooLong));
-        assertEquals(CourseCode.MESSAGE_CONSTRAINTS,
-                assertThrows(IllegalArgumentException.class, () -> new CourseCode(tooLong)).getMessage());
-        assertEquals(CourseCode.MESSAGE_CONSTRAINTS,
-                assertThrows(ParseException.class, () -> ParserUtil.parseCourseCode(tooLong)).getMessage());
+        assertTrue(CourseCode.isValidCourseCode(tooLong));
+        assertEquals(new CourseCode(tooLong), ParserUtil.parseCourseCode(tooLong));
+        assertEquals(ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS,
+                assertThrows(ParseException.class, () -> ParserUtil.parseNewCourseCode(tooLong)).getMessage());
     }
 
     @Test
@@ -66,7 +65,7 @@ public class CourseClassValueTest {
     public void parseValues_trimsAndReportsConstraints() throws Exception {
         assertEquals(new Name("F10-2"), ParserUtil.parseCourseClassName("  F10-2  "));
         assertEquals(new CourseCode("CS2103T"), ParserUtil.parseCourseCode("  CS2103T  "));
-        assertEquals(Name.MESSAGE_CONSTRAINTS,
+        assertEquals(ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS,
                 assertThrows(ParseException.class, () -> ParserUtil.parseCourseClassName("!")).getMessage());
         assertEquals(CourseCode.MESSAGE_CONSTRAINTS,
                 assertThrows(ParseException.class, () -> ParserUtil.parseCourseCode("!")).getMessage());

@@ -31,7 +31,8 @@ public class AddCourseClassCommandParserTest {
     @Test
     public void parse_nameContainsReservedPrefix_failure() {
         for (String prefix : new String[] {"t/", "m/", "i/", "o/"}) {
-            assertParseFailure(parser, " n/Group " + prefix + "05 c/CS2103T", Name.MESSAGE_CONSTRAINTS);
+            assertParseFailure(parser, " n/Group " + prefix + "05 c/CS2103T",
+                    ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
         }
         for (Prefix prefix : new Prefix[] {CliSyntax.PREFIX_NAME, CliSyntax.PREFIX_CODE}) {
             assertParseFailure(parser, " n/Group " + prefix + "05 c/CS2103T",
@@ -48,6 +49,14 @@ public class AddCourseClassCommandParserTest {
     }
 
     @Test
+    public void parse_courseCodeLengthLimit() {
+        String code = "C".repeat(50);
+        assertParseSuccess(parser, " n/Group c/" + code, new AddCourseClassCommand(
+                new CourseClass(new Name("Group"), new CourseCode(code), Set.of())));
+        assertParseFailure(parser, " n/Group c/" + code + "C", ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS);
+    }
+
+    @Test
     public void parse_missingFieldsOrPreamble_failure() {
         String expected = String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddCourseClassCommand.MESSAGE_USAGE);
         assertParseFailure(parser, " n/F10-2", expected);
@@ -61,10 +70,10 @@ public class AddCourseClassCommandParserTest {
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_NAME));
         assertParseFailure(parser, " n/F10-2 c/CS2103T c/CS2101",
                 Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_CODE));
-        assertParseFailure(parser, " n/ c/CS2103T", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " n/T i/5 c/CS2103T", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " n/T o/5 c/CS2103T", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, " n/F10-2 c/", CourseCode.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, " n/ c/CS2103T", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, " n/T i/5 c/CS2103T", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, " n/T o/5 c/CS2103T", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, " n/F10-2 c/", ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS);
         assertParseFailure(parser, " n/F10-2 c/CS2103T t/invalid*tag", Tag.MESSAGE_CONSTRAINTS);
     }
 }

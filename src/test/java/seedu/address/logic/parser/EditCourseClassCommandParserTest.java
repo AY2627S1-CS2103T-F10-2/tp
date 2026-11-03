@@ -30,6 +30,15 @@ public class EditCourseClassCommandParserTest {
     }
 
     @Test
+    public void parse_courseCodeLengthLimit() {
+        String code = "C".repeat(50);
+        EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
+        descriptor.setCourseCode(new CourseCode(code));
+        assertParseSuccess(parser, "1 c/" + code, new EditCourseClassCommand(Index.fromOneBased(1), descriptor));
+        assertParseFailure(parser, "1 c/" + code + "C", ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS);
+    }
+
+    @Test
     public void parse_onlyCode_success() {
         EditCourseClassDescriptor descriptor = new EditCourseClassDescriptor();
         descriptor.setCourseCode(new CourseCode("CS2101"));
@@ -58,12 +67,12 @@ public class EditCourseClassCommandParserTest {
 
     @Test
     public void parse_invalidFields_failure() {
-        assertParseFailure(parser, "1 n/", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, "1 n/F10*2", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, "1 n/T i/5", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, "1 n/T o/5", Name.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, "1 c/", CourseCode.MESSAGE_CONSTRAINTS);
-        assertParseFailure(parser, "1 c/CS*", CourseCode.MESSAGE_CONSTRAINTS);
+        assertParseFailure(parser, "1 n/", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, "1 n/F10*2", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, "1 n/T i/5", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, "1 n/T o/5", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
+        assertParseFailure(parser, "1 c/", ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS);
+        assertParseFailure(parser, "1 c/CS*", ParserUtil.MESSAGE_NEW_COURSE_CODE_CONSTRAINTS);
         assertParseFailure(parser, "1 t/tutorial*", Tag.MESSAGE_CONSTRAINTS);
         assertParseFailure(parser, "1 t/ t/lab", Tag.MESSAGE_CONSTRAINTS);
     }
@@ -71,7 +80,7 @@ public class EditCourseClassCommandParserTest {
     @Test
     public void parse_nameContainsReservedUnrecognizedPrefix_failure() {
         for (String prefix : new String[] {"m/", "i/", "o/"}) {
-            assertParseFailure(parser, "1 n/Group " + prefix + "05", Name.MESSAGE_CONSTRAINTS);
+            assertParseFailure(parser, "1 n/Group " + prefix + "05", ParserUtil.MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
         }
     }
 

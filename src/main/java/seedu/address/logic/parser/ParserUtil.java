@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
@@ -24,6 +25,12 @@ import seedu.address.model.tag.Tag;
 public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
+    public static final String MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS =
+            seedu.address.model.courseclass.Name.MESSAGE_CONSTRAINTS
+                    + " New class names must not contain n/, t/, c/, m/, i/ or o/ after a space.";
+    public static final String MESSAGE_NEW_COURSE_CODE_CONSTRAINTS =
+            CourseCode.MESSAGE_CONSTRAINTS + ", must not be blank and must be at most 50 characters.";
+    private static final Pattern RESERVED_COMMAND_PREFIX_PATTERN = Pattern.compile(" (?:n|t|c|m|i|o)/");
 
     private ParserUtil() {}
 
@@ -34,8 +41,9 @@ public class ParserUtil {
     public static seedu.address.model.courseclass.Name parseCourseClassName(String name) throws ParseException {
         requireNonNull(name);
         String trimmedName = name.trim();
-        if (!seedu.address.model.courseclass.Name.isValidName(trimmedName)) {
-            throw new ParseException(seedu.address.model.courseclass.Name.MESSAGE_CONSTRAINTS);
+        if (!seedu.address.model.courseclass.Name.isValidName(trimmedName)
+                || RESERVED_COMMAND_PREFIX_PATTERN.matcher(trimmedName).find()) {
+            throw new ParseException(MESSAGE_COURSE_CLASS_NAME_CONSTRAINTS);
         }
         return new seedu.address.model.courseclass.Name(trimmedName);
     }
@@ -49,6 +57,16 @@ public class ParserUtil {
         String trimmedCode = code.trim();
         if (!CourseCode.isValidCourseCode(trimmedCode)) {
             throw new ParseException(CourseCode.MESSAGE_CONSTRAINTS);
+        }
+        return new CourseCode(trimmedCode);
+    }
+
+    /** Parses a code for class creation or editing, while allowing legacy codes in references and storage. */
+    public static CourseCode parseNewCourseCode(String code) throws ParseException {
+        requireNonNull(code);
+        String trimmedCode = code.trim();
+        if (trimmedCode.length() > 50 || !CourseCode.isValidCourseCode(trimmedCode)) {
+            throw new ParseException(MESSAGE_NEW_COURSE_CODE_CONSTRAINTS);
         }
         return new CourseCode(trimmedCode);
     }

@@ -182,19 +182,25 @@ public class JsonCourseClassBookStorageTest {
     }
 
     @Test
-    public void read_reservedPrefixInCurrentDataOrUndoHistory_throwsDataLoadingException() throws Exception {
+    public void read_legacyNamesAndLongCodes_preservesCurrentDataAndUndoHistory() throws Exception {
         Path file = temporaryFolder.resolve("legacy-prefixes.json");
         JsonCourseClassBookStorage storage = new JsonCourseClassBookStorage(file);
-        for (String prefix : new String[] {"n/", "t/", "c/", "m/", "i/", "o/"}) {
+        String code = "C".repeat(51);
+        for (String prefix : new String[] {"n/", "t/", "c/", "m/"}) {
             String book = "{\"courseClasses\":[{\"name\":\"Group " + prefix
-                    + "05\",\"courseCode\":\"CS2103T\",\"tags\":[]}]}";
-            for (String json : new String[] {book, "{\"courseClasses\":[],\"undoHistory\":[" + book + "]}"}) {
-                Files.writeString(file, json);
-                DataLoadingException exception = assertThrows(DataLoadingException.class,
-                        storage::readCourseClassBookData);
-                assertEquals(Name.MESSAGE_CONSTRAINTS, exception.getCause().getMessage());
-                assertEquals(json, Files.readString(file));
-            }
+                    + "05\",\"courseCode\":\"" + code + "\",\"tags\":[]}]}";
+            String json = book.substring(0, book.length() - 1) + ",\"undoHistory\":[" + book + "]}";
+            Files.writeString(file, json);
+            CourseClassBookStorageData restored = storage.readCourseClassBookData().orElseThrow();
+            CourseClass expected = new CourseClass(new Name("Group " + prefix + "05"),
+                    new CourseCode(code), Set.of());
+            assertEquals(List.of(expected), restored.getCourseClassBook().getCourseClassList());
+            assertEquals(List.of(expected), restored.getUndoHistory().getFirst().getCourseClassList());
+            assertEquals(json, Files.readString(file));
+            storage.saveCourseClassBookData(restored.getCourseClassBook(), restored.getUndoHistory());
+            CourseClassBookStorageData reloaded = storage.readCourseClassBookData().orElseThrow();
+            assertEquals(restored.getCourseClassBook(), reloaded.getCourseClassBook());
+            assertEquals(restored.getUndoHistory(), reloaded.getUndoHistory());
         }
     }
 

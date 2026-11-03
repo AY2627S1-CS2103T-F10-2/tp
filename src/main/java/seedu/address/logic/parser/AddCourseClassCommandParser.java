@@ -45,7 +45,7 @@ public class AddCourseClassCommandParser implements Parser<AddCourseClassCommand
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_CODE);
         Name name = ParserUtil.parseCourseClassName(argMultimap.getValue(PREFIX_NAME).get());
-        CourseCode code = ParserUtil.parseCourseCode(argMultimap.getValue(PREFIX_CODE).get());
+        CourseCode code = ParserUtil.parseNewCourseCode(argMultimap.getValue(PREFIX_CODE).get());
         Set<Tag> tags = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
 
         return new AddCourseClassCommand(new CourseClass(name, code, tags));
@@ -66,7 +66,7 @@ public class AddCourseClassCommandParser implements Parser<AddCourseClassCommand
         codeAndTags.verifyNoDuplicatePrefixesFor(PREFIX_CODE);
 
         Name name = ParserUtil.parseCourseClassName(nameValue);
-        CourseCode code = ParserUtil.parseCourseCode(codeAndTags.getValue(PREFIX_CODE).orElseThrow());
+        CourseCode code = ParserUtil.parseNewCourseCode(codeAndTags.getValue(PREFIX_CODE).orElseThrow());
         Set<Tag> tags = ParserUtil.parseTags(codeAndTags.getAllValues(PREFIX_TAG));
 
         return new AddCourseClassCommand(new CourseClass(name, code, tags));

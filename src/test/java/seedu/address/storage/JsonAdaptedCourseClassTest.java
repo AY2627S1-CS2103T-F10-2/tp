@@ -27,7 +27,7 @@ public class JsonAdaptedCourseClassTest {
             assertThrows(IllegalValueException.class, () ->
                     new JsonAdaptedCourseClass(name, "CS2103T", null, null).toModelType());
         }
-        for (String code : new String[] {null, "", "invalid*", "C".repeat(51)}) {
+        for (String code : new String[] {null, "", "invalid*"}) {
             assertThrows(IllegalValueException.class, () ->
                     new JsonAdaptedCourseClass("F10-2", code, null, null).toModelType());
         }

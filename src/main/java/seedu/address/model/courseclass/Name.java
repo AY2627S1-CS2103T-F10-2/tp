@@ -14,7 +14,7 @@ public class Name {
     public static final String MESSAGE_CONSTRAINTS =
             "Names should only contain alphanumeric characters and spaces,"
                 + " accents, apostrophes, slashes, hyphens"
-                + ", should not contain the reserved prefixes n/, t/, c/, m/, i/ or o/ after a space,"
+                + ", should not contain the reserved prefixes i/ or o/ after a space,"
                 + " should not be blank and be at most 50 characters!";
 
     /*
@@ -22,7 +22,7 @@ public class Name {
      * otherwise " " (a blank string) becomes a valid input.
      */
     public static final String VALIDATION_REGEX = "[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N} '/-]*";
-    private static final Pattern RESERVED_COMMAND_PREFIX_PATTERN = Pattern.compile(" (?:n|t|c|m|i|o)/");
+    private static final Pattern RESERVED_NOTE_PREFIX_PATTERN = Pattern.compile(" (?:i|o)/");
 
     public final String fullName;
 
@@ -43,7 +43,7 @@ public class Name {
     public static boolean isValidName(String test) {
         return test.length() <= 50
                 && test.matches(VALIDATION_REGEX)
-                && !RESERVED_COMMAND_PREFIX_PATTERN.matcher(test).find();
+                && !RESERVED_NOTE_PREFIX_PATTERN.matcher(test).find();
     }
 
 
