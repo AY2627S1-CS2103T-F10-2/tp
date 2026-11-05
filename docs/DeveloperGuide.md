@@ -1007,3 +1007,20 @@ testers are expected to do more *exploratory* testing.
    1. _{Explain how to simulate missing or corrupted data files and state the expected behavior.}_
 
 1. _{ more test cases …​ }_
+
+
+## **Use of generative AI**
+
+Codex was used
+throughout the project by members of the team. Their use was widespread and
+included:
+
+* brainstorming and comparing feature and design alternatives;
+* generating and refining portions of implementation code and automated tests;
+* debugging failures and identifying edge cases;
+* reviewing code and pull requests and suggesting improvements;
+* drafting and refining parts of the User Guide and Developer Guide.
+
+All AI-assisted output was reviewed and adapted by team members before being
+included in the project. Code changes were tested before being merged, and the
+team remains responsible for all submitted work.
